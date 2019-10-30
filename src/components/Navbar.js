@@ -7,9 +7,7 @@ class Navbar extends Component {
     M.Dropdown.init(elems, {
       inDuration: 300,
       outDuration: 255,
-
       coverTrigger: false,
-
       constrainWidth: false
     });
   }
@@ -17,7 +15,7 @@ class Navbar extends Component {
   render() {
     return (
       <div>
-        <ul id="about-dropdown" className="dropdown-content">
+        <ul id="about-dropdown" className="dropdown-content red lighten-2">
           <li><a href="#">The Team</a></li>
           <li><a href="#">Contact Us</a></li>
         </ul>

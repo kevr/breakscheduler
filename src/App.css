@@ -1,3 +1,15 @@
+/* white-text does not override specific <li> text color,
+ * so we override it here with plain white. */
+.dropdown-content li > a {
+  color: white;
+}
+
+/* Closest background I could get to the other navbar
+ * items; this requires further research: What is the
+ * exact background-color used by materialize navbar? */
+.dropdown-content li:hover {
+  background-color: rgba(0, 0, 0, 0.0015);
+}
 
 /**
  * .brand-logo.left must be overridden with a relative position
