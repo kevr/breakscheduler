@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
+import Layout from './Layout';
 import logo from '../logo.svg';
-import './Landing.css';
 
 const Landing = () => (
-  <div className="Page">
-
-    <div className="Image Section"> 
-      <img src={logo} alt="Break Schedulers" />
-    </div>
-
+  <Layout>
     <header className="App-header">
       <img src={logo} className="App-logo" alt="logo" />
       <p>
@@ -23,7 +18,7 @@ const Landing = () => (
         Learn React
       </a>
     </header>
-  </div>
+  </Layout>
 );
 
 export default Landing;

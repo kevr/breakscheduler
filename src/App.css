@@ -1,3 +1,14 @@
+
+/**
+ * .brand-logo.left must be overridden with a relative position
+ * at this point: materialize-css linked to this webpage via
+ * public/index.html does not reposition the brand-logo accompanied
+ * by the left class.
+**/
+.brand-logo.left {
+  position: relative;
+}
+
 .App {
   text-align: center;
 }
