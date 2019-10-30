@@ -1,68 +1,41 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Source code for the [breakscheduler.com](https://breakscheduler.com "Break Scheduler") webpage.
 
-## Available Scripts
+## Design
 
-In the project directory, you can run:
+This website is written using React.js for it's front-end choice of framework. It is meant to communicate with a back-end API server which provides contents for some pages via fetching from a database[, as well as user accounts that can be used for support tickets].
 
-### `npm start`
+### Pages
+1. Home (Landing)
+2. Features
+3. Help
+4. Get It
+5. About Us
+    1. The Team
+    2. Contact Us
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+#### Home (Landing)
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+Welcome page to the website. Banners and logos, images of the product and close-ups of most important features of the product.
 
-### `npm test`
+#### Features
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Display of product features. This page should correlate features with business gain, to give a more compelling sales pitch to anybody browsing the product.
 
-### `npm run build`
+#### Get Help
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Technical help directory. Users can search terms in this directory to reveal any matching topics in a grid-like poster format. More of a Q&A section than anything.
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+#### Get It
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Product trial download page and link to purchasing options.
 
-### `npm run eject`
+#### About Us
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+##### The Team
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+A descriptive explanation of who we are, both personally and in business,
+accompanied by a gallery.
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+##### Contact Us
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Contact details. *Break Scheduler* being a B2B product, close relationships are absolutely required to communicate the needs of the business using it. Also, general contact location for any potential clients or questions from bystanders.
