@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import M from 'materialize-css';
+import config from '../config.json';
 
 class Navbar extends Component {
   componentDidMount() {
@@ -23,7 +24,7 @@ class Navbar extends Component {
         <nav>
           <div className="nav-wrapper">
             <div className="container">
-              <a href="#!" className="brand-logo left">{"Break Scheduler"}</a>
+              <a href="#!" className="brand-logo left">{config.appName}</a>
               <ul id="nav-mobile" className="right">
                 <li><Link to="/">Home</Link></li>
                 <li><Link to="/features">Features</Link></li>

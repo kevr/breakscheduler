@@ -2,6 +2,7 @@ import React from 'react';
 import Helmet from 'react-helmet';
 import PropTypes from 'prop-types';
 import Navbar from '../components/Navbar';
+import config from '../config.json';
 
 const Layout = ({ pageTitle, children }) => (
   <div className="Layout">
@@ -13,11 +14,11 @@ const Layout = ({ pageTitle, children }) => (
     }
     {pageTitle !== null ? (
       <Helmet>
-        <title>Break Scheduler - {pageTitle}</title>
+        <title>{config.appName} - {pageTitle}</title>
       </Helmet>
     ) : (
       <Helmet>
-        <title>Break Scheduler</title>
+        <title>{config.appName}</title>
       </Helmet>
     )}
 
