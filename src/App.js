@@ -4,7 +4,10 @@ import {
   Switch,
   Route
 } from 'react-router-dom';
-import { Landing } from './pages';
+import {
+  Landing,
+  NotFound
+} from './pages';
 import './App.css';
 
 const App = () => (
@@ -12,6 +15,7 @@ const App = () => (
     <BrowserRouter>
       <Switch>
         <Route exact path="/" component={Landing} />
+        <Route path="*" component={NotFound} />
       </Switch>
     </BrowserRouter>
   </div>

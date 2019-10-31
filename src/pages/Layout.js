@@ -6,9 +6,18 @@ import Navbar from '../components/Navbar';
 const Layout = ({ pageTitle, children }) => (
   <div className="Layout">
 
-    {pageTitle !== null && (
+    {
+      // If a pageTitle was supplied, append it to
+      // our base web title. Otherwise, set the title
+      // to the base: Break Scheduler.
+    }
+    {pageTitle !== null ? (
       <Helmet>
-        <title>{pageTitle}</title>
+        <title>Break Scheduler - {pageTitle}</title>
+      </Helmet>
+    ) : (
+      <Helmet>
+        <title>Break Scheduler</title>
       </Helmet>
     )}
 
