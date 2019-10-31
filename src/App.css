@@ -4,6 +4,13 @@
   color: white;
 }
 
+.dropdown-content li.active,
+.dropdown-content li.active:hover,
+nav ul li.active,
+nav ul li.active:hover {
+  background-color: rgba(0, 0, 0, 0.225);
+}
+
 /* Closest background I could get to the other navbar
  * items; this requires further research: What is the
  * exact background-color used by materialize navbar? */
