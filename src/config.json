@@ -1,3 +1,4 @@
 {
-  "appName": "Break Scheduler"
+  "appName": "Break Scheduler",
+  "apiPrefix": "http://localhost:6666"
 }
