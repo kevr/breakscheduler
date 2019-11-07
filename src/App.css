@@ -52,3 +52,14 @@ nav ul li.active:hover {
   height: 40vmin;
 }
 
+.memberTitle {
+  font-size: 10px;
+}
+
+.InnerPage {
+  padding-top: 20px;
+}
+
+.memberCard {
+  cursor: pointer;
+}
