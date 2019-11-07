@@ -1,3 +1,19 @@
+/**
+ * html, body and #root should all be flexing vertically
+ * to consume at least the entire page.
+**/
+html {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+body, #root {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
 /* white-text does not override specific <li> text color,
  * so we override it here with plain white. */
 .dropdown-content li > a {
