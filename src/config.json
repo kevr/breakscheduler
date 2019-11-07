@@ -1,4 +1,7 @@
 {
   "appName": "Break Scheduler",
-  "apiPrefix": "http://localhost:6666"
+  "apiPrefix": "http://localhost:5000",
+  "contact": {
+    "email": "kevr.gtalk@gmail.com"
+  }
 }
