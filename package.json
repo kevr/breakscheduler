@@ -5,6 +5,7 @@
   "dependencies": {
     "axios": "^0.19.0",
     "jest": "^24.9.0",
+    "jest-environment-jsdom-fourteen": "^0.1.0",
     "jquery": "^3.4.1",
     "materialize-css": "^1.0.0",
     "react": "^16.11.0",
@@ -18,8 +19,9 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test": "react-scripts test --env=jsdom-fourteen",
+    "eject": "react-scripts eject",
+    "coverage": "react-scripts test --env=jsdom-fourteen --watchAll=false --coverage"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -34,6 +36,13 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "jest": {
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/src/index.js",
+      "/src/serviceWorker.js"
     ]
   }
 }
