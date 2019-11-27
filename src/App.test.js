@@ -120,7 +120,6 @@ test('/help route sets correct title', async () => {
   await expectTitle("Help Directory");
 });
 
-/*
 test('/help/search route sets correct title', async () => {
   const root = render(
     <Bootstrap store={store} route="/help/search">
@@ -138,6 +137,7 @@ test('/help/search route sets correct title', async () => {
   await expectTitle("Help Directory");
 });
 
+/*
 test('/help/support route sets correct title', async () => {
   await act(async () => {
     render(

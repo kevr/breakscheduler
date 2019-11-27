@@ -14,7 +14,8 @@ import config from '../config.json';
 class Help extends Component {
   render() {
     const routes = [
-      { to: "/help", label: "User Manual" }
+      { to: "/help", label: "User Manual" },
+      { to: "/help/search", label: "Search" }
     ];
 
     return (
@@ -23,9 +24,9 @@ class Help extends Component {
 
         <div className="TabContent">
           <Switch>
-            <Route exact path="/help" component={UserManual} />
-            {/* <Route exact path="/help/search" component={Search} /> */}
+            <Route exact path="/help/search" component={Search} />
             {/* <Route exact path="/help/support" component={Support} /> */}
+            <Route exact path="/help" component={UserManual} />
           </Switch>
         </div>
       </Layout>
