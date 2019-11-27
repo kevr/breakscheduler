@@ -21,6 +21,7 @@ class Help extends Component {
     return (
       <Layout pageTitle="Help Directory">
         <ExtendedNavbar routes={routes} />
+        <div style={{ height: "12px" }} />
 
         <div className="TabContent">
           <Switch>
