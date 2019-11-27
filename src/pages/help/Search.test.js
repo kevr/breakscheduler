@@ -13,7 +13,6 @@ import {
 } from '@testing-library/react';
 import mockAxios from 'jest-mock-axios';
 import axios from 'axios';
-import App from '../../App';
 import Search from './Search';
 import config from '../../config.json';
 import Reducers from '../../reducers';
@@ -46,32 +45,37 @@ afterEach(tearDown);
 
 test('Search page default cards', () => {
   const topics = [
-    { "id": 1, "subject": "Test Subject", "body": "Test body." }
+    { id: 1, subject: "Test Subject", body: "Test body." }
   ];
 
-  const root = render(
+  const node = mount((
     <Bootstrap store={store} route="/help/search">
       <Search />
     </Bootstrap>
-    , container
-  );
-
-  expect(mockAxios.request).toBeCalled();
-
-  mockAxios.mockResponse({
-    data: topics
+  ), {
+    attachTo: document.getElementById("root")
   });
 
-  // How is there just one?
-  let cards = document.querySelectorAll(".card");
+  expect(mockAxios.request).toBeCalled();
+  mockAxios.mockResponse({ data: topics });
+  node.update();
+
+  const cards = node.find(".card");
   expect(cards.length).toBe(1);
 
-  let card = cards[0];
-  expect(card.querySelector(".card-title").textContent).toBe("Test Subject");
-  expect(card.querySelector("p").textContent).toBe("Test body.");
+  const card = cards.at(0);
+  expect(card.find(".card-title").text()).toBe("Test Subject");
+  expect(card.find("p").text()).toBe("Test body.");
 
-  fireEvent.click(card);
-  let modal = document.querySelector(".modal.open");
+  // Clicking on a card should open a modal with it's details
+  card.simulate('click');
+
+  node.update();
+
+  // We should be able to use enzyme.find here, but
+  // it returns nothing: investigate why.
+  const modal = document.querySelector(".modal.open");
+  expect(modal).not.toBeNull();
 
   expect(modal.querySelector("h4").textContent).toBe("Test Subject");
   expect(modal.querySelector("p").textContent).toBe("Test body.");
