@@ -30,8 +30,8 @@ class App extends React.Component {
 
           {/* Passthrough /help to the routed Help page, which
           contains internal routes to different tabs of it's nav. */}
-          {/*
           <Route exact path="/help" component={Help} />
+          {/*
           <Route exact path="/help/search" component={Help} />
           <Route exact path="/help/support" component={Help} />
           */}
