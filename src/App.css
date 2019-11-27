@@ -85,3 +85,7 @@ nav ul li.active:hover {
   text-align: left;
 }
 
+li.tab > a.active {
+ border-bottom: 2px solid white; 
+}
+

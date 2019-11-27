@@ -3,11 +3,6 @@ import { Link, withRouter } from 'react-router-dom';
 import M from 'materialize-css';
 
 class ExtendedNavbar extends Component {
-  componentDidMount() {
-    var elems = document.querySelectorAll(".tabs");
-    M.Tabs.init(elems, {});
-  }
-
   render() {
     const { pathname } = this.props.location;
     console.log(`ExtendedNavbar Path: ${pathname}`);
