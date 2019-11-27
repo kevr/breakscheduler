@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { createStore } from 'redux';
 import { act } from 'react-dom/test-utils';
 import { MemoryRouter } from 'react-router-dom';
 import {
@@ -8,14 +9,18 @@ import {
   waitForElement
 } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import MockAdapter from 'axios-mock-adapter';
+import mockAxios from 'jest-mock-axios';
 import axios from 'axios';
 import Team from './Team';
 import config from '../../config.json';
+import Reducers from '../../reducers';
+import { Bootstrap } from '../../lib/TestUtils';
 
 let container;
+let store;
 
 beforeEach(() => {
+  store = createStore(Reducers);
   container = document.createElement('div');
   container.id = "root";
   document.body.appendChild(container);
@@ -28,24 +33,27 @@ afterEach(() => {
 
 describe('Team Page', () => {
   test('shows all users', async () => {
-    let axiosMock = new MockAdapter(axios);
-    axiosMock.onGet(`${config.apiPrefix}/members`).reply(200, [
-      {
-        id: 1,
-        name: "Kevin Morris",
-        email: "kevr.gtalk@gmail.com",
-        summary: "A cool guy.",
-        title: "Software Engineer",
-        avatar: ""
-      }
-    ]);
-
     await act(async () => {
       render(
-        <MemoryRouter initialEntries={[ "/about/team" ]}>
+        <Bootstrap store={store} route="/about/team">
           <Team />
-        </MemoryRouter>
+        </Bootstrap>
       , container);
+    });
+
+    expect(mockAxios.request).toBeCalled();
+
+    mockAxios.mockResponse({
+      data: [
+        {
+          id: 1,
+          name: "Kevin Morris",
+          email: "kevr.gtalk@gmail.com",
+          summary: "A cool guy.",
+          title: "Software Engineer",
+          avatar: ""
+        }
+      ]
     });
 
     const cards = document.body.querySelectorAll(".memberCard");
@@ -59,24 +67,27 @@ describe('Team Page', () => {
   });
 
   test('card click triggers modal with summary', async () => {
-    let axiosMock = new MockAdapter(axios);
-    axiosMock.onGet(`${config.apiPrefix}/members`).reply(200, [
-      {
-        id: 1,
-        name: "Kevin Morris",
-        email: "kevr.gtalk@gmail.com",
-        summary: "A cool guy.",
-        title: "Software Engineer",
-        avatar: ""
-      }
-    ]);
-
     await act(async () => {
       render(
-        <MemoryRouter>
+        <Bootstrap store={store} route="/about/team">
           <Team />
-        </MemoryRouter>
+        </Bootstrap>
       , container);
+    });
+
+    expect(mockAxios.request).toBeCalled();
+
+    mockAxios.mockResponse({
+      data: [
+        {
+          id: 1,
+          name: "Kevin Morris",
+          email: "kevr.gtalk@gmail.com",
+          summary: "A cool guy.",
+          title: "Software Engineer",
+          avatar: ""
+        }
+      ]
     });
 
     const cards = document.body.querySelectorAll(".memberCard");

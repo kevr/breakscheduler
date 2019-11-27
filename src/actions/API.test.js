@@ -7,63 +7,55 @@ import {
   fireEvent,
   waitForElement
 } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
+import mockAxios from 'jest-mock-axios';
+import axios from 'axios';
 import {
   apiRequest,
   getRequest,
-  postRequest,
-  patchRequest
+  postRequest
 } from './API';
-import MockAdapter from 'axios-mock-adapter';
-import axios from 'axios';
 import config from '../config.json';
 
-let axiosMock;
-let token;
-
-beforeEach(() => {
-  axiosMock = new MockAdapter(axios);
+afterEach(() => {
+  mockAxios.reset();
 });
 
-const userLogin = () => {
-  return postRequest("users/login", {
-    username: "test@example.com",
-    password: "password"
-  }).then((response) => {
-    return response.data;
-  });
-};
-
 test("GET /members returns 200", async () => {
-  axiosMock.onGet(`${config.apiPrefix}/members`).reply(200, []);
-  await getRequest("members").then((response) => {
+  let promise = getRequest("members").then((response) => {
     expect(response.status).toBe(200);
     expect(response.data).toStrictEqual([]);
   });
-});
-
-test("POST /users/login returns an auth token", async () => {
-  axiosMock.onPost(`${config.apiPrefix}/users/login`).reply(200, {
-    token: "stubToken"
+  expect(mockAxios.request).toBeCalled();
+  mockAxios.mockResponse({
+    data: []
   });
-  await userLogin().then((data) => {
-    token = data.token;
-  });
-  expect(token).not.toBeNull();
+  await promise;
 });
 
 test("GET /members with a token has Authorization header", async () => {
-  let headers = {};
-  axiosMock.onGet(`${config.apiPrefix}/members`).reply((config) => {
-    headers = config.headers;
-    return [200, []];
-  });
+  localStorage.setItem("@authToken", "stubToken");
 
-  expect(token).not.toBeNull();
-  localStorage.setItem("@authToken", token);
-
-  await getRequest("members").then((response) => {
+  let promise = getRequest("members").then((response) => {
     expect(response.status).toBe(200);
-    expect(headers["Authorization"]).toBe("Token stubToken");
+    console.log(response);
   });
+
+  let request = mockAxios.lastReqGet();
+
+  const { headers } = request.config;
+  expect(headers["Authorization"]).toBe("Token stubToken");
+
+  expect(mockAxios.request).toBeCalled();
+  mockAxios.mockResponse({
+    data: []
+  });
+
+  // Wait for our getRequest to be fulfilled.
+  await promise;
+});
+
+test("POST populates the proper config fields", async () => {
+  postRequest("members", ["testData"]);
+  let request = mockAxios.lastReqGet();
+  expect(request.data).toEqual(["testData"]);
 });

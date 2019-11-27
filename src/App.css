@@ -63,3 +63,25 @@ nav ul li.active:hover {
 .memberCard {
   cursor: pointer;
 }
+
+.articleTitle {
+  margin-top: 24px;
+}
+
+.searchResult {
+  cursor: pointer;
+}
+
+/* Text classes */
+.textCenter {
+  text-align: center;
+}
+
+.textJustify {
+  text-align: justify;
+}
+
+.textLeft {
+  text-align: left;
+}
+

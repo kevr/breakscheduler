@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { createStore } from 'redux';
 import { act } from 'react-dom/test-utils';
 import { MemoryRouter } from 'react-router-dom';
 import {
@@ -7,20 +8,26 @@ import {
   fireEvent,
   waitForElement
 } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
-import MockAdapter from 'axios-mock-adapter';
+import mockAxios from 'jest-mock-axios';
 import axios from 'axios';
 import App from './App';
+import Search from './pages/help/Search';
+import config from './config.json';
+import { Bootstrap } from './lib/TestUtils';
+import Reducers from './reducers';
 
 let container;
+let store;
 
 beforeEach(() => {
+  store = createStore(Reducers);
   container = document.createElement('div');
   container.id = "root";
   document.body.appendChild(container);
 });
 
 afterEach(() => {
+  mockAxios.reset();
   var title = document.head.querySelector("title");
   if(title)
     document.head.removeChild(title);
@@ -40,9 +47,9 @@ const expectTitle = async (title) => {
 test('/ route sets correct title', async () => {
   await act(async () => {
     render(
-      <MemoryRouter initialEntries={[ "/" ]}>
+      <Bootstrap store={store} route="/">
         <App />
-      </MemoryRouter>
+      </Bootstrap>
     , container);
   });
 
@@ -54,12 +61,12 @@ test('/ route sets correct title', async () => {
     .toBeNull();
 });
 
-test('/about/contact route sets correct title', async() => {
+test('/about/contact route sets correct title', async () => {
   await act(async () => {
     render(
-      <MemoryRouter initialEntries={[ "/about/contact" ]}>
+      <Bootstrap store={store} route="/about/contact">
         <App />
-      </MemoryRouter>
+      </Bootstrap>
     , container);
   });
 
@@ -67,38 +74,74 @@ test('/about/contact route sets correct title', async() => {
 });
 
 test('/about/team route sets correct title', async () => {
-  var axiosMock = new MockAdapter(axios);
-  axiosMock.onGet(`${config.apiPrefix}/members`).reply(200, [
-    {
-      id: 1,
-      name: "Kevin Morris"
-    }
-  ]);
-
-  await act(async () => {
-    render(
-      <MemoryRouter initialEntries={[ "/about/team" ]}>
-        <App />
-      </MemoryRouter>
+  const root = render(
+    <Bootstrap store={store} route="/about/team">
+      <App />
+    </Bootstrap>
     , container);
+
+  expect(mockAxios.request).toBeCalled();
+
+  mockAxios.mockResponse({
+    data: [
+      {
+        id: 1,
+        name: "Kevin Morris",
+        title: "Software Engineer"
+      }
+    ]
   });
 
   await expectTitle("The Team");
 });
 
+/*
 test('/help route sets correct title', async () => {
-  var axiosMock = new MockAdapter(axios);
-  axiosMock.onGet(`${config.apiPrefix}/articles`).reply(200, [
-    {
-      id: 1,
-      title: "Getting Started",
-      body: "An article!"
-    }
-  ]);
 
   await act(async () => {
     render(
-      <MemoryRouter initialEntries={[ "/help" ]}>
+      <Bootstrap store={store} route="/help">
+        <App />
+      </Bootstrap>
+    );
+  });
+
+  expect(mockAxios.request).toBeCalled();
+
+  mockAxios.mockResponse({
+    data: [
+      {
+        id: 1,
+        title: "Getting Started",
+        body: "An article!"
+      }
+    ]
+  });
+
+  await expectTitle("Help Directory");
+});
+
+test('/help/search route sets correct title', async () => {
+  const root = render(
+    <Bootstrap store={store} route="/help/search">
+      <App />
+    </Bootstrap>
+    , container
+  );
+
+  expect(mockAxios.request).toBeCalled();
+
+  mockAxios.mockResponse({
+    data: []
+  });
+
+  await expectTitle("Help Directory");
+});
+
+test('/help/support route sets correct title', async () => {
+  await act(async () => {
+    render(
+      <MemoryRouter initialEntries={[ "/help/support" ]}>
         <App />
       </MemoryRouter>
     );
@@ -106,6 +149,7 @@ test('/help route sets correct title', async () => {
 
   await expectTitle("Help Directory");
 });
+*/
 
 test('/random route gives not found', async () => {
   await act(async () => {
@@ -142,3 +186,4 @@ test('/product route renders the product page', async () => {
 
   await expectTitle("Product");
 });
+

@@ -7,14 +7,14 @@ const Contact = () => (
   <Layout pageTitle="Contact Us">
 
     <div className="container">
-      <p className="Intro">
+      <p className="Intro flow-text">
         {`${config.appName} prides itself on it's ease-of-use and abundance
         of topics which can be found in our `}<Link to="/help">Help</Link>
         {` knowledgebase.`}
       </p>
     </div>
 
-    <div className="container">
+    <div className="container flow-text">
       <p className="Intro">
         {`Need help with something not found in the knowledgebase? Have a
           personal or business inquiry? For any other questions, contact
@@ -25,7 +25,7 @@ const Contact = () => (
     </div>
 
     <div className="container">
-      <p className="Intro">
+      <p className="Intro flow-text">
         {`We look forward to hearing from you!`}
       </p>
     </div>

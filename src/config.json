@@ -1,7 +1,20 @@
 {
   "appName": "Break Scheduler",
   "apiPrefix": "http://localhost:5000",
+
   "contact": {
     "email": "kevr.gtalk@gmail.com"
+  },
+
+  "article": {
+    "allowedTags": [
+      "br",
+      "a",
+      "img"
+    ],
+    "allowedAttributes": {
+      "a": [ "href" ],
+      "img": [ "src", "alt" ]
+    }
   }
 }

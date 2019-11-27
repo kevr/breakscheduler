@@ -1,12 +1,9 @@
 import axios from 'axios';
 import config from '../config.json';
 
-export const apiRequest = (method, endpoint, data, headers) => {
+export const apiRequest = (method, endpoint, data) => {
   const url = `${config.apiPrefix}/${endpoint}`;
-  let head = {
-    "Accept": "application/json",
-    "Content-Type": "application/json"
-  };
+  var head = {};
 
   // Provide an Authorization header if we have a token to use.
   const token = localStorage.getItem("@authToken", null);
@@ -14,7 +11,7 @@ export const apiRequest = (method, endpoint, data, headers) => {
     head["Authorization"] = `Token ${token}`;
   }
 
-  return axios({
+  return axios.request({
     url: url,
     method: method,
     headers: head,
@@ -28,11 +25,9 @@ export const patchRequest = (endpoint, data) => {
   return apiRequest("PATCH", endpoint, data, null);
 } */
 
-export const postRequest = (endpoint, data) => {
-  return apiRequest("POST", endpoint, data, null);
-}
+export const postRequest = (endpoint, data) =>
+  apiRequest("post", endpoint, data);
 
-export const getRequest = (endpoint) => {
-  return apiRequest("GET", endpoint, null, null);
-}
+export const getRequest = (endpoint) =>
+  apiRequest("get", endpoint);
 
