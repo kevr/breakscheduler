@@ -11,66 +11,66 @@ import {
   fireEvent,
   waitForElement
 } from '@testing-library/react';
-import mockAxios from 'jest-mock-axios';
+import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import Search from './Search';
 import config from '../../config.json';
 import Reducers from '../../reducers';
-import { Bootstrap } from '../../lib/TestUtils';
+import {
+  Bootstrap,
+  mockPath,
+  flushPromises
+} from '../../lib/TestUtils';
 
 configure({ adapter: new Adapter() });
 
+let axiosMock;
 let container; // Stubbed div#root
 let store;     // Stubbed redux store
 
-// Seperate setUp and tearDown so we can run
-// them manually in tests when needed.
-const setUp = () => {
-  container = document.createElement('div');
-  container.id = "root";
-  document.body.appendChild(container);
-};
-
-const tearDown = () => {
-  mockAxios.reset();
-  document.body.removeChild(container);
-  container = null;
-};
+beforeAll(() => {
+  axiosMock = new MockAdapter(axios);
+});
 
 beforeEach(() => {
   store = createStore(Reducers);
-  setUp();
+  container = document.createElement('div');
+  container.id = "root";
+  document.body.appendChild(container);
 });
-afterEach(tearDown);
 
-test('Search page default cards', () => {
+afterEach(() => {
+  axiosMock.reset();
+  document.body.removeChild(container);
+  container = null;
+});
+
+test('Search page default cards', async () => {
   const topics = [
     { id: 1, subject: "Test Subject", body: "Test body." }
   ];
 
-  const node = mount((
-    <Bootstrap store={store} route="/help/search">
-      <Search />
-    </Bootstrap>
-  ), {
-    attachTo: document.getElementById("root")
+  axiosMock.onGet(mockPath("topics")).reply(200, topics);
+
+  await act(async () => {
+    render(
+      <Bootstrap store={store} route="/help/search">
+        <Search />
+      </Bootstrap>
+      , container
+    );
   });
 
-  expect(mockAxios.request).toBeCalled();
-  mockAxios.mockResponse({ data: topics });
-  node.update();
-
-  const cards = node.find(".card");
+  const cards = document.querySelectorAll(".card");
   expect(cards.length).toBe(1);
 
-  const card = cards.at(0);
-  expect(card.find(".card-title").text()).toBe("Test Subject");
-  expect(card.find("p").text()).toBe("Test body.");
+  const card = cards[0];
+  expect(card.querySelector(".card-title").textContent).toBe("Test Subject");
+  expect(card.querySelector("p").textContent).toBe("Test body.");
 
   // Clicking on a card should open a modal with it's details
-  card.simulate('click');
-
-  node.update();
+  fireEvent.click(card);
+  await flushPromises();
 
   // We should be able to use enzyme.find here, but
   // it returns nothing: investigate why.
@@ -88,20 +88,24 @@ test('Search page renders filtered topics', async () => {
     { "id": 3, "subject": "Another One", "body": "Third one." }
   ];
 
-  const {
-    getByLabelText
-  } = render(
-    <Bootstrap store={store} route="/help/search">
-      <Search />
-    </Bootstrap>
-    , container
-  );
+  axiosMock.onGet(mockPath("topics")).reply(200, topics);
 
-  expect(mockAxios.request).toBeCalled();
-
-  mockAxios.mockResponse({
-    data: topics
+  let object = {
+    getByLabelText: null
+  };
+  await act(async () => {
+    const {
+      getByLabelText
+    } = render(
+      <Bootstrap store={store} route="/help/search">
+        <Search />
+      </Bootstrap>
+      , container
+    );
+    object.getByLabelText = getByLabelText;
   });
+
+  expect(object.getByLabelText).not.toBeNull();
 
   // How is there just one?
   let cards = document.querySelectorAll(".card");
@@ -109,13 +113,17 @@ test('Search page renders filtered topics', async () => {
 
   // Test our search input field as if we were
   // typing into it.
-  let searchInput = getByLabelText("Search help topics...");
+  let searchInput = object.getByLabelText("Search help topics...");
+
+  // Type "Test" into the search input widget
   fireEvent.change(searchInput, {
     target: {
       value: "Test"
     }
   });
+  await flushPromises();
 
+  // Check that we only have "Test" related results
   cards = document.querySelectorAll(".card");
   expect(cards.length).toBe(1);
 
@@ -123,12 +131,15 @@ test('Search page renders filtered topics', async () => {
   expect(card.querySelector(".card-title").textContent).toBe("Test Subject");
   expect(card.querySelector("p").textContent).toBe("Test body.");
 
+  // Type "Second" into the search input widget
   fireEvent.change(searchInput, {
     target: {
       value: "Second"
     }
   });
+  await flushPromises();
 
+  // Check that we only have "Second" related results
   cards = document.querySelectorAll(".card");
   expect(cards.length).toBe(1);
 
@@ -137,31 +148,33 @@ test('Search page renders filtered topics', async () => {
   expect(card.querySelector("p").textContent).toBe("Next.");
 });
 
-test('Re-render of Search page does not call API', () => {
+test('Re-render of Search page does not call API', async () => {
   let topics = [
     { "id": 1, "subject": "Test Subject", "body": "Test body." },
     { "id": 2, "subject": "Second One", "body": "Next." },
     { "id": 3, "subject": "Another One", "body": "Third one." }
   ];
 
-  const node = mount(
-    <Bootstrap store={store} route="/help/search">
-      <Search />
-    </Bootstrap>
-  );
+  axiosMock.onGet(mockPath("topics")).replyOnce(200, topics);
 
-  expect(mockAxios.request).toBeCalled();
-  mockAxios.mockResponse({
-    data: topics
+  // Allow initial topics retrieval to occur.
+  const node = mount((
+      <Bootstrap store={store} route="/help/search">
+        <Search />
+      </Bootstrap>
+  ), {
+    attachTo: document.getElementById("root")
   });
-
+  await flushPromises();
   node.update();
   expect(node.find(".card").length).toBe(3);
 
-  mockAxios.reset();
+  // On the remount, we already have topics in Redux, so
+  // the component should skip retrieving anything and
+  // it's render should remain the same.
   node.unmount();
   node.mount();
-  expect(mockAxios.request).not.toBeCalled();
-
+  await flushPromises();
+  node.update();
   expect(node.find(".card").length).toBe(3);
 });

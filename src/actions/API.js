@@ -8,6 +8,7 @@ export const apiRequest = (method, endpoint, data) => {
   // Provide an Authorization header if we have a token to use.
   const token = localStorage.getItem("@authToken", null);
   if(token) {
+    console.log(`Using token authorization: ${token}`);
     head["Authorization"] = `Token ${token}`;
   }
 

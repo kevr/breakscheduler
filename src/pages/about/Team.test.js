@@ -9,15 +9,20 @@ import {
   waitForElement
 } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import mockAxios from 'jest-mock-axios';
+import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import Team from './Team';
 import config from '../../config.json';
 import Reducers from '../../reducers';
-import { Bootstrap } from '../../lib/TestUtils';
+import { Bootstrap, mockPath } from '../../lib/TestUtils';
 
+let axiosMock;
 let container;
 let store;
+
+beforeAll(() => {
+  axiosMock = new MockAdapter(axios);
+});
 
 beforeEach(() => {
   store = createStore(Reducers);
@@ -27,33 +32,30 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  axiosMock.reset();
   document.body.removeChild(container);
   container = null;
 });
 
 describe('Team Page', () => {
   test('shows all users', async () => {
+    axiosMock.onGet(mockPath("members")).reply(200, [
+      {
+        id: 1,
+        name: "Kevin Morris",
+        email: "kevr.gtalk@gmail.com",
+        summary: "A cool guy.",
+        title: "Software Engineer",
+        avatar: ""
+      }
+    ]);
+
     await act(async () => {
       render(
         <Bootstrap store={store} route="/about/team">
           <Team />
         </Bootstrap>
       , container);
-    });
-
-    expect(mockAxios.request).toBeCalled();
-
-    mockAxios.mockResponse({
-      data: [
-        {
-          id: 1,
-          name: "Kevin Morris",
-          email: "kevr.gtalk@gmail.com",
-          summary: "A cool guy.",
-          title: "Software Engineer",
-          avatar: ""
-        }
-      ]
     });
 
     const cards = document.body.querySelectorAll(".memberCard");
@@ -67,27 +69,23 @@ describe('Team Page', () => {
   });
 
   test('card click triggers modal with summary', async () => {
+    axiosMock.onGet(mockPath("members")).reply(200, [
+      {
+        id: 1,
+        name: "Kevin Morris",
+        email: "kevr.gtalk@gmail.com",
+        summary: "A cool guy.",
+        title: "Software Engineer",
+        avatar: ""
+      }
+    ]);
+
     await act(async () => {
       render(
         <Bootstrap store={store} route="/about/team">
           <Team />
         </Bootstrap>
       , container);
-    });
-
-    expect(mockAxios.request).toBeCalled();
-
-    mockAxios.mockResponse({
-      data: [
-        {
-          id: 1,
-          name: "Kevin Morris",
-          email: "kevr.gtalk@gmail.com",
-          summary: "A cool guy.",
-          title: "Software Engineer",
-          avatar: ""
-        }
-      ]
     });
 
     const cards = document.body.querySelectorAll(".memberCard");

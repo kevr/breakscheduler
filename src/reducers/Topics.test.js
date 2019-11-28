@@ -12,19 +12,6 @@ import axios from 'axios';
 import TopicsReducer from './Topics';
 import config from '../config.json';
 
-let container;
-
-beforeEach(() => {
-  container = document.createElement('div');
-  container.id = "root";
-  document.body.appendChild(container);
-});
-
-afterEach(() => {
-  document.body.removeChild(container);
-  container = null;
-});
-
 test('default TopicsReducer returns an empty array', async () => {
   const state = TopicsReducer(undefined, {});
   expect(state).toEqual([]);

@@ -8,16 +8,25 @@ import {
   fireEvent,
   waitForElement
 } from '@testing-library/react';
-import mockAxios from 'jest-mock-axios';
+import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import App from './App';
 import Search from './pages/help/Search';
 import config from './config.json';
-import { Bootstrap } from './lib/TestUtils';
+import {
+  Bootstrap,
+  mockPath,
+  flushPromises
+} from './lib/TestUtils';
 import Reducers from './reducers';
 
+let axiosMock;
 let container;
 let store;
+
+beforeAll(() => {
+  axiosMock = new MockAdapter(axios);
+});
 
 beforeEach(() => {
   store = createStore(Reducers);
@@ -27,7 +36,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  mockAxios.reset();
+  axiosMock.reset();
   var title = document.head.querySelector("title");
   if(title)
     document.head.removeChild(title);
@@ -74,64 +83,54 @@ test('/about/contact route sets correct title', async () => {
 });
 
 test('/about/team route sets correct title', async () => {
-  const root = render(
-    <Bootstrap store={store} route="/about/team">
-      <App />
-    </Bootstrap>
+  axiosMock.onGet(mockPath("members")).reply(200, [
+    {
+      id: 1,
+      name: "Kevin Morris",
+      title: "Software Engineer"
+    }
+  ]);
+
+  await act(async() => {
+    render(
+      <Bootstrap store={store} route="/about/team">
+        <App />
+      </Bootstrap>
     , container);
-
-  expect(mockAxios.request).toBeCalled();
-
-  mockAxios.mockResponse({
-    data: [
-      {
-        id: 1,
-        name: "Kevin Morris",
-        title: "Software Engineer"
-      }
-    ]
   });
 
   await expectTitle("The Team");
 });
 
 test('/help route sets correct title', async () => {
+  axiosMock.onGet(mockPath("articles")).reply(200, [
+    {
+      id: 1,
+      title: "Getting Started",
+      body: "An article!"
+    }
+  ]);
 
   await act(async () => {
     render(
       <Bootstrap store={store} route="/help">
         <App />
       </Bootstrap>
-    );
-  });
-
-  expect(mockAxios.request).toBeCalled();
-
-  mockAxios.mockResponse({
-    data: [
-      {
-        id: 1,
-        title: "Getting Started",
-        body: "An article!"
-      }
-    ]
+    , container);
   });
 
   await expectTitle("Help Directory");
 });
 
 test('/help/search route sets correct title', async () => {
-  const root = render(
-    <Bootstrap store={store} route="/help/search">
-      <App />
-    </Bootstrap>
-    , container
-  );
+  axiosMock.onGet(mockPath("topics")).reply(200, []);
 
-  expect(mockAxios.request).toBeCalled();
-
-  mockAxios.mockResponse({
-    data: []
+  await act(async() => {
+    render(
+      <Bootstrap store={store} route="/help/search">
+        <App />
+      </Bootstrap>
+    , container);
   });
 
   await expectTitle("Help Directory");
