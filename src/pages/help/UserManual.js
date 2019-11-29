@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import jQuery from 'jquery';
 import sanitizeHtml from 'sanitize-html';
+import M from 'materialize-css';
 import Layout from '../Layout';
 import { getRequest } from '../../actions/API';
 import config from '../../config.json';
@@ -12,7 +13,8 @@ class UserManual extends Component {
       winHeight: 0,
       navHeight: "100vh",
       navWidth: 0,
-      articles: []
+      articles: [],
+      sidenavOpen: false
     };
 
     this.resizeFn = this.resizeFn.bind(this);
@@ -36,6 +38,21 @@ class UserManual extends Component {
   componentDidMount() {
     window.addEventListener('resize', this.resizeFn);
     this.resizeFn();
+
+    // Initialize sidenav
+    var elems = document.querySelectorAll(".sidenav");
+    const options = {
+      onOpenStart: () => {
+        this.setState({ sidenavOpen: true });
+      },
+      onCloseStart: () => {
+        this.setState({ sidenavOpen: false });
+      }
+    };
+    let instances = M.Sidenav.init(elems, options);
+
+    // Save sidenav instance
+    this.sidenav = M.Sidenav.getInstance(elems[0]);
   }
 
   componentWillUnmount() {
@@ -68,34 +85,88 @@ class UserManual extends Component {
     return (
       <div className="container">
 
-        <div className="Section" style={{ paddingLeft: navWidth }}>
-          <ul id="slide-out" className="sidenav sidenav-fixed"
+        <div className="subPage userManual">
+
+          <div
+            className="sidenavButton"
+            onClick={(e) => {
+              e.preventDefault();
+              this.sidenav.open();
+            }}
             style={{
-              height: (winHeight - navHeight - delta) + "px",
-              marginTop: (navHeight + delta) + "px"
-            }}>
+              top: (navHeight + 10) + "px"
+            }}
+          >
+            <i className="material-icons">bookmarks</i>
+          </div>
+
+          <ul
+            id="slide-out"
+            className={"sidenav" + (this.state.sidenavOpen ? " open" : "")}
+          >
             <li><h5>{"Table of Contents"}</h5></li>
+            <li>
+              <a
+                href={"#article_preamble"}
+                onClick={(e) => {
+                  this.sidenav.close();
+                }}
+              >
+                {"Preamble"}
+              </a>
+            </li>
             {articles.map((article) => (
               <li key={article.id}>
-                <a href={`#article_${article.id}`}>{article.title}</a>
+                <a
+                  href={`#article_${article.id}`}
+                  onClick={(e) => {
+                    this.sidenav.close();
+                  }}
+                >
+                  {article.title}
+                </a>
               </li>
             ))}
           </ul>
 
-          <div className="Content">
+          <div className="Section">
+            <div className="Content">
 
-            {articles.map((article) => (
-              <div id={`article_${article.id}`}
-                className="Article" key={article.id}>
-                <h5 className="articleTitle">{article.title}</h5>
-                <p className="textJustify"
-                  dangerouslySetInnerHTML={{
-                    __html: sanitized(article.body)
-                  }} />
+              <div
+                id="article_preamble"
+                className="Article"
+              >
+                <h5 id="preambleTitle" className="articleTitle">
+                  {"Preamble"}
+                </h5>
+                <label htmlFor="preambleTitle">
+                  {"Intro, Tips and Tricks to the User Manual"}
+                </label>
+                <p className="textJustify">
+                  {"Welcome to our User Manual. Here, you will find detailed "}
+                  {`information about all aspects of ${config.appName}. `}
+                  {"At any point, you may navigate through the "}
+                  {"Table of Contents through a side navigation bar, which "}
+                  {"can be accessed by clicking the "}
+                  <i className="material-icons textMedium">bookmarks</i>
+                  {" icon located in the upper left portion of this page."}
+                </p>
               </div>
-            ))}
 
+              {articles.map((article) => (
+                <div id={`article_${article.id}`}
+                  className="Article" key={article.id}>
+                  <h5 className="articleTitle">{article.title}</h5>
+                  <p className="textJustify"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitized(article.body)
+                    }} />
+                </div>
+              ))}
+
+            </div>
           </div>
+
         </div>
 
       </div>

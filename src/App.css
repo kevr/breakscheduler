@@ -85,7 +85,35 @@ nav ul li.active:hover {
   text-align: left;
 }
 
+.textSmall {
+  font-size: 12px;
+}
+
+.textMedium {
+  font-size: 16px;
+}
+
 li.tab > a.active {
  border-bottom: 2px solid white; 
 }
 
+.widgets a {
+  display: inline-block;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.controlBox {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  text-align: left;
+}
+
+/* Subpage styles */
+.sidenavButton {
+  cursor: pointer;
+  color: #555;
+  position: fixed;
+  left: 10px;
+  top: 0;
+}
