@@ -30,5 +30,11 @@ export const postRequest = (endpoint, data) =>
   apiRequest("post", endpoint, data);
 
 export const getRequest = (endpoint) =>
-  apiRequest("get", endpoint);
+  apiRequest("get", endpoint, null);
+
+export const patchRequest = (endpoint, data) =>
+  apiRequest("patch", endpoint, data);
+
+export const deleteRequest = (endpoint) =>
+  apiRequest("delete", endpoint, null);
 

@@ -14,7 +14,7 @@ import {
   getRequest,
   postRequest
 } from './API';
-import { mockPath } from '../lib/TestUtils';
+import { mockPath } from 'TestUtil';
 import config from '../config.json';
 
 let axiosMock;
