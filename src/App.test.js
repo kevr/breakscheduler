@@ -17,7 +17,7 @@ import {
   Bootstrap,
   mockPath,
   flushPromises
-} from './lib/TestUtils';
+} from 'TestUtil';
 import Reducers from './reducers';
 
 let axiosMock;

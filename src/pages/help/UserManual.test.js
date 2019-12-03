@@ -14,7 +14,7 @@ import {
   Bootstrap,
   mockPath,
   flushPromises
-} from '../../lib/TestUtils';
+} from 'TestUtil';
 
 configure({ adapter: new Adapter() });
 

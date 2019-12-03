@@ -14,7 +14,7 @@ import config from '../config.json';
 
 test('default SessionReducer returns isValid = false', async () => {
   const state = SessionReducer(undefined, {});
-  expect(state).toEqual({ isValid: false });
+  expect(state).toEqual({ isValid: false, resolved: false });
 });
 
 test('SET_SESSION sets session with isValid = true', async () => {
@@ -25,7 +25,12 @@ test('SET_SESSION sets session with isValid = true', async () => {
       email: "test@example.com"
     }
   });
-  expect(state).toEqual({ id: 1, email: "test@example.com", isValid: true });
+  expect(state).toEqual({
+    id: 1,
+    email: "test@example.com",
+    isValid: true,
+    resolved: true
+  });
 });
 
 test('CLEAR_SESSION sets state to default', async () => {
@@ -36,5 +41,5 @@ test('CLEAR_SESSION sets state to default', async () => {
   }, {
     type: "CLEAR_SESSION"
   });
-  expect(state).toEqual({ isValid: false });
+  expect(state).toEqual({ isValid: false, resolved: true });
 });

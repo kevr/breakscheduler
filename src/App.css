@@ -107,6 +107,7 @@ li.tab > a.active {
   padding-top: 10px;
   padding-bottom: 10px;
   text-align: left;
+  z-index: 2;
 }
 
 /* Subpage styles */
@@ -116,4 +117,8 @@ li.tab > a.active {
   position: fixed;
   left: 10px;
   top: 0;
+}
+
+.controlBox button {
+  cursor: pointer;
 }

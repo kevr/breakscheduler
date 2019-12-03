@@ -14,7 +14,10 @@ import axios from 'axios';
 import Team from './Team';
 import config from '../../config.json';
 import Reducers from '../../reducers';
-import { Bootstrap, mockPath } from '../../lib/TestUtils';
+import {
+  Bootstrap,
+  mockPath
+} from 'TestUtil';
 
 let axiosMock;
 let container;
