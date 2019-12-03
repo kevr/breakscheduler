@@ -3,7 +3,6 @@ export const SET_SESSION = "SET_SESSION";
 export const CLEAR_SESSION = "CLEAR_SESSION";
 
 const Session = (state = { isValid: false, resolved: false }, action) => {
-  console.log(`Session reducer got action: ${JSON.stringify(action)}`);
   switch(action.type) {
     case SET_SESSION:
       return Object.assign({}, state, {
