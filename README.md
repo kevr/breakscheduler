@@ -1,5 +1,7 @@
 Source code for the [breakscheduler.com](https://breakscheduler.com "Break Scheduler") webpage.
 
+[![Build Status](https://travis-ci.org/kevr/breakscheduler.svg?branch=help)](https://travis-ci.org/kevr/breakscheduler)
+
 ## Design
 
 This website is written using React.js for it's front-end choice of framework. It is meant to communicate with a back-end API server which provides contents for some pages via fetching from a database[, as well as user accounts that can be used for support tickets].
