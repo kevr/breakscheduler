@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
 import {
   getRequest,
-  postRequest
+  postRequest,
+  userLogin,
+  getSession
 } from '../../../actions/API';
 
 class Login extends Component {
@@ -10,12 +13,43 @@ class Login extends Component {
     super(props);
     this.state = {
       email: '',
-      password: ''
+      password: '',
+      isAdmin: false,
+      rememberForm: false
     };
 
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
+    this.handleIsAdminChange = this.handleIsAdminChange.bind(this);
+    this.handleRememberChange = this.handleRememberChange.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
+  }
+  
+  componentDidMount() {
+    // When this component mounts, we'll try to apply
+    // any rememberedLogin data stored by a previous login.
+    const rememberedLogin = localStorage.getItem("@rememberedLogin", "null");
+    if(rememberedLogin !== null && rememberedLogin !== "null") {
+      // Base64-decode our rememberedLogin data, then parse
+      // it into a javascript object.
+      const details = JSON.parse(rememberedLogin);
+      console.log(`Remembered details: ${rememberedLogin}`);
+      const endpoint = details.isAdmin
+        ? "users/admin/login"
+        : "users/login";
+
+      console.log(`POST ${endpoint}`);
+      // Login
+      userLogin(details).then(data => {
+        const token = data.token;
+        this.props.setToken(token);
+      }).catch((error) => {
+        // If we got an error, which is probably a 401, forget
+        // the rememberedLogin data.
+        localStorage.setItem("@rememberedLogin", null);
+        this.props.clearToken();
+      });
+    }
   }
 
   handleEmailChange(e) {
@@ -28,48 +62,68 @@ class Login extends Component {
 
   handleLogin(e) {
     e.preventDefault();
-    let self = this;
-
     localStorage.setItem("@authToken", null);
 
-    postRequest("users/login", this.state).then((response) => {
-      // Did we get a token?
-      console.log(response);
-      const token = response.data.token;
-      console.log(`Logged in successfully, got token: ${token}`);
-      localStorage.setItem("@authToken", token);
+    // If the administrator box is checked, we login via
+    // users/admin/login. Otherwise, we login as a normal
+    // user via users/login.
+    const endpoint = this.state.isAdmin
+      ? "users/admin/login"
+      : "users/login";
 
-      // Then, retrieve session data from server.
-      getRequest("users/me").then((response) => {
-        self.props.setSession(response.data);
-        window.location.assign("/help/support");
+    userLogin(this.state).then(data => {
+      // Did we get a token?
+      console.log(data);
+      const token = data.token;
+      console.log(`Logged in successfully, got token: ${token}`);
+
+      // If we successfully logged in, save our login details
+      // if rememberForm was true.
+      const { rememberForm } = this.state;
+      if(rememberForm) {
+        // If we store remembered data, we Base64-encode the
+        // JSON-encoded version of this.state.
+        localStorage.setItem("@rememberedLogin",
+          JSON.stringify(this.state));
+      } else {
+        localStorage.setItem("@rememberedLogin", null);
+      }
+
+      localStorage.setItem("@authToken", token);
+      getSession().then(user => this.props.setSession(user))
+        .catch(error => {
+          this.props.clearSession();
+        });
+
+    }).catch((error) => {
+      console.error(
+        "Unable to login due to http error originating from " +
+        `${endpoint}`);
+      this.setState({
+        error: "Unable to login due to http error."
+      }, () => {
+        // Erase rememberedLogin if it exists.
+        localStorage.setItem("@rememberedLogin", null);
+        this.props.clearSession();
       });
     });
+  }
 
-    /* We should catch errors and test through this.
-    .catch((error) => {
-      console.error(error);
-    });
-    */
+  handleIsAdminChange(e) {
+    this.setState({ isAdmin: e.target.checked });
+  }
+
+  handleRememberChange(e) {
+    this.setState({ rememberForm: e.target.checked });
   }
 
   render() {
-
-    if(this.props.userData.isValid) {
-      return (
-        <div className="subPage supportLogin">
-          <p className="textCenter">
-            {"You are logged in, redirecting to the "}
-            <Link to="/help/support">Dashboard</Link> in three seconds...
-          </p>
-        </div>
-      );
-    }
-
     return (
       <div className="subPage supportLogin">
-        <h4>Support Login</h4>
-
+        <p className="textSmall textCenter">
+          {"A user is required in order to access the Support section."}<br />
+          {"You can login below."}
+        </p>
         <form onSubmit={this.handleLogin}>
           <div className="input-field">
             <input
@@ -91,17 +145,76 @@ class Login extends Component {
             <label htmlFor="password-input">Password</label>
           </div>
 
-          <button
-            id="submit-button"
-            type="submit"
-            className="btn primary"
-          >
-            {"Login"}
-          </button>
+          <p className="left" style={{
+            marginRight: "12px"
+          }}>
+            <label>
+              <input
+                id="is-admin-input"
+                className="filled-in"
+                type="checkbox"
+                checked={this.state.isAdmin}
+                onChange={this.handleIsAdminChange}
+              />
+              <span>I am an Administrator</span>
+            </label>
+          </p>
+
+          <p className="left">
+            <label>
+              <input
+                id="remember-input"
+                className="filled-in"
+                type="checkbox"
+                checked={this.state.rememberForm}
+                onChange={this.handleRememberChange}
+              />
+              <span>Remember me</span>
+            </label>
+          </p>
+
+          <div className="input-field right">
+            <button
+              id="submit-button"
+              type="submit"
+              className="btn primary red lighten-2"
+            >
+              {"Login"}
+            </button>
+          </div>
         </form>
       </div>
     );
   }
 }
 
-export default Login;
+const mapState = (state, ownProps) => ({
+  session: state.session
+});
+
+const mapDispatch = (dispatch, ownProps) => ({
+  setSession: (session) => dispatch({
+    type: "SET_SESSION",
+    session: session
+  }),
+  clearSession: (session) => dispatch({
+    type: "CLEAR_SESSION"
+  }),
+
+  // Token dispatchers
+  setToken: (token) => {
+    localStorage.setItem("@authToken", token);
+    dispatch({
+      type: "SET_TOKEN",
+      token: token
+    });
+  },
+  clearToken: () => {
+    localStorage.setItem("@authToken", null);
+    dispatch({
+      type: "CLEAR_TOKEN"
+    });
+  }
+});
+
+export default connect(mapState, mapDispatch)(Login);

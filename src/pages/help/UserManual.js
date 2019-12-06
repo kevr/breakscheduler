@@ -82,6 +82,11 @@ class UserManual extends Component {
       });
     };
 
+    let sidenavClass = "sidenav textCenter";
+    if(this.state.sidenavOpen) {
+      sidenavClass += " open";
+    }
+
     return (
       <div className="container">
 
@@ -102,7 +107,7 @@ class UserManual extends Component {
 
           <ul
             id="slide-out"
-            className={"sidenav" + (this.state.sidenavOpen ? " open" : "")}
+            className={sidenavClass}
           >
             <li><h5>{"Table of Contents"}</h5></li>
             <li>
@@ -134,7 +139,7 @@ class UserManual extends Component {
 
               <div
                 id="article_preamble"
-                className="Article"
+                className="Article textCenter"
               >
                 <h5 id="preambleTitle" className="articleTitle">
                   {"Preamble"}
@@ -155,7 +160,7 @@ class UserManual extends Component {
 
               {articles.map((article) => (
                 <div id={`article_${article.id}`}
-                  className="Article" key={article.id}>
+                  className="Article textCenter" key={article.id}>
                   <h5 className="articleTitle">{article.title}</h5>
                   <p className="textJustify"
                     dangerouslySetInnerHTML={{

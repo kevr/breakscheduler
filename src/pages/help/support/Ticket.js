@@ -1,13 +1,18 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import M from 'materialize-css';
 import {
   postRequest
 } from '../../../actions/API';
-import Loader from '../../../components/Loader';
-import Reply from '../../../components/Reply';
+import {
+  Loader,
+  Reply,
+  Breadcrumb,
+  Badge
+} from '../../../components';
 
 class Ticket extends Component {
   constructor(props) {
@@ -18,29 +23,48 @@ class Ticket extends Component {
       error: null
     };
 
+    this.bindInstances = this.bindInstances.bind(this);
     this.handleBodyChange = this.handleBodyChange.bind(this);
-    this.submitForm = this.submitForm.bind(this);
+    this.addReply = this.addReply.bind(this);
   }
 
+  bindInstances() {
+    let elems = document.querySelectorAll(".collapsible");
+    let instances = M.Collapsible.init(elems, {});
+    this.collapsibles = instances;
+    this.collapsible = instances[0];
+  }
+
+  // We need to setup .collapsible whenever we can.
   componentDidMount() {
-    var elems = document.querySelector(".collapsible");
-    var instance = M.Collapsible.init(elems, {});
-    this.collapsible = instance;
+    console.log("Ticket.componentDidMount");
+    this.bindInstances();
+  }
+
+  componentDidUpdate() {
+    console.log("Ticket.componentDidUpdate");
+    this.collapsibles.map(c => c.destroy());
+    this.bindInstances();
+  }
+
+  componentWillUnmount() {
+    this.collapsibles.map(c => c.destroy());
   }
 
   handleBodyChange(e) {
     this.setState({ replyBody: e.target.value });
   }
 
-  submitForm(e) {
+  addReply(e) {
     e.preventDefault();
-    const { session, ticket } = this.props;
+
+    const id = this.props.match.params.id;
 
     // POST tickets/:ticket_id is used to create
     // a reply to the ticket. On the server-side,
     // the user is deduced by the POST request
     // header state and properly assigned.
-    postRequest(`tickets/${ticket.id}/replies`, {
+    postRequest(`tickets/${id}/replies`, {
       body: this.state.replyBody
     }).then((response) => {
       // We expect a ticket to come back with the
@@ -72,95 +96,162 @@ class Ticket extends Component {
   }
 
   render() {
-    const { ticket } = this.props;
+    console.log("Ticket.render");
+    // If tickets are not yet resolved, display a loader.
+    if(!this.props.tickets.resolved) {
+      return <Loader />;
+    } else {
+      console.log(`Tickets: ${JSON.stringify(this.props.tickets.data)}`);
+    }
+
+    const id = this.props.match.params.id;
+    const ticket = this.props.tickets.data.find(t => t.id.toString() == id);
+
+    if(!ticket) {
+      console.error("Rendering ticket page for ticket that does not exist");
+      const breadcrumb = [
+        { to: "/help/support", text: "Dashboard" },
+        { text: "Not Found" }
+      ];
+      
+      const id = this.props.match.params.id;
+      return (
+        <div className="ticketPage">
+          <div className="row">
+            <Breadcrumb items={breadcrumb} />
+          </div>
+
+          <div className="row">
+            <p className="textCenter">
+              {`The ticket you were looking for with id '${id}' could not be located.`}
+            </p>
+          </div>
+        </div>
+      );
+    }
     console.log(`Rendering ${JSON.stringify(ticket)}`);
 
-    if(!ticket)
-      return <Loader />;
+    // Breadcrumb items we'll use for <Breadcrumb> when rendering.
+    const breadcrumb = [
+      { to: "/help/support", text: "Dashboard" },
+      { text: `Ticket(${ticket.id})` }
+    ];
 
-    const {
-      id,
-      user,
-      subject,
-      body,
-      updated_at,
-      replies
-    } = ticket;
-
+    const dateUpdated = new Date(ticket.updated_at);
     return (
       <div className="ticketPage">
-        <div className="ticket" id={`ticket${id}`}>
-          <h5>{subject}</h5>
-          <div className="textSmall">{`created by ${user.email}`}</div>
-          <div className="textSmall">{`updated at ${updated_at}`}</div>
-          <p className="textMedium">{body}</p>
+        <div className="row">
+          <Breadcrumb items={breadcrumb} />
         </div>
 
-        <div className="ticketReplies">
-          {replies.map((reply) => (
-            <Reply
-              key={reply.id}
-              session={this.props.session}
-              reply={reply}
-            />
-          ))}
-        </div>
+        <div className="row">
+          <div className="col s12">
+            <div className="ticket card" id={`ticket_${ticket.id}`}>
+              <div className="statusBox right">
+                <label htmlFor="status-badge">Status</label>
+                <Badge
+                  id="status-badge"
+                  className={Badge.getBadgeClass(ticket.status)}
+                >
+                  {Badge.getBadgeText(ticket.status)}
+                </Badge>
+              </div>
 
-        <ul className="collapsible">
-          <li>
-            <div className="collapsible-header">
-              <i className="material-icons">email</i>Reply
-            </div>
-            <div className="collapsible-body">
-
-              {/* Ticket reply form */}
-              <div className="replyForm">
-
-                {/* We intercept the form submission, then send
-                    state data to our API via axios. */}
-                <form onSubmit={this.submitForm}>
-
-                  {/* Body text area */}
-                  <div className="input-field">
-                    <textarea
-                      className="materialize-textarea"
-                      placeholder="Details of your reply..."
-                      value={this.state.replyBody}
-                      onChange={this.handleBodyChange}
-                    />
-                  </div>
-
-                  {/* Send Reply button; Form submission */}
-                  <div className="input-field textLeft">
-                    <button type="submit"
-                      className="primary btn"
-                    >
-                      {"Send Reply"}
-                    </button>
-                  </div>
-
-                  {/* Error text that renders when there is
-                      a non-null error to show. */}
-                  {this.state.error && (
-                    <div className="error">
-                      {this.state.error}
+              {/* Use s10 cols here to avoid cramming statusBox located
+                  on the right of this card. */}
+              <div className="card-content">
+                <span className="card-title">
+                  <div className="row">
+                    <div className="col s10">
+                      {ticket.subject}
                     </div>
-                  )}
+                  </div>
+                </span>
+                <div className="row">
+                  <div className="col s10">
+                    <p>{ticket.body}</p>
+                  </div>
+                </div>
+              </div>
 
-                </form>
+              <div className="card-action">
+                <span className="textSmall">{`created by ${ticket.user.email}`}</span>
               </div>
 
             </div>
-          </li>
-        </ul>
 
+          </div>
+        </div>
+
+        <div className="ticketReplies">
+          <span className="textSmall">Replies</span>
+          <div className="container">
+            {ticket.replies.map((reply) => (
+              <Reply
+                key={reply.id}
+                session={this.props.session}
+                reply={reply}
+              />
+            ))}
+          </div>
+
+          <ul className="collapsible addReply">
+            <li>
+              <div className="collapsible-header toggleButton">
+                <i className="material-icons">email</i>Reply
+              </div>
+              <div className="collapsible-body">
+
+                {/* Ticket reply form */}
+                <div className="replyForm">
+
+                  {/* We intercept the form submission, then send
+                      state data to our API via axios. */}
+                  <form onSubmit={this.addReply}>
+
+                    {/* Body text area */}
+                    <div className="input-field">
+                      <textarea
+                        className="materialize-textarea"
+                        placeholder="Details of your reply..."
+                        value={this.state.replyBody}
+                        onChange={this.handleBodyChange}
+                      />
+                    </div>
+
+                    {/* Send Reply button; Form submission */}
+                    <div className="input-field textLeft">
+                      <button type="submit"
+                        className="primary red lighten-2 btn"
+                      >
+                        {"Send Reply"}
+                      </button>
+                    </div>
+
+                    {/* Error text that renders when there is
+                        a non-null error to show. */}
+                    {this.state.error && (
+                      <div className="error">
+                        {this.state.error}
+                      </div>
+                    )}
+
+                  </form>
+                </div>
+
+              </div>
+            </li>
+          </ul>
+
+        </div>
       </div>
     );
   }
 };
 
 const mapState = (state, ownProps) => ({
-  session: state.session
+  session: state.session,
+  tickets: state.tickets
 });
 
 const mapDispatch = (dispatch, ownProps) => ({

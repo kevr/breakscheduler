@@ -5,10 +5,23 @@ import { getRequest } from '../../actions/API';
 import UserWidget from '../../components/UserWidget';
 import Layout from '../Layout';
 import Subpages from './support';
+import { SupportRouter } from './support';
+import AuthenticationBarrier from '../../components/AuthenticationBarrier';
 
 class Support extends Component {
+  componentDidUpdate(lastProps) {
+    if(lastProps.session.resolved &&
+      !lastProps.session.isValid &&
+      this.props.session.isValid) {
+      // If we just logged in, redirect to the Dashboard.
+      this.props.history.push("/help/support");
+    }
+  }
+
   render() {
-    const { session } = this.props;
+    const {
+      session
+    } = this.props;
 
     return (
       <div className="container">
@@ -17,45 +30,9 @@ class Support extends Component {
         </div>
 
         <div className="Content">
-          <Switch>
-            {/* Support Login (support/Login.js) */}
-            <Route exact path={"/help/support/login"} component={() => (
-              <Subpages.Login
-                userData={session}
-                setSession={this.props.setSession}
-              />
-            )} />
-
-            {/* Support Authenticated routes (support/Authenticated.js)
-                Including:
-                  /help/support Dashboard
-                  /help/support/createTicket Create a Ticket
-                  /help/support/ticket/:id View a Ticket 
-                  
-                If we are not logged in, we redirect to the Support
-                Login page. */}
-            <Route path={"/help/support"} component={() => {
-              // If we do not have a valid session, redirect to Login.
-              if(session.resolved && !session.isValid) {
-                this.props.history.push("/help/support/login");
-                return (
-                  // A .state div we can use for testing purposes, and to
-                  // avoid rendering data-dependant components with
-                  // an invalid session.
-                  <div className="state">{"Redirecting"}</div>
-                );
-              }
-
-              // Otherwise, render our Authenticated route.
-              return (
-                <Subpages.Authenticated
-                  session={session}
-                  tickets={this.props.tickets}
-                />
-              );
-            }} />
-
-          </Switch>
+          <AuthenticationBarrier>
+            <SupportRouter />
+          </AuthenticationBarrier>
         </div>
       </div>
     )
@@ -67,13 +44,4 @@ const mapState = (state, ownProps) => ({
   tickets: state.tickets
 });
 
-const mapDispatch = (dispatch, ownProps) => ({
-  setSession: (session) => {
-    dispatch({
-      type: "SET_SESSION",
-      session: session
-    });
-  }
-});
-
-export default connect(mapState, mapDispatch)(Support);
+export default connect(mapState, null)(Support);

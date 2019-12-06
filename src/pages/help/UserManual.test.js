@@ -8,12 +8,13 @@ import {
 import Adapter from 'enzyme-adapter-react-16';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
+import { act } from 'react-dom/test-utils';
 import UserManual from './UserManual';
 import Reducers from '../../reducers';
 import {
-  Bootstrap,
-  mockPath,
-  flushPromises
+  TestRouter,
+  createHistory,
+  mockPath
 } from 'TestUtil';
 
 configure({ adapter: new Adapter() });
@@ -42,15 +43,20 @@ describe('User Manual page', () => {
   });
 
   test('renders', async () => {
+    const history = createHistory("/help");
+
     axiosMock.onGet(mockPath("articles")).reply(200, []);
-    const node = mount((
-      <Bootstrap store={store} route="/help">
-        <UserManual />
-      </Bootstrap>
-    ), {
-      attachTo: document.getElementById("root")
+
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <UserManual />
+        </TestRouter>
+      ), {
+        attachTo: document.getElementById("root")
+      });
     });
-    await flushPromises();
 
     const preamble = node.find("#article_preamble").first();
     expect(preamble).not.toBeNull();
@@ -60,37 +66,46 @@ describe('User Manual page', () => {
     const trigger = node.find(".sidenavButton").first();
 
     // Click on the nav button
-    trigger.simulate('click', {
-      preventDefault: () => {
-        return true;
-      }
+    await act(async () => {
+      trigger.simulate('click', {
+        preventDefault: () => {
+          return true;
+        }
+      });
     });
-    await flushPromises();
     node.update();
+
     expect(node.find(".sidenav.open").exists()).toBe(true);
 
     const sidenav = node.find(".sidenav");
     const preambleButton = sidenav.find("a").first();
     // Click the Preamble navigation
-    preambleButton.simulate('click', {});
-    await flushPromises();
+    await act(async () => {
+      preambleButton.simulate('click');
+    });
     node.update();
+
     expect(node.find(".sidenav.open").exists()).toBe(false);
   });
 
   test('renders with multiple articles', async () => {
+    const history = createHistory("/help");
+
     axiosMock.onGet(mockPath("articles")).reply(200, [
       { id: 1, topic: "Article 1", body: "First article written." },
       { id: 2, topic: "Article 2", body: "Second article written." }
     ]);
-    const node = mount((
-      <Bootstrap store={store} route="/help">
-        <UserManual />
-      </Bootstrap>
-    ), {
-      attachTo: document.getElementById("root")
+
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <UserManual />
+        </TestRouter>
+      ), {
+        attachTo: document.getElementById("root")
+      });
     });
-    await flushPromises();
     node.update();
 
     // We should have Preamble + the two mocked REST articles.
@@ -100,12 +115,13 @@ describe('User Manual page', () => {
     const trigger = node.find(".sidenavButton").first();
 
     // Click on the nav button
-    trigger.simulate('click', {
-      preventDefault: () => {
-        return true;
-      }
+    await act(async () => {
+      trigger.simulate('click', {
+        preventDefault: () => {
+          return true;
+        }
+      });
     });
-    await flushPromises();
     node.update();
 
     // Assert that the sidenav exists and is open.

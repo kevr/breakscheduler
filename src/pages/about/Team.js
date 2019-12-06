@@ -48,14 +48,20 @@ class Team extends Component {
     return (
       <Layout pageTitle="The Team">
         <div className="container InnerPage">
+          {/* We should change this header; it looks bad. */}
+          <h4 className="textCenter">The Team</h4>
 
-          <h4>The Team</h4>
-          <p className="Intro">
-            Everybody on our team loves to craft practical, useful tools that make things easier for day-to-day life. The less that people have to worry about, the better off they are! Less mistakes, more convenience, and absolute serenity: that's what we believe the future holds.
+          <p>
+            {`Everybody on our team loves to craft practical, useful
+            tools that make things easier for day-to-day life. The
+            less that people have to worry about, the better
+            off they are; that's the way we see it! Less mistakes,
+            less trouble and absolute serenity: that's what we believe
+            the future holds.`}
           </p>
 
-          <p className="Intro">
-            Click on a card to learn more about one of us!
+          <p className="textCenter">
+            {"Click on a card below to learn more about one of us!"}
           </p>
 
           {rows.map((i) => (

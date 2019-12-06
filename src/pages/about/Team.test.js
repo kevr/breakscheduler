@@ -15,7 +15,8 @@ import Team from './Team';
 import config from '../../config.json';
 import Reducers from '../../reducers';
 import {
-  Bootstrap,
+  TestRouter,
+  createHistory,
   mockPath
 } from 'TestUtil';
 
@@ -42,6 +43,8 @@ afterEach(() => {
 
 describe('Team Page', () => {
   test('shows all users', async () => {
+    const history = createHistory("/about/team");
+
     axiosMock.onGet(mockPath("members")).reply(200, [
       {
         id: 1,
@@ -55,9 +58,9 @@ describe('Team Page', () => {
 
     await act(async () => {
       render(
-        <Bootstrap store={store} route="/about/team">
+        <TestRouter store={store} history={history}>
           <Team />
-        </Bootstrap>
+        </TestRouter>
       , container);
     });
 
@@ -72,6 +75,8 @@ describe('Team Page', () => {
   });
 
   test('card click triggers modal with summary', async () => {
+    const history = createHistory("/about/team");
+
     axiosMock.onGet(mockPath("members")).reply(200, [
       {
         id: 1,
@@ -85,9 +90,9 @@ describe('Team Page', () => {
 
     await act(async () => {
       render(
-        <Bootstrap store={store} route="/about/team">
+        <TestRouter store={store} history={history}>
           <Team />
-        </Bootstrap>
+        </TestRouter>
       , container);
     });
 

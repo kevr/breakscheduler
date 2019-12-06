@@ -17,9 +17,9 @@ import Search from './Search';
 import config from '../../config.json';
 import Reducers from '../../reducers';
 import {
-  Bootstrap,
-  mockPath,
-  flushPromises
+  TestRouter,
+  createHistory,
+  mockPath
 } from 'TestUtil';
 
 configure({ adapter: new Adapter() });
@@ -46,6 +46,8 @@ afterEach(() => {
 });
 
 test('Search page default cards', async () => {
+  const history = createHistory("/help/search");
+
   const topics = [
     { id: 1, subject: "Test Subject", body: "Test body." }
   ];
@@ -54,9 +56,9 @@ test('Search page default cards', async () => {
 
   await act(async () => {
     render(
-      <Bootstrap store={store} route="/help/search">
+      <TestRouter store={store} history={history}>
         <Search />
-      </Bootstrap>
+      </TestRouter>
       , container
     );
   });
@@ -69,8 +71,9 @@ test('Search page default cards', async () => {
   expect(card.querySelector("p").textContent).toBe("Test body.");
 
   // Clicking on a card should open a modal with it's details
-  fireEvent.click(card);
-  await flushPromises();
+  await act(async () => {
+    fireEvent.click(card);
+  });
 
   // We should be able to use enzyme.find here, but
   // it returns nothing: investigate why.
@@ -82,6 +85,8 @@ test('Search page default cards', async () => {
 });
 
 test('Search page renders filtered topics', async () => {
+  const history = createHistory("/help/search");
+
   const topics = [
     { "id": 1, "subject": "Test Subject", "body": "Test body." },
     { "id": 2, "subject": "Second One", "body": "Next." },
@@ -97,9 +102,9 @@ test('Search page renders filtered topics', async () => {
     const {
       getByLabelText
     } = render(
-      <Bootstrap store={store} route="/help/search">
+      <TestRouter store={store} history={history}>
         <Search />
-      </Bootstrap>
+      </TestRouter>
       , container
     );
     object.getByLabelText = getByLabelText;
@@ -116,12 +121,13 @@ test('Search page renders filtered topics', async () => {
   let searchInput = object.getByLabelText("Search help topics...");
 
   // Type "Test" into the search input widget
-  fireEvent.change(searchInput, {
-    target: {
-      value: "Test"
-    }
+  await act(async () => {
+    fireEvent.change(searchInput, {
+      target: {
+        value: "Test"
+      }
+    });
   });
-  await flushPromises();
 
   // Check that we only have "Test" related results
   cards = document.querySelectorAll(".card");
@@ -132,12 +138,13 @@ test('Search page renders filtered topics', async () => {
   expect(card.querySelector("p").textContent).toBe("Test body.");
 
   // Type "Second" into the search input widget
-  fireEvent.change(searchInput, {
-    target: {
-      value: "Second"
-    }
+  await act(async () => {
+    fireEvent.change(searchInput, {
+      target: {
+        value: "Second"
+      }
+    });
   });
-  await flushPromises();
 
   // Check that we only have "Second" related results
   cards = document.querySelectorAll(".card");
@@ -149,6 +156,8 @@ test('Search page renders filtered topics', async () => {
 });
 
 test('Re-render of Search page does not call API', async () => {
+  const history = createHistory("/help/search");
+
   let topics = [
     { "id": 1, "subject": "Test Subject", "body": "Test body." },
     { "id": 2, "subject": "Second One", "body": "Next." },
@@ -158,14 +167,16 @@ test('Re-render of Search page does not call API', async () => {
   axiosMock.onGet(mockPath("topics")).replyOnce(200, topics);
 
   // Allow initial topics retrieval to occur.
-  const node = mount((
-      <Bootstrap store={store} route="/help/search">
-        <Search />
-      </Bootstrap>
-  ), {
-    attachTo: document.getElementById("root")
+  let node;
+  await act(async () => {
+    node = mount((
+        <TestRouter store={store} history={history}>
+          <Search />
+        </TestRouter>
+    ), {
+      attachTo: document.getElementById("root")
+    });
   });
-  await flushPromises();
   node.update();
   expect(node.find(".card").length).toBe(3);
 
@@ -174,7 +185,6 @@ test('Re-render of Search page does not call API', async () => {
   // it's render should remain the same.
   node.unmount();
   node.mount();
-  await flushPromises();
   node.update();
   expect(node.find(".card").length).toBe(3);
 });

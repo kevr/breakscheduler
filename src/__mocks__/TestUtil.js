@@ -2,7 +2,8 @@
  * Test utilities for the breakscheduler project.
 **/
 import React from 'react';
-import { MemoryRouter } from 'react-router';
+import { Router } from 'react-router';
+import { createMemoryHistory } from 'history';
 import { Provider } from 'react-redux';
 import config from '../config.json';
 
@@ -16,13 +17,19 @@ import config from '../config.json';
 //   </Bootstrap>
 // );
 //
-export const Bootstrap = ({ store, route, children }) => (
-  <MemoryRouter initialEntries={[ route ]}>
+export const TestRouter = ({ store, history, children }) => (
+  <Router history={history}>
     <Provider store={store}>
       {children}
     </Provider>
-  </MemoryRouter>
+  </Router>
 );
+
+export const createHistory = (route) => {
+  return createMemoryHistory({
+    initialEntries: [route]
+  });
+};
 
 // Generate an API request path with an endpoint
 // by abstracting away our JSON configuration.

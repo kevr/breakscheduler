@@ -8,23 +8,26 @@ import {
   fireEvent,
   waitForElement
 } from '@testing-library/react';
-// import mockAxios from 'jest-mock-axios';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
-import sinon from 'sinon';
-import Support from './Support';
+import { act } from 'react-dom/test-utils';
+import App from '../../App';
 import config from '../../config.json';
 import Reducers from '../../reducers';
 import {
-  Bootstrap,
-  mockPath,
-  flushPromises
+  TestRouter,
+  createHistory,
+  mockPath
 } from 'TestUtil';
+import {
+  createTicket,
+  createReply
+} from 'mockTickets';
 
 // Configure enzyme
 configure({ adapter: new Adapter() });
 
-describe('Support Page', () => {
+describe('Support page', () => {
 
   let axiosMock;
   let container;
@@ -34,17 +37,10 @@ describe('Support Page', () => {
 
   beforeAll(() => {
     axiosMock = new MockAdapter(axios);
-    delete window.location;
-    window.location = {
-      assign: jest.fn()
-    };
-  });
-
-  afterAll(() => {
-    window.location = location;
   });
 
   beforeEach(() => {
+    localStorage.clear();
     store = createStore(Reducers);
     container = document.createElement("div");
     container.id = "root";
@@ -55,10 +51,11 @@ describe('Support Page', () => {
     axiosMock.reset();
     document.body.removeChild(container);
     container = null;
-    jest.clearAllTimers();
   });
 
-  test('/help/support with auth token gets user info on mount', async () => { 
+  test('/help/support with auth token gets user info on mount', async () => {
+    const history = createHistory("/help/support");
+
     axiosMock.onGet(mockPath("users/me")).reply(200, {
       id: 1,
       name: "Kevin Morris",
@@ -67,44 +64,54 @@ describe('Support Page', () => {
 
     axiosMock.onGet(mockPath("tickets")).reply(200, []);
 
-    const node = mount((
-      <Bootstrap store={store} route="/help/support">
-        <Support />
-      </Bootstrap>
-    ), {
-      attachTo: document.getElementById("root")
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}> 
+          <App />
+        </TestRouter>
+      ), {
+        attachTo: document.getElementById("root")
+      });
     });
-    await flushPromises();
 
     await waitForElement(() => document.querySelector(".logoutButton"));
   });
 
   test('/help/support/login can login to API', async () => {
+    const history = createHistory("/help/support/login");
+
     axiosMock.onGet(mockPath("users/me")).replyOnce(401);
 
-    const node = mount((
-      <Bootstrap store={store} route="/help/support/login">
-        <Support />
-      </Bootstrap>
-    ), {
-      attachTo: document.getElementById("root")
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
+      ), {
+        attachTo: document.getElementById("root")
+      });
     });
-    await flushPromises();
-
     node.update();
 
     const email = node.find("#email-input").first();
     const pass = node.find("#password-input").first();
 
-    email.simulate('change', { 
-      target: {
-        value: "test@example.com"
-      }
+    await act(async () => {
+      email.simulate('change', { 
+        target: {
+          value: "test@example.com"
+        }
+      });
     });
-    pass.simulate('change', {
-      target: {
-        value: "password"
-      }
+
+    await act(async () => {
+      pass.simulate('change', {
+        target: {
+          value: "password"
+        }
+      });
     });
 
     // Reset mock adapter
@@ -115,63 +122,59 @@ describe('Support Page', () => {
       token: "abcd"
     });
 
-    axiosMock.onGet(mockPath("users/me")).reply(200, {
+    const user = {
       id: 1,
       name: "Kevin Morris",
       email: "test@example.com"
-    });
+    };
 
+    axiosMock.onGet(mockPath("users/me")).reply(200, user);
     axiosMock.onGet(mockPath("tickets")).reply(200, []);
 
     const form = node.find(".supportLogin form").first();
     let prevented = false;
-    form.simulate('submit', {
-      preventDefault: () => {
-        prevented = true;
-      }
+
+    await act(async () => {
+      form.simulate('submit', {
+        preventDefault: () => {
+          prevented = true;
+        }
+      });
     });
     expect(prevented).toBe(true);
 
     await waitForElement(() => document.querySelector(".logoutButton"));
     await expect(store.getState().session.isValid).toBe(true);
-
-    node.unmount();
-    node.mount();
+    node.update();
   });
 
   test('/help/support with ticket data renders tickets', async () => {
+    const history = createHistory("/help/support");
+
     localStorage.setItem("@authToken", "stubToken");
 
-    axiosMock.onGet(mockPath("users/me")).reply(200, {
+    const user = {
       id: 1,
-      name: "Example User",
-      email: "test@example.com",
-      type: "user"
-    });
+      name: "Kevin Morris",
+      email: "test@example.com"
+    };
+    axiosMock.onGet(mockPath("users/me")).reply(200, user);
 
     axiosMock.onGet(mockPath("tickets")).reply(200, [
-      {
-        id: 1,
-        subject: "Ticket subject 1",
-        body: "Ticket body 1",
-        updated_at: "stubUpdated"
-      },
-      {
-        id: 2,
-        subject: "Ticket subject 2",
-        body: "Ticket body 2",
-        updated_at: "stubUpdated"
-      }
+      createTicket(1, "Ticket subject 1", "Ticket body 1", "open", user, []),
+      createTicket(2, "Ticket subject 2", "Ticket body 2", "open", user, [])
     ]);
 
-    const node = mount((
-      <Bootstrap store={store} route="/help/support">
-        <Support />
-      </Bootstrap>
-    ), {
-      assignTo: document.getElementById("root")
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
+      ), {
+        assignTo: document.getElementById("root")
+      });
     });
-    await flushPromises();
 
     node.update();
 
@@ -184,72 +187,89 @@ describe('Support Page', () => {
 
     // Expect that the first row matches the first ticket
     const firstRow = tr.at(0);
-    expect(firstRow.find("td").first().text()).toBe("1");
-    expect(firstRow.find("td").at(1).text()).toBe("Ticket subject 1");
-    expect(firstRow.find("td").at(2).text()).toBe("stubUpdated");
+    expect(firstRow.find("td").at(0).text()).toBe("Ticket subject 1");
 
     const secondRow = tr.at(1);
-    expect(secondRow.find("td").first().text()).toBe("2");
-    expect(secondRow.find("td").at(1).text()).toBe("Ticket subject 2");
-    expect(secondRow.find("td").at(2).text()).toBe("stubUpdated");
+    expect(secondRow.find("td").at(0).text()).toBe("Ticket subject 2");
   });
 
   test('invalid session redirects to Login', async () => {
+    const history = createHistory("/help/support");
+
     axiosMock.onGet(mockPath("users/me")).reply(401);
 
-    let redirected;
-    const historyMock = {
-      push: jest.fn().mockImplementation((url) => {
-        redirected = url;
-      })
-    };
-
-    const node = mount((
-      <Bootstrap store={store} route="/help/support">
-        <Support history={historyMock} />
-      </Bootstrap>
-    ), {
-      assignTo: document.getElementById("root")
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
+      ), {
+        assignTo: document.getElementById("root")
+      });
     });
-    await flushPromises();
-
     node.update();
 
-    expect(redirected).toBe("/help/support/login");
+    expect(history.location.pathname).toBe("/help/support/login");
+  });
+
+  test('valid session redirects from Login', async () => {
+    const history = createHistory("/help/support/login");
+
+    const user = {
+      id: 1,
+      name: "Test User",
+      email: "test@example.com",
+      type: "user"
+    };
+
+    localStorage.setItem("@authToken", "stubToken");
+    axiosMock.onGet(mockPath("users/me")).reply(200, user);
+    axiosMock.onGet(mockPath("tickets")).reply(200, []);
+
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
+      ), {
+        assignTo: document.getElementById("root")
+      });
+    });
+    node.update();
+
+    expect(history.location.pathname).toBe("/help/support");
   });
 
   test('/help/support/createTicket requires authentication', async () => {
+    const history = createHistory("/help/support/createTicket");
+
     // Reply with bad valid user response, unauthorized.
     axiosMock.onGet(mockPath("users/me")).reply(401);
+    axiosMock.onGet(mockPath("tickets")).reply(401);
 
-    let redirected;
-    const historyMock = {
-      push: (url) => {
-        redirected = url;
-      }
-    };
-
-    // Support.Authenticated deals with routing to createTicket
+    // App.Authenticated deals with routing to createTicket
     // when the user is authenticated properly.
-    const node = mount((
-      <Bootstrap store={store} route="/help/support/createTicket">
-        <Support history={historyMock} />
-      </Bootstrap>
-    ), {
-      attachTo: document.getElementById("root")
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
+      ), {
+        attachTo: document.getElementById("root")
+      });
     });
-
-    // Await for componentDidMount stuff and related timers.
-    await flushPromises();
-
-    // Update node to reflect DOM changes.
     node.update();
 
     // Expect to be redirected to the Login page.
-    expect(redirected).toBe("/help/support/login");
+    expect(history.location.pathname).toBe("/help/support/login");
   });
 
   test('/help/support/createTicket renders when authenticated', async () => {
+    const history = createHistory("/help/support/createTicket");
+
     // Reply with a valid user.
     axiosMock.onGet(mockPath("users/me")).reply(200, {
       id: 1,
@@ -261,26 +281,25 @@ describe('Support Page', () => {
     // No tickets yet.
     axiosMock.onGet(mockPath("tickets")).reply(200, []);
 
-    // Support.Authenticated deals with routing to createTicket
+    // App.Authenticated deals with routing to createTicket
     // when the user is authenticated properly.
-    const node = mount((
-      <Bootstrap store={store} route="/help/support/createTicket">
-        <Support />
-      </Bootstrap>
-    ), {
-      attachTo: document.getElementById("root")
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
+      ), {
+        attachTo: document.getElementById("root")
+      });
     });
-
-    // Await for componentDidMount stuff and related timers.
-    await flushPromises();
-
-    // Update node to reflect DOM changes
     node.update();
 
     expect(node.find("form").exists()).toBe(true);
   });
 
   test('deal with tickets 404', async () => {
+    const history = createHistory("/help/support/createTicket");
     // Reply with a valid user.
     axiosMock.onGet(mockPath("users/me")).reply(200, {
       id: 1,
@@ -294,26 +313,25 @@ describe('Support Page', () => {
     // case in the UI.
     axiosMock.onGet(mockPath("tickets")).reply(404);
 
-    // Support.Authenticated deals with routing to createTicket
+    // App.Authenticated deals with routing to createTicket
     // when the user is authenticated properly.
     const node = mount((
-      <Bootstrap store={store} route="/help/support/createTicket">
-        <Support />
-      </Bootstrap>
+      <TestRouter store={store} history={history}>
+        <App />
+      </TestRouter>
     ), {
       attachTo: document.getElementById("root")
     });
-
-    // Await for componentDidMount stuff and related timers.
-    await flushPromises();
 
     // Update node to reflect DOM changes
     node.update();
   });
 
   test('Ticket page renders', async () => {
-    localStorage.setItem("@authToken", "stubToken");
     const ticketId = 1;
+    const history = createHistory(`/help/support/ticket/${ticketId}`);
+
+    localStorage.setItem("@authToken", "stubToken");
 
     const user = {
       id: 1,
@@ -325,26 +343,20 @@ describe('Support Page', () => {
     axiosMock.onGet(mockPath("users/me")).reply(200, user);
 
     axiosMock.onGet(mockPath("tickets")).reply(200, [
-      {
-        id: 1,
-        subject: "Ticket 1",
-        body: "Ticket body 1",
-        user: user,
-        replies: []
-      }
+      createTicket(1, "Ticket 1", "Ticket body 1", "open", user, [])
     ]);
 
-    const node = mount((
-      <Bootstrap
-        store={store}
-        route={`/help/support/ticket/${ticketId}`}
-      >
-        <Support />
-      </Bootstrap>
-    ), {
-      attachTo: document.getElementById("root")
+    let node;
+
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
+      ), {
+        attachTo: document.getElementById("root")
+      });
     });
-    await flushPromises();
     node.update();
 
     await waitForElement(() => document.querySelector(".ticket"));
@@ -352,21 +364,18 @@ describe('Support Page', () => {
   });
 
   test('not found matches unknown urls past /help/support', async () => {
-    let redirected;
-    const historyMock = {
-      push: (url) => {
-        redirected = url;
-      }
-    };
+    const history = createHistory("/help/support/blah");
 
-    const node = mount((
-      <Bootstrap store={store} route="/help/support/blah">
-        <Support history={historyMock} />
-      </Bootstrap>
-    ), {
-      assignTo: document.getElementById("root")
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
+      ), {
+        assignTo: document.getElementById("root")
+      });
     });
-    await flushPromises();
     node.update();
   });
 

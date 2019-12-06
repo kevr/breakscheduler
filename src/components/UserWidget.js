@@ -12,14 +12,15 @@ const UserWidget = ({ userData, clearSession }) => (
           {`Logged in as ${userData.email}`}{userData.type === "admin" && " [admin]"}
         </span>
         <span className="widgets right">
-          <Link to="/help/support/settings"
-            className="settingsButton"
+          <Link
+            to="/help/support/settings"
+            className="settingsButton primary red lighten-2 btn"
             alt="Settings"
           >
             {"Settings"}
           </Link>
-          <a href="#"
-            className="logoutButton"
+          <button
+            className="logoutButton primary red lighten-2 btn"
             alt="Logout"
             onClick={(e) => {
               e.preventDefault();
@@ -30,7 +31,7 @@ const UserWidget = ({ userData, clearSession }) => (
             }}
           >
             {"Logout"}
-          </a>
+          </button>
         </span>
       </div>
     ) : (

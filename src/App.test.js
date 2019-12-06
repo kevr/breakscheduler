@@ -14,12 +14,14 @@ import App from './App';
 import Search from './pages/help/Search';
 import config from './config.json';
 import {
-  Bootstrap,
+  TestRouter,
+  createHistory,
   mockPath,
   flushPromises
 } from 'TestUtil';
 import Reducers from './reducers';
 
+let history;
 let axiosMock;
 let container;
 let store;
@@ -54,13 +56,15 @@ const expectTitle = async (title) => {
 }
 
 test('/ route sets correct title', async () => {
+  const history = createHistory("/");
   await act(async () => {
     render(
-      <Bootstrap store={store} route="/">
+      <TestRouter store={store} history={history}>
         <App />
-      </Bootstrap>
+      </TestRouter>
     , container);
   });
+  expect(history.location.pathname).toBe("/");
 
   await waitForElement(() => document.head.querySelector("title"));
   expect(document.head.querySelector("title").textContent)
@@ -71,18 +75,22 @@ test('/ route sets correct title', async () => {
 });
 
 test('/about/contact route sets correct title', async () => {
+  const history = createHistory("/about/contact");
   await act(async () => {
     render(
-      <Bootstrap store={store} route="/about/contact">
+      <TestRouter store={store} history={history}>
         <App />
-      </Bootstrap>
+      </TestRouter>
     , container);
   });
+  expect(history.location.pathname).toBe("/about/contact");
 
   await expectTitle("Contact Us");
 });
 
 test('/about/team route sets correct title', async () => {
+  const history = createHistory("/about/team");
+
   axiosMock.onGet(mockPath("members")).reply(200, [
     {
       id: 1,
@@ -93,16 +101,19 @@ test('/about/team route sets correct title', async () => {
 
   await act(async() => {
     render(
-      <Bootstrap store={store} route="/about/team">
+      <TestRouter store={store} history={history}>
         <App />
-      </Bootstrap>
+      </TestRouter>
     , container);
   });
+  expect(history.location.pathname).toBe("/about/team");
 
   await expectTitle("The Team");
 });
 
 test('/help route sets correct title', async () => {
+  const history = createHistory("/help");
+
   axiosMock.onGet(mockPath("articles")).reply(200, [
     {
       id: 1,
@@ -113,36 +124,42 @@ test('/help route sets correct title', async () => {
 
   await act(async () => {
     render(
-      <Bootstrap store={store} route="/help">
+      <TestRouter store={store} history={history}>
         <App />
-      </Bootstrap>
+      </TestRouter>
     , container);
   });
+
+  expect(history.location.pathname).toBe("/help");
 
   await expectTitle("Help Directory");
 });
 
 test('/help/search route sets correct title', async () => {
+  const history = createHistory("/help/search");
   axiosMock.onGet(mockPath("topics")).reply(200, []);
 
-  await act(async() => {
+  await act(async () => {
     render(
-      <Bootstrap store={store} route="/help/search">
+      <TestRouter store={store} history={history}>
         <App />
-      </Bootstrap>
+      </TestRouter>
     , container);
   });
+
+  expect(history.location.pathname).toBe("/help/search");
 
   await expectTitle("Help Directory");
 });
 
-/*
+/* This needs to be tested with the others.
 test('/help/support route sets correct title', async () => {
+  const history = createHistory("/help/support");
   await act(async () => {
     render(
-      <MemoryRouter initialEntries={[ "/help/support" ]}>
+      <TestRouter store={store} history={history}>
         <App />
-      </MemoryRouter>
+      </TestRouter>
     );
   });
 
@@ -151,37 +168,43 @@ test('/help/support route sets correct title', async () => {
 */
 
 test('/random route gives not found', async () => {
+  const history = createHistory("/random");
   await act(async () => {
     render(
-      <MemoryRouter initialEntries={[ "/random" ]}>
+      <TestRouter store={store} history={history}>
         <App />
-      </MemoryRouter>
+      </TestRouter>
     );
   });
+  expect(history.location.pathname).toBe("/random");
 
   await expectTitle("Not Found");
 });
 
 test('/features route renders the features page', async () => {
+  const history = createHistory("/features");
   await act(async () => {
     render(
-      <MemoryRouter initialEntries={[ "/features" ]}>
+      <TestRouter store={store} history={history}>>
         <App />
-      </MemoryRouter>
+      </TestRouter>
     );
   });
+  expect(history.location.pathname).toBe("/features");
 
   await expectTitle("Features");
 });
 
 test('/product route renders the product page', async () => {
+  const history = createHistory("/product");
   await act(async () => {
     render(
-      <MemoryRouter initialEntries={[ "/product" ]}>
+      <TestRouter store={store} history={history}>
         <App />
-      </MemoryRouter>
+      </TestRouter>
     );
   });
+  expect(history.location.pathname).toBe("/product");
 
   await expectTitle("Product");
 });

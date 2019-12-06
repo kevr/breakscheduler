@@ -84,6 +84,7 @@ const Tickets = (state = defaultState, action) => {
               })
             });
           }
+          return t;
         })
       });
 
@@ -100,6 +101,7 @@ const Tickets = (state = defaultState, action) => {
               replies: t.replies.filter(reply => reply.id !== action.reply.id)
             });
           }
+          return t;
         })
       });
 

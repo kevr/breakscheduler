@@ -38,3 +38,50 @@ export const patchRequest = (endpoint, data) =>
 export const deleteRequest = (endpoint) =>
   apiRequest("delete", endpoint, null);
 
+// Abstracted API methods.
+export const getSession = () =>
+  getRequest("users/me").then(response => response.data);
+
+export const getTickets = () =>
+  getRequest("tickets").then(response => response.data);
+
+// Session
+export const userLogin = (data) => {
+  const endpoint = data.isAdmin ? "users/admin/login" : "users/login";
+  return postRequest(endpoint, data).then(response => response.data);
+}
+
+// Tickets
+export const addTicket = (data) =>
+  postRequest("tickets", data)
+    .then(response => response.data);
+
+export const updateTicket = (data) =>
+  patchRequest(`tickets/${data.id}`, data)
+    .then(response => response.data);
+
+export const deleteTicket = (data) =>
+  deleteRequest(`tickets/${data.id}`)
+    .then(response => response.status);
+
+// Ticket replies
+export const addReply = (data) => {
+  const ticketId = data.ticket_id;
+  return postRequest(`tickets/${ticketId}/replies`, data)
+    .then(response => response.data);
+}
+
+export const updateReply = (data) => {
+  const replyId = data.id;
+  const ticketId = data.ticket_id;
+  return patchRequest(`tickets/${ticketId}/replies/${replyId}`, data)
+    .then(response => response.data);
+}
+
+export const deleteReply = (data) => {
+  const replyId = data.id;
+  const ticketId = data.ticket_id;
+  return deleteRequest(`tickets/${ticketId}/replies/${replyId}`)
+    .then(response => response.status);
+}
+

@@ -7,10 +7,14 @@ import { configure, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import Reducers from '../../../reducers';
 import {
-  Bootstrap,
+  TestRouter,
+  createHistory,
   mockPath
 } from 'TestUtil';
 import Create from './Create';
+import App from '../../../App';
+import Support from '../Support';
+import PropTypes from 'prop-types';
 
 configure({ adapter: new Adapter() });
 
@@ -38,29 +42,29 @@ describe('Create ticket page', () => {
   });
 
   test('renders', async () => {
-    let node;
+    const history = createHistory("/help/support/createTicket");
 
-    let redirected;
-    const historyMock = {
-      push: jest.fn().mockImplementation((url) => {
-        redirected = url;
-      })
+    const user = {
+      id: 1,
+      name: "Test User",
+      email: "test@example.com",
+      type: "user"
     };
 
+    axiosMock.onGet(mockPath("users/me")).reply(200, user);
+    axiosMock.onGet(mockPath("tickets")).reply(200, []);
+
+    let node;
     await act(async () => {
       node = mount((
-        <Bootstrap
-          store={store}
-          route="/help/support/createTicket"
-        >
-          <Create history={historyMock} />
-        </Bootstrap>
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
       ), {
         assignTo: document.getElementById("root")
       });
     });
     node.update();
-    expect(node.exists()).toBe(true);
 
     // Change subject
     const subject = node.find("#subject-input");
@@ -100,20 +104,16 @@ describe('Create ticket page', () => {
     expect(node.find(".error").text())
       .toBe("An error occurred while creating this ticket.");
 
-    const user = {
-      id: 1,
-      name: "Test User",
-      email: "test@example.com",
-      type: "user"
-    };
-
-    axiosMock.onPost(mockPath("tickets")).replyOnce(200, {
+    const ticketCreated = {
       id: 1,
       subject: "Test subject",
       body: "Test body",
       user: user,
+      status: "open",
       replies: []
-    });
+    };
+
+    axiosMock.onPost(mockPath("tickets")).replyOnce(200, ticketCreated);
 
     submitClicked = false;
     await act(async () => {
@@ -126,7 +126,7 @@ describe('Create ticket page', () => {
     expect(submitClicked).toBe(true);
     node.update();
 
-    expect(redirected).toBe("/help/support/ticket/1");
+    expect(history.location.pathname).toBe("/help/support/ticket/1");
   });
 
 });

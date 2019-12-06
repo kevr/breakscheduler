@@ -10,14 +10,20 @@ import {
 import { act } from 'react-dom/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
-import sinon from 'sinon';
+import App from '../../../App';
 import Reducers from '../../../reducers';
 import {
-  Bootstrap,
+  TestRouter,
+  createHistory,
   mockPath,
   flushPromises
 } from 'TestUtil';
-import Support from '../Support';
+import {
+  createTicket,
+  createReply,
+  addReply,
+  removeReply
+} from 'mockTickets';
 
 configure({ adapter: new Adapter() });
 
@@ -52,12 +58,7 @@ describe('Ticket page', () => {
     // Our mocked up ticketId value.
     ticketId = 1;
 
-    // Prepare Redux store
-    store.dispatch({
-      type: "SET_SESSION",
-      session: user
-    });
-
+    axiosMock.onGet(mockPath("users/me")).reply(200, user);
   });
 
   afterEach(() => {
@@ -66,99 +67,87 @@ describe('Ticket page', () => {
     container = null;
   });
 
-  test('Ticket page renders', async () => {
-    store.dispatch({
-      type: "SET_TICKETS",
-      tickets: [
-        {
-          id: ticketId,
-          subject: "Test ticket",
-          body: "Ticket body",
-          user: user,
-          replies: [
-            {
-              id: 1,
-              ticket_id: ticketId,
-              body: "Reply one",
-              user: user
-            },
-            {
-              id: 2,
-              ticket_id: ticketId,
-              body: "Reply two",
-              user: user
-            }
-          ]
-        }
-      ]
-    });
+  test('renders correctly after mounting', async () => {
+    const history = createHistory(`/help/support/ticket/${ticketId}`);
 
-    const node = mount((
-      <Bootstrap
-        store={store}
-        route={`/help/support/ticket/${ticketId}`}
-      >
-        <Support />
-      </Bootstrap>
-    ), {
-      attachTo: document.getElementById("root")
+    const replies = [
+      createReply(1, ticketId, "Reply one", user),
+      createReply(2, ticketId, "Reply two", user)
+    ];
+
+    const tickets = [
+      createTicket(
+        ticketId, "Test ticket", "Ticket body", "open", user, replies
+      )
+    ];
+
+    axiosMock.onGet(mockPath("tickets")).reply(200, tickets);
+
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
+      ), {
+        attachTo: document.getElementById("root")
+      });
     });
-    await flushPromises();
+    node.update();
 
     const ticket = node.find(".ticket");
     expect(ticket.exists()).toBe(true);
 
     // Expect that this Ticket page is rendering the ticket
-    // in our Redux store.
-    expect(ticket.find("h5").text()).toBe("Test ticket");
+    // located in our Redux store.
+    expect(ticket.find(".card-title .col.s10").text()).toBe("Test ticket");
   });
 
-  test('can be replied to', async () => {
-    store.dispatch({
-      type: "SET_TICKETS",
-      tickets: [
-        {
-          id: ticketId,
-          subject: "Test ticket",
-          body: "Ticket body",
-          user: user,
-          replies: []
-        }
-      ]
-    });
+  // A huge test that uses the entire Ticket page to
+  // reply to the ticket and perform other various tasks.
+  test('can be navigated and edited', async () => {
+    const history = createHistory(`/help/support/ticket/${ticketId}`);
 
-    const node = mount((
-      <Bootstrap
-        store={store}
-        route={`/help/support/ticket/${ticketId}`}
-      >
-        <Support />
-      </Bootstrap>
-    ), {
-      attachTo: document.getElementById("root")
+    // Mock up some tickets.
+    const tickets = [
+      createTicket(ticketId, "Test ticket", "Ticket body", "open", user, [])
+    ];
+    axiosMock.onGet(mockPath("tickets")).reply(200, tickets);
+
+    // Mount the node at /help/support/ticket/:id
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
+      ), {
+        attachTo: document.getElementById("root")
+      });
     });
-    await flushPromises();
     node.update();
 
-    const collapsible = node.find(".collapsible");
-    const header = collapsible.find(".collapsible-header");
+    const collapsible = node.find(".addReply");
+    const header = collapsible.find(".toggleButton");
     expect(header.exists()).toBe(true);
 
     // Click to open the Reply dialog
-    header.simulate('click', {});
-    await flushPromises();
+    await act(async () => {
+      header.simulate('click');
+    });
     node.update();
 
     // Reply dialog should be open, change the textarea
     const replyBody = collapsible.find("textarea");
     expect(replyBody.exists()).toBe(true);
 
-    replyBody.simulate('change', {
-      target: {
-        value: "Test reply"
-      }
+    await act(async () => {
+      replyBody.simulate('change', {
+        target: {
+          value: "Test reply"
+        }
+      });
     });
-    await flushPromises();
     node.update();
 
     // First, we'll mock an error to test that code path
@@ -178,17 +167,12 @@ describe('Ticket page', () => {
     });
     node.update();
 
-    expect(node.find(".error").text())
+    expect(node.find(".ticketPage .error").first().text())
       .toBe("There was an error replying to this ticket.");
 
     // Now, mock a response that was successful
     axiosMock.onPost(mockPath(`tickets/${ticketId}/replies`))
-      .replyOnce(200, {
-        id: 1,
-        ticket_id: ticketId,
-        body: "Test reply",
-        user: user
-      });
+      .replyOnce(200, createReply(1, ticketId, "Test reply", user));
 
     // Submit again, with a proper network mock
     await act(async () => {
@@ -204,24 +188,29 @@ describe('Ticket page', () => {
     const replies = node.find(".ticketReply");
     expect(replies.length).toBe(1);
 
+    // Now, begin to edit a reply.
     let reply = replies.at(0);
     let editButton = reply.find(".editButton");
     expect(editButton.exists()).toBe(true);
 
     await act(async () => {
-      editButton.simulate('click', {});
+      editButton.simulate('click');
     });
+    node.update();
 
+    // We can cancel an edit.
     const cancelButton = reply.update().find(".cancelButton");
     await act(async () => {
-      cancelButton.simulate('click', {});
+      cancelButton.simulate('click');
     });
+    node.update();
 
     editButton = reply.find(".editButton");
     await act(async () => {
-      editButton.simulate('click', {});
+      editButton.simulate('click');
     });
 
+    // Or we can fill out the text area with new content.
     const replyEditor = await waitForElement(() => {
       return node.update().find(".replyEditor").first();
     });
@@ -243,12 +232,16 @@ describe('Ticket page', () => {
         }
       });
     });
+    node.update();
 
+    // We can try to save edits with a blank body.
     await act(async () => {
-      replySaveButton.simulate('click', {});
+      replySaveButton.simulate('click');
     });
+    node.update();
 
-    expect(node.update().find(".error").text())
+    // But a body is required.
+    expect(node.find(".replyContent .error").text())
       .toBe("A reply body is required.");
 
     await act(async() => {
@@ -258,33 +251,31 @@ describe('Ticket page', () => {
         }
       });
     });
+    node.update();
 
+    // We can try to edit the reply again, with a 500 API server error.
     axiosMock.onPatch(mockPath(`tickets/${ticketId}/replies/1`))
       .replyOnce(500);
 
     await act(async () => {
-      replySaveButton.simulate('click', {});
+      replySaveButton.simulate('click');
     });
+    node.update();
 
-    expect(node.update().find(".error").text())
+    expect(node.find(".replyContent .error").text())
       .toBe("Encountered a server error while saving reply edits.");
 
+    // Now we can update our reply successfully.
     axiosMock.onPatch(mockPath(`tickets/${ticketId}/replies/1`))
-      .replyOnce(200, {
-        id: 1,
-        ticket_id: 1,
-        body: "Edited reply",
-        user: user,
-        replies: []
-      });
+      .replyOnce(200, createReply(1, ticketId, "Edited reply", user));
 
     await act(async () => {
-      replySaveButton.simulate('click', {});
+      replySaveButton.simulate('click');
     });
-
     node.update();
     reply = node.find(".ticketReply").first();
 
+    // We can also delete a reply.
     const deleteButton = await waitForElement(() => {
       return reply.update().find(".deleteButton").first();
     });
@@ -295,8 +286,9 @@ describe('Ticket page', () => {
 
     // Do it with confirm = false
     await act(async () => {
-      fireEvent.click(deleteButton.getDOMNode());
+      deleteButton.simulate('click');
     });
+    node.update();
 
     // Then actually delete it
     window.confirm = jest.fn().mockImplementation((message) => {
@@ -308,21 +300,53 @@ describe('Ticket page', () => {
       .replyOnce(500);
 
     await act(async () => {
-      fireEvent.click(deleteButton.getDOMNode());
+      deleteButton.simulate('click');
     });
+    node.update();
 
-    expect(node.update().find(".error").text())
+    expect(node.find(".replyContent .error").text())
       .toBe("Encountered a server error while deleting reply.");
 
-    // Then, a successful deletion
+    // Then, delete the reply successfully.
     axiosMock.onDelete(mockPath(`tickets/${ticketId}/replies/1`))
       .replyOnce(200);
 
     await act(async () => {
-      fireEvent.click(deleteButton.getDOMNode());
+      deleteButton.simulate('click');
     });
+    node.update();
 
-    expect(node.update().find(".ticketReply").length).toBe(0);
+    // Expect that we deleted the reply and have none left.
+    expect(node.find(".ticketReply").length).toBe(0);
+
+    // Now, navigate away from the Ticket page to fire
+    // componentWillUnmount
+    await act(async () => {
+      history.push("/help/support");
+    });
+  });
+
+  test('renders not found details for ticket', async () => {
+    const history = createHistory("/help/support/ticket/666");
+
+    axiosMock.onGet(mockPath("users/me")).reply(200, user);
+    axiosMock.onGet(mockPath("tickets")).reply(200, []);
+
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
+      ), {
+        assignTo: document.getElementById("root")
+      });
+    });
+    node.update();
+
+    expect(node.find(".textCenter").text())
+      .toBe("The ticket you were looking for " +
+            "with id '666' could not be located.");
   });
 
 });

@@ -6,7 +6,8 @@ import Adapter from 'enzyme-adapter-react-16';
 import UserWidget from './UserWidget';
 import Reducers from '../reducers';
 import {
-  Bootstrap,
+  TestRouter,
+  createHistory,
   flushPromises
 } from 'TestUtil';
 
@@ -62,13 +63,15 @@ describe('UserWidget component', () => {
   });
 
   test('default is logged out', async () => {
+    const history = createHistory("/help/support");
+
     const userData = {
       isValid: false
     };
     const node = mount((
-      <Bootstrap store={store} route="/help/support">
+      <TestRouter store={store} history={history}>
         <UserWidget userData={userData} />
-      </Bootstrap>
+      </TestRouter>
     ), {
       attachTo: document.getElementById("root")
     });
@@ -78,10 +81,11 @@ describe('UserWidget component', () => {
   });
 
   test('valid user data is logged in', async () => {
+    const history = createHistory("/help/support");
     const node = mount((
-      <Bootstrap store={store} route="/help/support">
+      <TestRouter store={store} history={history}>
         <Mock />
-      </Bootstrap>
+      </TestRouter>
     ), {
       attachTo: document.getElementById("root")
     });
@@ -89,12 +93,9 @@ describe('UserWidget component', () => {
 
     // Test when window.confirm is false while clicking on Logout
     window.confirm = jest.fn().mockImplementation(() => false);
-    let logout = node.find("a").at(1);
+    let logout = node.find(".logoutButton").first();
     expect(logout.text()).toBe("Logout");
     logout.simulate('click');
-
-    // Expect nothing to happen; Logout should still be there.
-    expect(node.find(".logoutButton").first()).not.toBeNull();
 
     // Test when window.confirm is true while clickong on Logout
     window.confirm = jest.fn().mockImplementation(() => true)
@@ -109,6 +110,7 @@ describe('UserWidget component', () => {
   });
 
   test('admin user data shows admin annotations', async () => {
+    const history = createHistory("/help/support");
     const userData = {
       isValid: true,
       id: 1,
@@ -117,11 +119,11 @@ describe('UserWidget component', () => {
       type: "admin"
     };
     const node = mount((
-      <Bootstrap store={store} route="/help/support">
+      <TestRouter store={store} history={history}>
         <UserWidget
           userData={userData}
         />
-      </Bootstrap>
+      </TestRouter>
     ), {
       attachTo: document.getElementById("root")
     });

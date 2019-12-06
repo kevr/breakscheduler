@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
   patchRequest,
-  deleteRequest
+  deleteRequest,
+  updateReply,
+  deleteReply
 } from '../actions/API';
 import Loader from './Loader';
 
@@ -47,14 +49,21 @@ class Reply extends Component {
     }
 
     // Otherwise, let's perform a delete request.
-    const { reply } = this.props;
-    deleteRequest(`tickets/${reply.ticket_id}/replies/${reply.id}`)
-      .then((response) => {
-        // If it succeeds, remove it from redux
-        this.props.removeReply(reply);
-      }).catch((error) => {
-        // Otherwise, just set error state.
+    const {
+      reply,
+      removeReply
+    } = this.props;
+    deleteReply(reply)
+      .then(statusCode => {
+        console.log(
+          `Deleted Reply(${reply.id}) in Ticket(${reply.ticket_id})
+          with status code: ${statusCode}`);
+        removeReply(reply);
+      }).catch(error => {
         console.error(error);
+        console.warn(
+          `Unable to delete Reply(${reply.id}) in Ticket(${reply.ticket_id})
+          with status code: ${error.status}`);
         this.setState({
           error: "Encountered a server error while deleting reply."
         });
@@ -70,8 +79,35 @@ class Reply extends Component {
       return;
     }
 
-    const { reply } = this.props;
+    const {
+      reply,
+      setReply
+    } = this.props;
+
+    // First, set status state to loading, then
+    // attempt to update the reply. If any error
+    // is encountered, we'll set the error state
+    // to some relevent text and log out warnings
+    // and errors. Otherwise, we'll just set the
+    // updated reply.
     this.setState({ status: "loading" }, () => {
+      updateReply(reply).then(reply => {
+          setReply(reply);
+          this.setState({
+            body: reply.body,
+            edit: false,
+            error: null,
+            status: "updated"
+          });
+        })
+        .catch(error => {
+          console.error(error);
+          this.setState({
+            error: "Encountered a server error while saving reply edits."
+          });
+        });
+    });
+      /*
       patchRequest(`tickets/${reply.ticket_id}/replies/${reply.id}`, {
         body: this.state.body
       })
@@ -96,6 +132,7 @@ class Reply extends Component {
           });
         });
     });
+    */
   }
 
   handleCancel(e) {
@@ -120,9 +157,11 @@ class Reply extends Component {
       }
     };
 
+    const dateUpdated = new Date(reply.updated_at);
+
     return (
-      <div className="ticketReply">
-        <div className="replyContent">
+      <div className="ticketReply card">
+        <div className="replyContent card-content">
           {reply.user.id === session.id && (
             <div className="controlBox right">
               {!this.state.edit && (
@@ -175,8 +214,7 @@ class Reply extends Component {
             </div>
           ) : (
             <div className="replyInfo">
-              <p className="textMedium">{reply.body}</p>
-              <div className="textSmall">{`by ${reply.user.email}`}</div>
+              <p>{reply.body}</p>
             </div>
           )}
 
@@ -189,6 +227,12 @@ class Reply extends Component {
           <div className="status">
             {renderStatus(this.state.status)}
           </div>
+        </div>
+
+        <div className="card-action">
+          <span className="textSmall">
+            {`updated ${dateUpdated.toString()} by ${reply.user.email}`}
+          </span>
         </div>
       </div>
     );

@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 import {
   getRequest,
   postRequest
 } from '../../../actions/API';
+import Breadcrumb from '../../../components/Breadcrumb';
 
 // A Ticket creation form for users.
 //
@@ -58,8 +60,16 @@ class Create extends Component {
   }
 
   render() {
+    const breadcrumb = [
+      { to: "/help/support", text: "Dashboard" },
+      { text: "Create Ticket" }
+    ];
+
     return (
       <div className="subPage ticketCreate">
+        <div className="row">
+          <Breadcrumb items={breadcrumb} />
+        </div>
 
         <form onSubmit={this.onSubmit}>
 
@@ -85,7 +95,7 @@ class Create extends Component {
           <div className="input-field">
             <button
               type="submit"
-              className="primary btn"
+              className="primary red lighten-2 btn"
             >
               {"Create Ticket"}
             </button>
@@ -103,6 +113,10 @@ class Create extends Component {
   }
 }
 
+const mapState = (state, ownProps) => ({
+  session: state.session
+});
+
 const mapDispatch = (dispatch, ownProps) => ({
   addTicket: (ticket) => dispatch({
     type: "ADD_TICKET",
@@ -110,4 +124,4 @@ const mapDispatch = (dispatch, ownProps) => ({
   })
 });
 
-export default connect(null, mapDispatch)(Create);
+export default connect(mapState, mapDispatch)(Create);
