@@ -44,10 +44,6 @@ nav ul li.active:hover {
   position: relative;
 }
 
-.App {
-  text-align: center;
-}
-
 .App-logo {
   height: 40vmin;
 }
@@ -83,6 +79,10 @@ nav ul li.active:hover {
 
 .textLeft {
   text-align: left;
+}
+
+.textRight {
+  text-align: right;
 }
 
 .textSmall {
@@ -122,3 +122,57 @@ li.tab > a.active {
 .controlBox button {
   cursor: pointer;
 }
+
+.colorBadge {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  font-size: 0.8rem;
+}
+
+.statusBox {
+  padding: 5px;
+}
+
+.statusBox label {
+  padding-right: 5px;
+}
+
+.ticketReplies {
+  background-color: rgba(0, 0, 0, 0.02);
+  padding: 25px;
+  border-radius: 4px;
+}
+
+.ticketReplies .collapsible {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.breadcrumbTransparent .breadcrumb {
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 12px;
+  line-height: 2em;
+}
+
+.breadcrumbTransparent .breadcrumb:before {
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 12px;
+}
+
+.breadcrumbTransparent .breadcrumb:last-child {
+  color: black;
+}
+
+.tickets tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+  cursor: pointer;
+}
+
+.supportLogin {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
