@@ -176,3 +176,8 @@ li.tab > a.active {
   margin: 0 auto;
 }
 
+.horizontalGap {
+  display: inline-block;
+  width: 6px;
+}
+

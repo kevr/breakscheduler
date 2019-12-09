@@ -67,7 +67,10 @@ describe('ReplyForm component', () => {
     await act(async () => {
       node = mount((
         <TestRouter store={store} history={history}>
-          <ReplyForm ticket={ticket} />
+          <ReplyForm
+            ticket={ticket}
+            collapse={() => {}}
+          />
         </TestRouter>
       ), {
         assignTo: document.getElementById("root")
@@ -124,7 +127,10 @@ describe('ReplyForm component', () => {
     await act(async () => {
       node = mount((
         <TestRouter store={store} history={history}>
-          <ReplyForm ticket={ticket} />
+          <ReplyForm
+            ticket={ticket}
+            collapse={() => {}}
+          />
         </TestRouter>
       ), {
         assignTo: document.getElementById("root")
@@ -203,7 +209,10 @@ describe('ReplyForm component', () => {
     await act(async () => {
       node = mount((
         <TestRouter store={store} history={history}>
-          <ReplyForm ticket={ticket} />
+          <ReplyForm
+            ticket={ticket}
+            collapse={() => {}}
+          />
         </TestRouter>
       ), {
         assignTo: document.getElementById("root")

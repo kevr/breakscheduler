@@ -72,6 +72,7 @@ class ReplyForm extends Component {
               // NOTE: Why is setTicket being called three times?
               console.log(ticket);
               this.props.setTicket(ticket);
+              this.props.collapse(); // Collapse dialog
             })
             .catch(error => {
               console.error(error);
@@ -79,7 +80,10 @@ class ReplyForm extends Component {
                 error: "Encountered a server error while updating ticket state."
               });
             });
+        } else {
+          this.props.collapse(); // Collapse dialog
         }
+
       });
     }).catch(error => {
       console.error(error);
@@ -119,8 +123,10 @@ class ReplyForm extends Component {
             {this.state.buttonText}
           </button>
 
+          <div className="horizontalGap" />
+
           <a href="#"
-            className="btn dropdown-trigger"
+            className="dropdown-trigger btn red lighten-2"
             data-target="reply-dropdown"
           >
             <i className="material-icons">

@@ -5,6 +5,7 @@ import ReplyForm from './ReplyForm';
 class ReplyCollapse extends Component {
   constructor(props) {
     super(props);
+    this.collapse = this.collapse.bind(this);
     this.instances = [];
   }
 
@@ -12,13 +13,17 @@ class ReplyCollapse extends Component {
     const elems = document.querySelectorAll(".collapsible");
     const options = {};
     this.instances = M.Collapsible.init(elems, options);
-    this.instance = this.instances[0]
+    this.instance = this.instances[0];
   }
 
   componentWillUnmount() {
     this.instances.map(instance => {
       instance.destroy();
     });
+  }
+
+  collapse() {
+    this.instance.close();
   }
 
   render() {
@@ -29,7 +34,10 @@ class ReplyCollapse extends Component {
             <i className="material-icons">email</i>{" Reply"}
           </div>
           <div className="collapsible-body">
-            <ReplyForm ticket={this.props.ticket} />
+            <ReplyForm
+              ticket={this.props.ticket}
+              collapse={this.collapse}
+            />
           </div>
         </li>
       </ul>
