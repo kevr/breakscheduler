@@ -167,8 +167,8 @@ describe('Ticket page', () => {
     });
     node.update();
 
-    expect(node.find(".ticketPage .error").first().text())
-      .toBe("There was an error replying to this ticket.");
+    expect(node.find(".error").text())
+      .toBe("Unable to add reply. See the browser inspector for details.");
 
     // Now, mock a response that was successful
     axiosMock.onPost(mockPath(`tickets/${ticketId}/replies`))
@@ -228,7 +228,7 @@ describe('Ticket page', () => {
     await act(async () => {
       replyEditText.simulate('change', {
         target: {
-          value: ""
+          value: ''
         }
       });
     });
