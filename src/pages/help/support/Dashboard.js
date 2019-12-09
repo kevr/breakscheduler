@@ -28,6 +28,22 @@ class Dashboard extends Component {
       return dateFormat(date, "dd/mm/yyyy, h:MM:ss TT Z");
     };
 
+    // Enum conversion table for sorting.
+    const conv = {
+      "open": 0,
+      "escalated": 1,
+      "closed": 2
+    };
+
+    const sortedTickets = tickets.data;
+    sortedTickets.sort((a, b) => {
+      if(conv[a.status] < conv[b.status])
+        return -1;
+      if(conv[a.status] > conv[b.status])
+        return 1;
+      return 0;
+    });
+
     return (
       <div className="subPage supportDash">
         <div className="row">
@@ -53,7 +69,7 @@ class Dashboard extends Component {
             </thead>
               {tickets.resolved ? (
                 <tbody>
-                  {tickets.data.length > 0 ? tickets.data.map((ticket) => (
+                  {tickets.data.length > 0 ? sortedTickets.map((ticket) => (
                     <tr
                       key={ticket.id}
                       onClick={e => {

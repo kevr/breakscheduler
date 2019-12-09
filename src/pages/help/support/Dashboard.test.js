@@ -46,9 +46,12 @@ describe('Dashboard page', () => {
       type: "user"
     };
 
-    // Create a single ticket.
+    // We order these in this way to cover all sort situations.
     tickets = [
-      createTicket(1, "Test ticket", "Test body", "open", user, [])
+      createTicket(1, "Closed ticket", "Closed body", "closed", user, []),
+      createTicket(2, "Open ticket", "Open body", "open", user, []),
+      createTicket(3, "Escalated ticket", "Escalated body", "escalated", user, []),
+      createTicket(4, "Closed ticket", "Closed body", "closed", user, [])
     ];
 
   });
