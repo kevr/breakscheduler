@@ -3,9 +3,6 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import dateFormat from 'dateformat';
 import {
-  getRequest
-} from '../../../actions/API';
-import {
   Badge,
   Loader,
   Breadcrumb
@@ -22,7 +19,7 @@ class Dashboard extends Component {
   }
 
   render() {
-    const { session, tickets } = this.props;
+    const { tickets } = this.props;
 
     const format = (date) => {
       return dateFormat(date, "dd/mm/yyyy, h:MM:ss TT Z");
@@ -85,10 +82,8 @@ class Dashboard extends Component {
                       <td>
                         <Badge
                           id={`ticket_${ticket.id}_badge`}
-                          className={Badge.getBadgeClass(ticket.status)}
-                        >
-                          {Badge.getBadgeText(ticket.status)}
-                        </Badge>
+                          value={ticket.status}
+                        />
                       </td>
                     </tr>
                   )) : (

@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Layout from './Layout';
-import logo from '../logo.svg';
 import config from '../config.json';
 
 const Landing = () => (

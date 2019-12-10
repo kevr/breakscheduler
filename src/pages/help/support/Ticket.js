@@ -1,20 +1,13 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import M from 'materialize-css';
-import {
-  updateTicket,
-  addReply
-} from '../../../actions/API';
 import {
   Loader,
   Reply,
   Breadcrumb,
-  Badge
+  Badge,
+  ReplyCollapse,
+  TicketControl
 } from '../../../components';
-import ReplyCollapse from '../../../components/ReplyCollapse';
 
 class Ticket extends Component {
   render() {
@@ -59,19 +52,22 @@ class Ticket extends Component {
       { text: `Ticket(${ticket.id})` }
     ];
 
-    const dateUpdated = new Date(ticket.updated_at);
+    // const dateUpdated = new Date(ticket.updated_at);
 
-    // Reply actions
-    const replyActions = [
-      "Send Reply",
-      "Send Reply and Close"
-    ];
+    const isAdmin = u => u.isValid && u.type === "admin";
 
     return (
       <div className="ticketPage">
         <div className="row">
           <Breadcrumb items={breadcrumb} />
         </div>
+
+        {/* If the viewer is an Administrator, display our TicketControl */}
+        {isAdmin(this.props.session) && (
+          <div className="row">
+            <TicketControl ticket={ticket} />
+          </div>
+        )}
 
         <div className="row">
           <div className="col s12">
@@ -80,10 +76,8 @@ class Ticket extends Component {
                 <label htmlFor="status-badge">Status</label>
                 <Badge
                   id="status-badge"
-                  className={Badge.getBadgeClass(ticket.status)}
-                >
-                  {Badge.getBadgeText(ticket.status)}
-                </Badge>
+                  value={ticket.status}
+                />
               </div>
 
               {/* Use s10 cols here to avoid cramming statusBox located

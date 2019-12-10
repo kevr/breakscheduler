@@ -26,36 +26,55 @@ describe('Badge component', () => {
     container = null;
   });
 
-  test('renders', async () => {
+  test('renders open badge', async () => {
     let node;
     await act(async () => {
       node = mount((
-        <Badge id="badge-id">
-          {"Test"}
-        </Badge>
+        <Badge
+          id="badge-id"
+          value="open"
+        />
       ), {
         assignTo: document.getElementById("root")
       });
     });
 
-    expect(node.find(".colorBadge").exists()).toBe(true);
+    expect(node.find("#badge-id").at(1).hasClass("green")).toBe(true);
+    expect(node.find("#badge-id").at(1).text()).toBe("Open");
   });
 
-  test('renders with className', async () => {
+  test('renders escalated badge', async () => {
     let node;
     await act(async () => {
       node = mount((
-        <Badge id="badge-id"
-          className="test"
-        >
-          {"Test"}
-        </Badge>
+        <Badge
+          id="badge-id"
+          value="escalated"
+        />
       ), {
         assignTo: document.getElementById("root")
       });
     });
 
-    expect(node.find(".colorBadge.test").exists()).toBe(true);
+    expect(node.find("#badge-id").at(1).hasClass("yellow")).toBe(true);
+    expect(node.find("#badge-id").at(1).text()).toBe("Escalated");
+  });
+
+  test('renders closed badge', async () => {
+    let node;
+    await act(async () => {
+      node = mount((
+        <Badge
+          id="badge-id"
+          value="closed"
+        />
+      ), {
+        assignTo: document.getElementById("root")
+      });
+    });
+
+    expect(node.find("#badge-id").at(1).hasClass("red")).toBe(true);
+    expect(node.find("#badge-id").at(1).text()).toBe("Closed");
   });
 
   test('invalid text given to getBadgeClass throws', async () => {
@@ -70,25 +89,4 @@ describe('Badge component', () => {
     }).toThrow();
   });
 
-  test('valid text produces the right className', async () => {
-    let className = Badge.getBadgeClass("open");
-    expect(className).toBe("green lighten-3 black-text");
-
-    className = Badge.getBadgeClass("escalated");
-    expect(className).toBe("yellow lighten-3 black-text");
-
-    className = Badge.getBadgeClass("closed");
-    expect(className).toBe("red lighten-2 white-text");
-  });
-
-  test('valid text produces the right display text', async () => {
-    let text = Badge.getBadgeText("open");
-    expect(text).toBe("Open");
-
-    text = Badge.getBadgeText("escalated");
-    expect(text).toBe("Escalated");
-
-    text = Badge.getBadgeText("closed");
-    expect(text).toBe("Closed");
-  });
 });

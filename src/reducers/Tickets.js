@@ -31,7 +31,7 @@ const Tickets = (state = defaultState, action) => {
     case SET_TICKET:
       return Object.assign({}, state, {
         data: state.data.map((t) => {
-          if(t.id == action.ticket.id)
+          if(t.id === action.ticket.id)
             return action.ticket;
           return t;
         })

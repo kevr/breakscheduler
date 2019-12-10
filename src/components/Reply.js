@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-  patchRequest,
-  deleteRequest,
   updateReply,
   deleteReply
 } from '../actions/API';

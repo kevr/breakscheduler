@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-  getRequest,
   getSession
 } from '../actions/API';
 
@@ -32,8 +31,7 @@ class AuthenticationBarrier extends Component {
 
     const {
       session,
-      children,
-      token
+      children
     } = this.props;
 
     const isAuthenticated = session.resolved && session.isValid;

@@ -10,6 +10,9 @@ import UserWidget from './UserWidget';
 import Navbar from './Navbar';
 import ExtendedNavbar from './ExtendedNavbar';
 import Reply from './Reply';
+import ReplyForm from './ReplyForm';
+import ReplyCollapse from './ReplyCollapse';
+import TicketControl from './TicketControl';
 
 // All partials exported here should be mimicked in
 // the module's default export below.
@@ -21,7 +24,10 @@ export {
   UserWidget,
   Navbar,
   ExtendedNavbar,
-  Reply
+  Reply,
+  ReplyForm,
+  ReplyCollapse,
+  TicketControl
 };
 
 export default {
@@ -47,5 +53,17 @@ export default {
   ExtendedNavbar,
 
   // A Ticket reply
-  Reply
+  Reply,
+
+  // A form for creating a reply
+  ReplyForm,
+
+  // The parent of ReplyForm for most situations.
+  // Provides a collapsible form.
+  ReplyCollapse,
+
+  // Administrator Ticket control widget.
+  // Used for updating Ticket status, and other actions
+  // requiring elevated privileges.
+  TicketControl
 };

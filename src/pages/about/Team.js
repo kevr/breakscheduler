@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import M from 'materialize-css';
 import Layout from '../Layout';
 import Modal from '../../components/Modal';
-import config from '../../config.json';
 import { getRequest } from '../../actions/API';
 
 class Team extends Component {
@@ -75,7 +73,7 @@ class Team extends Component {
                 </Modal>
                 <div className="card memberCard" onClick={e => this.triggerModal(c)}>
                   <div className="card-image">
-                    <img src={member.avatar} />
+                    <img src={member.avatar} alt={member.name} />
                   </div>
                   <div className="card-content">
                     <div className="textCenter memberName">{member.name}</div>

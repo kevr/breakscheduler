@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import jQuery from 'jquery';
 import sanitizeHtml from 'sanitize-html';
 import M from 'materialize-css';
-import Layout from '../Layout';
 import { getRequest } from '../../actions/API';
 import config from '../../config.json';
 
@@ -49,8 +48,7 @@ class UserManual extends Component {
         this.setState({ sidenavOpen: false });
       }
     };
-    let instances = M.Sidenav.init(elems, options);
-
+    M.Sidenav.init(elems, options);
     // Save sidenav instance
     this.sidenav = M.Sidenav.getInstance(elems[0]);
   }
@@ -61,11 +59,8 @@ class UserManual extends Component {
 
   render() {
     // Height delta, used to produce margins properly for our sidenav.
-    const delta = 2;
     const {
-      winHeight,
       navHeight,
-      navWidth,
       articles
     } = this.state;
 

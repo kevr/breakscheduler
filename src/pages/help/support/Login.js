@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
-  getRequest,
-  postRequest,
   userLogin,
   getSession
 } from '../../../actions/API';

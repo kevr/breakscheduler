@@ -19,6 +19,7 @@ class ReplyCollapse extends Component {
   componentWillUnmount() {
     this.instances.map(instance => {
       instance.destroy();
+      return null;
     });
   }
 

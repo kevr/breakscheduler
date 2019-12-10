@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Switch, Route, useParams } from 'react-router-dom';
-import { getRequest } from '../../actions/API';
 import UserWidget from '../../components/UserWidget';
-import Layout from '../Layout';
-import Subpages from './support';
 import { SupportRouter } from './support';
 import AuthenticationBarrier from '../../components/AuthenticationBarrier';
 

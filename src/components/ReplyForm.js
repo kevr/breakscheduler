@@ -32,6 +32,7 @@ class ReplyForm extends Component {
   componentWillUnmount() {
     this.instances.map(instance => {
       instance.destroy();
+      return null;
     });
   }
 
@@ -132,7 +133,7 @@ class ReplyForm extends Component {
 
           <div className="horizontalGap" />
 
-          <a href="#"
+          <a href="#!"
             className="dropdown-trigger btn red lighten-2"
             data-target="reply-dropdown"
           >
@@ -164,7 +165,7 @@ class ReplyForm extends Component {
                 });
               }}
             >
-              <a href="#" onClick={e => e.preventDefault()}>
+              <a href="#!" onClick={e => e.preventDefault()}>
                 {item}
               </a>
             </li>

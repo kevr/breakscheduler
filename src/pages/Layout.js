@@ -1,6 +1,5 @@
 import React from 'react';
 import Helmet from 'react-helmet';
-import PropTypes from 'prop-types';
 import Navbar from '../components/Navbar';
 import config from '../config.json';
 

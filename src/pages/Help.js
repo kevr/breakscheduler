@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import M from 'materialize-css';
 import { Switch, Route } from 'react-router-dom';
 import {
   Search,
@@ -7,9 +6,7 @@ import {
   Support
 } from './help';
 import ExtendedNavbar from '../components/ExtendedNavbar';
-import { getRequest } from '../actions/API';
 import Layout from './Layout';
-import config from '../config.json';
 
 class Help extends Component {
   render() {

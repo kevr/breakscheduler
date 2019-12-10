@@ -57,8 +57,6 @@ describe('Ticket page', () => {
     
     // Our mocked up ticketId value.
     ticketId = 1;
-
-    axiosMock.onGet(mockPath("users/me")).reply(200, user);
   });
 
   afterEach(() => {
@@ -81,6 +79,7 @@ describe('Ticket page', () => {
       )
     ];
 
+    axiosMock.onGet(mockPath("users/me")).reply(200, user);
     axiosMock.onGet(mockPath("tickets")).reply(200, tickets);
 
     let node;
@@ -112,6 +111,7 @@ describe('Ticket page', () => {
     const tickets = [
       createTicket(ticketId, "Test ticket", "Ticket body", "open", user, [])
     ];
+    axiosMock.onGet(mockPath("users/me")).reply(200, user);
     axiosMock.onGet(mockPath("tickets")).reply(200, tickets);
 
     // Mount the node at /help/support/ticket/:id
@@ -323,6 +323,156 @@ describe('Ticket page', () => {
     // componentWillUnmount
     await act(async () => {
       history.push("/help/support");
+    });
+  });
+
+  test('control a ticket as Administrator', async () => {
+    const history = createHistory("/help/support/ticket/1");
+    localStorage.setItem("@authToken", "stubToken");
+
+    const admin = {
+      id: 2,
+      name: "Admin User",
+      email: "admin@example.com",
+      type: "admin"
+    };
+
+    const ticket =
+      createTicket(1, "Test ticket", "Test body", "open", admin, []);
+
+    axiosMock.onGet(mockPath("users/me")).reply(200, admin);
+    axiosMock.onGet(mockPath("tickets")).reply(200, [ticket]);
+
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
+      ), {
+        assignTo: document.getElementById("root")
+      });
+    });
+    node.update();
+
+    expect(node.find("#status-badge").at(1).text()).toBe("Open");
+
+    let control = node.find(".ticketControl");
+    expect(control.exists()).toBe(true);
+
+    const select = control.find("select");
+    await act(async () => {
+      select.simulate('change', {
+        target: {
+          value: "closed"
+        }
+      });
+    });
+    node.update();
+
+    // Update our copy of ticketControl
+    control = node.find(".ticketControl");
+
+    // Click the Save Button
+    let button = control.find("button");
+    expect(button.exists()).toBe(true);
+    expect(button.text()).toBe("Save Changes");
+
+    axiosMock.onPatch(mockPath("tickets/1")).reply(500);
+
+    await act(async () => {
+      button.simulate('click');
+    });
+    node.update();
+
+    expect(node.find("#ticket-control-error").text())
+      .toBe("Unable to update ticket through API.");
+
+    let updatedTicket = Object.assign({}, ticket, {
+      status: "closed"
+    });
+
+    axiosMock.onPatch(mockPath("tickets/1"))
+      .reply(200, updatedTicket);
+
+    await act(async () => {
+      button.simulate('click');
+    });
+    node.update();
+    control = node.find(".ticketControl");
+
+    expect(node.find("#status-badge").at(1).text()).toBe("Closed");
+
+    await act(async () => {
+      select.simulate('change', {
+        target: {
+          value: "escalated"
+        }
+      });
+    });
+    node.update();
+
+    // Update our copy of ticketControl
+    control = node.find(".ticketControl");
+
+    // Click the Save Button
+    button = control.find("button");
+    expect(button.exists()).toBe(true);
+    expect(button.text()).toBe("Save Changes");
+
+    updatedTicket = Object.assign({}, ticket, {
+      status: "escalated"
+    });
+
+    axiosMock.onPatch(mockPath("tickets/1"))
+      .reply(200, updatedTicket);
+
+    await act(async () => {
+      button.simulate('click');
+    });
+
+    node.update();
+    control = node.find(".ticketControl");
+
+    expect(node.find("#status-badge").at(1).text()).toBe("Escalated");
+
+    // Back to open
+    await act(async () => {
+      select.simulate('change', {
+        target: {
+          value: "open"
+        }
+      });
+    });
+    node.update();
+
+    // Update our copy of ticketControl
+    control = node.find(".ticketControl");
+
+    // Click the Save Button
+    button = control.find("button");
+    expect(button.exists()).toBe(true);
+    expect(button.text()).toBe("Save Changes");
+
+    updatedTicket = Object.assign({}, ticket, {
+      status: "open"
+    });
+
+    axiosMock.onPatch(mockPath("tickets/1"))
+      .reply(200, updatedTicket);
+
+    await act(async () => {
+      button.simulate('click');
+    });
+
+    node.update();
+    control = node.find(".ticketControl");
+
+    expect(node.find("#status-badge").at(1).text()).toBe("Open");
+
+    // Unmount our node.
+    await act(async () => {
+      node.unmount();
     });
   });
 
