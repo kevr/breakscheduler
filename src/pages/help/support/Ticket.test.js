@@ -167,7 +167,7 @@ describe('Ticket page', () => {
     });
     node.update();
 
-    expect(node.find(".error").text())
+    expect(node.find("#reply-form-error").text())
       .toBe("Unable to add reply. See the browser inspector for details.");
 
     // Now, mock a response that was successful
@@ -241,8 +241,8 @@ describe('Ticket page', () => {
     node.update();
 
     // But a body is required.
-    expect(node.find(".replyContent .error").text())
-      .toBe("A reply body is required.");
+    expect(node.find("#reply-edit-error").text())
+      .toBe("Reply body is required.");
 
     await act(async() => {
       replyEditText.simulate('change', {
@@ -262,7 +262,7 @@ describe('Ticket page', () => {
     });
     node.update();
 
-    expect(node.find(".replyContent .error").text())
+    expect(node.find("#reply-edit-error").text())
       .toBe("Encountered a server error while saving reply edits.");
 
     // Now we can update our reply successfully.
@@ -304,7 +304,7 @@ describe('Ticket page', () => {
     });
     node.update();
 
-    expect(node.find(".replyContent .error").text())
+    expect(node.find("#reply-edit-error").text())
       .toBe("Encountered a server error while deleting reply.");
 
     // Then, delete the reply successfully.

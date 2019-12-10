@@ -39,6 +39,13 @@ class ReplyForm extends Component {
     console.log("ReplyForm.handleSubmit");
     e.preventDefault();
 
+    if(this.state.body === '') {
+      this.setState({
+        error: "Reply body is required."
+      });
+      return;
+    }
+
     const { ticket } = this.props;
     const replyData = {
       body: this.state.body,
@@ -137,7 +144,9 @@ class ReplyForm extends Component {
 
         <div className="textSmall">
           {this.state.error && (
-            <div className="error">{this.state.error}</div>
+            <span id="reply-form-error" className="error">
+              {this.state.error}
+            </span>
           )}
         </div>
 
@@ -167,20 +176,14 @@ class ReplyForm extends Component {
 }
 
 const mapDispatch = (dispatch, ownProps) => ({
-  addReply: (reply) => {
-    console.log("Redux.addReply");
-    dispatch({
-      type: "ADD_REPLY",
-      reply: reply
-    });
-  },
-  setTicket: (ticket) => {
-    console.log("Redux.setTicket");
-    dispatch({
-      type: "SET_TICKET",
-      ticket: ticket
-    });
-  }
+  addReply: (reply) =>dispatch({
+    type: "ADD_REPLY",
+    reply: reply
+  }),
+  setTicket: (ticket) => dispatch({
+    type: "SET_TICKET",
+    ticket: ticket
+  })
 });
 
 export default connect(null, mapDispatch)(ReplyForm);

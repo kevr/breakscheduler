@@ -15,7 +15,8 @@ class Login extends Component {
       email: '',
       password: '',
       isAdmin: false,
-      rememberForm: false
+      rememberForm: false,
+      error: null
     };
 
     this.handleEmailChange = this.handleEmailChange.bind(this);
@@ -60,6 +61,8 @@ class Login extends Component {
     this.setState({ password: e.target.value });
   }
 
+  // We should have some extra logic in this function that checks
+  // our input validation before attempting to login.
   handleLogin(e) {
     e.preventDefault();
     localStorage.setItem("@authToken", null);
@@ -99,12 +102,12 @@ class Login extends Component {
       console.error(
         "Unable to login due to http error originating from " +
         `${endpoint}`);
+
       this.setState({
-        error: "Unable to login due to http error."
+        error: "Unable to login."
       }, () => {
         // Erase rememberedLogin if it exists.
         localStorage.setItem("@rememberedLogin", null);
-        this.props.clearSession();
       });
     });
   }
@@ -182,7 +185,21 @@ class Login extends Component {
               {"Login"}
             </button>
           </div>
+
         </form>
+
+        <div style={{ clear: "both" }} />
+        <div className="textSmall textCenter">
+          {this.state.error !== null && (
+            <span
+              id="login-form-error"
+              className="error"
+            >
+              {this.state.error}
+            </span>
+          )}
+        </div>
+
       </div>
     );
   }

@@ -95,6 +95,9 @@ describe('ReplyForm component', () => {
           value: reply.body
         }
       });
+    });
+
+    await act(async () => {
       replyForm.simulate('submit', {
         preventDefault: () => {
           console.log("preventDefault called");
@@ -109,9 +112,6 @@ describe('ReplyForm component', () => {
       .toBe(1);
   });
 
-  // We need to analyze this test to see why it's not updating
-  // Redux. We should log out from API request/response points
-  // to see where our flow starts and ends.
   test('submits a Reply and closes a Ticket', async () => {
     const history = createHistory("/help/support/ticket/1");
 
@@ -191,6 +191,8 @@ describe('ReplyForm component', () => {
     console.log(store.getState().tickets.data[0]);
     expect(store.getState().tickets.data[0].replies.length)
       .toBe(1);
+    expect(store.getState().tickets.data[0].status).toBe("closed");
+
   });
 
   test('http error while submitting Reply and closing a Ticket', async () => {
@@ -238,12 +240,34 @@ describe('ReplyForm component', () => {
     const dropdownTrigger = node.find(".dropdown-trigger");
 
     const replyForm = node.find("#reply-form");
+
+    await act(async () => {
+      body.simulate('change', {
+        target: {
+          value: ''
+        }
+      });
+    });
+    node.update();
+
+    await act(async () => {
+      node.find("form").simulate('submit');
+    });
+    node.update();
+
+    expect(node.find("#reply-form-error").text())
+      .toBe("Reply body is required.");
+
     await act(async () => {
       body.simulate('change', {
         target: {
           value: reply.body
         }
       });
+    });
+    node.update();
+
+    await act(async () => {
       dropdownTrigger.simulate('click');
     });
     node.update();
@@ -267,14 +291,10 @@ describe('ReplyForm component', () => {
 
     console.log(dropdownButton.html());
 
-    // We expect the form to have submitted and resolved
-    // promises at this point.
-    console.log(store.getState());
-    console.log(store.getState().tickets.data[0]);
     expect(store.getState().tickets.data[0].replies.length)
       .toBe(1);
 
-    expect(node.find(".error").text())
+    expect(node.find("#reply-form-error").text())
       .toBe("Encountered a server error while updating ticket state.");
   });
 });

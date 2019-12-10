@@ -74,7 +74,7 @@ class Reply extends Component {
     console.log("handleSave called");
     if(this.state.body === '') {
       this.setState({
-        error: "A reply body is required."
+        error: "Reply body is required."
       });
       return;
     }
@@ -220,9 +220,16 @@ class Reply extends Component {
 
           {/* Conditionally expose an "error" div that displays
               any errors we set in this component's state. */}
-          {this.state.error && (
-            <div className="error textSmall">{this.state.error}</div>
-          )}
+          <div className="textSmall">
+            {this.state.error && (
+              <span
+                id="reply-edit-error"
+                className="error"
+              >
+                {this.state.error}
+              </span>
+            )}
+          </div>
 
           <div className="status">
             {renderStatus(this.state.status)}

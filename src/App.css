@@ -181,3 +181,7 @@ li.tab > a.active {
   width: 6px;
 }
 
+.error:before {
+  content: "Error: ";
+}
+

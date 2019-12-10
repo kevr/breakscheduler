@@ -103,9 +103,14 @@ class Create extends Component {
 
         </form>
 
-        <div className="row">
+        <div className="textSmall">
           {this.state.error && (
-            <div className="error">{this.state.error}</div>
+            <span
+              id="create-ticket-form-error"
+              className="error"
+            >
+              {this.state.error}
+            </span>
           )}
         </div>
       </div>

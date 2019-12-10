@@ -101,7 +101,7 @@ describe('Create ticket page', () => {
     node.update();
 
     // Check .error's text
-    expect(node.find(".error").text())
+    expect(node.find("#create-ticket-form-error").text())
       .toBe("An error occurred while creating this ticket.");
 
     const ticketCreated = {

@@ -538,11 +538,19 @@ describe('Login page', () => {
           value: "test@example.com"
         }
       });
+    });
+    node.update();
+
+    await act(async () => {
       password.simulate('change', {
         target: {
           value: "password"
         }
       });
+    });
+    node.update();
+
+    await act(async () => {
       form.simulate('submit', {
         preventDefault: () => {
           submitClicked = true;
@@ -553,6 +561,68 @@ describe('Login page', () => {
 
     expect(submitClicked).toBe(true);
     expect(history.location.pathname).toBe("/help/support/login");
+  });
+
+  test('logging in with invalid creds shows an error', async () => {
+    const history = createHistory("/help/support/login");
+
+    // Just reply to 401 for all getSessions
+    axiosMock.onGet(mockPath("users/me")).reply(401);
+
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
+      ), {
+        assignTo: document.getElementById("root")
+      });
+    });
+    node.update();
+
+    const email = node.find("#email-input");
+    const password = node.find("#password-input");
+    const form = node.find("form");
+
+    // Reply with a valid login, then we store the token.
+    axiosMock.onPost(mockPath("users/login"))
+      .reply(401);
+
+    let submitClicked = false;
+    await act(async () => {
+      email.simulate('change', {
+        target: {
+          value: "test@example.com"
+        }
+      });
+    });
+    node.update();
+
+    await act(async () => {
+      password.simulate('change', {
+        target: {
+          value: "password"
+        }
+      });
+    });
+    node.update();
+
+    await act(async () => {
+      form.simulate('submit', {
+        preventDefault: () => {
+          submitClicked = true;
+        }
+      });
+    });
+    node.update();
+
+    expect(submitClicked).toBe(true);
+    expect(history.location.pathname).toBe("/help/support/login");
+
+    node.update();
+    expect(node.find("#login-form-error").text()).toBe("Unable to login.");
+
   });
 
 });
