@@ -14,10 +14,7 @@ import ReplyForm from './ReplyForm';
 import ReplyCollapse from './ReplyCollapse';
 import TicketControl from './TicketControl';
 import Paginator from './Paginator';
-<<<<<<< HEAD
 import Search from './Search';
-=======
->>>>>>> f9384c5... Add Paginator component
 
 // All partials exported here should be mimicked in
 // the module's default export below.
@@ -33,12 +30,8 @@ export {
   ReplyForm,
   ReplyCollapse,
   TicketControl,
-<<<<<<< HEAD
   Paginator,
   Search
-=======
-  Paginator
->>>>>>> f9384c5... Add Paginator component
 };
 
 export default {
@@ -79,12 +72,8 @@ export default {
   TicketControl,
 
   // Data paginator
-<<<<<<< HEAD
   Paginator,
 
   // Search component
   Search
-=======
-  Paginator
->>>>>>> f9384c5... Add Paginator component
 };
