@@ -110,4 +110,60 @@ describe('Dashboard page', () => {
       .toBe(`/help/support/ticket/${ticket.id}`);
   });
 
+  // To be implemented.
+  test('searching Tickets returns the proper results', async () => {
+    const history = createHistory("/help/support");
+
+    // Setup and mock on-mount requests.
+    localStorage.setItem("@authToken", "stubToken");
+    axiosMock.onGet(mockPath("users/me")).reply(200, user);
+    axiosMock.onGet(mockPath("tickets")).reply(200, tickets);
+
+    // We mount Dashboard via <App /> and routing to /help/support
+    // This allows Dashboard to properly access history when redirecting.
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
+      ), {
+        assignTo: document.getElementById("root")
+      });
+    });
+    node.update();
+
+    const searchInput = node.find("#ticket-search-input").at(1);
+    await act(async () => {
+      searchInput.simulate('change', {
+        target: {
+          value: "Open ticket"
+        }
+      });
+    });
+    node.update();
+
+    let searchResults = node.find("tbody tr");
+    expect(searchResults.length).toBe(1);
+
+    let firstResult = searchResults.find("td").first();
+    expect(firstResult.find("a").text()).toBe("Open ticket");
+
+    await act(async () => {
+      searchInput.simulate('change', {
+        target: {
+          value: "Closed ticket"
+        }
+      });
+    });
+    node.update();
+
+    // Get all search result rows and expect that they're all
+    // tickets with "Closed ticket" in the subject.
+    searchResults = node.find("tbody tr");
+    searchResults.map((result) => {
+      expect(result.find("td").first().text()).toBe("Closed ticket");
+    });
+  });
+
 });

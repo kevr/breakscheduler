@@ -5,17 +5,38 @@ import dateFormat from 'dateformat';
 import {
   Badge,
   Loader,
-  Breadcrumb
+  Breadcrumb,
+  Paginator
 } from '../../../components';
+import SearchComponent from '../../../components/Search';
 
 class Dashboard extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      ticketStart: 0,
+      ticketEnd: 0,
+      searchTerms: []
+    };
+
+    this.handleSearch = this.handleSearch.bind(this);
+    this.handlePageChange = this.handlePageChange.bind(this);
     this.navigateTo = this.navigateTo.bind(this);
   }
 
   navigateTo(ticket) {
     this.props.history.push(`/help/support/ticket/${ticket.id}`);
+  }
+
+  handlePageChange(dataStart, dataEnd) {
+    this.setState({
+      ticketStart: dataStart,
+      ticketEnd: dataEnd
+    });
+  }
+
+  handleSearch(terms) {
+    this.setState({ searchTerms: terms });
   }
 
   render() {
@@ -32,7 +53,19 @@ class Dashboard extends Component {
       "closed": 2
     };
 
-    const sortedTickets = tickets.data;
+    // We need to filter tickets by search criteria, if any is given.
+    let sortedTickets = tickets.data;
+    if(this.state.searchTerms.length > 0) {
+      this.state.searchTerms.map(searchTerm => {
+        sortedTickets = sortedTickets.filter(ticket => {
+          return ticket.subject.toLowerCase()
+            .includes(searchTerm.toLowerCase());
+        });
+      });
+    }
+
+    console.log(`searchTerms: ${this.state.searchTerms}`);
+
     sortedTickets.sort((a, b) => {
       if(conv[a.status] < conv[b.status])
         return -1;
@@ -40,6 +73,31 @@ class Dashboard extends Component {
         return 1;
       return 0;
     });
+
+    const ticketResults = sortedTickets
+      .slice(this.state.ticketStart, this.state.ticketEnd)
+      .map(ticket => {
+        return (
+          <tr key={ticket.id}
+            onClick={e => {
+              this.navigateTo(ticket);
+            }}
+          >
+            <td>
+              <Link to={`/help/support/ticket/${ticket.id}`}>
+                {ticket.subject}
+              </Link>
+            </td>
+            <td>{format(new Date(ticket.updated_at))}</td>
+            <td>
+              <Badge
+                id={`ticket_${ticket.id}_badge`}
+                value={ticket.status}
+              />
+            </td>
+          </tr>
+        );
+      });
 
     return (
       <div className="subPage supportDash">
@@ -56,52 +114,45 @@ class Dashboard extends Component {
             </Link>
           </div>
 
-          <table className="tickets">
-            <thead>
-              <tr>
-                <th>Subject</th>
-                <th>Updated</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-              {tickets.resolved ? (
-                <tbody>
-                  {tickets.data.length > 0 ? sortedTickets.map((ticket) => (
-                    <tr
-                      key={ticket.id}
-                      onClick={e => {
-                        this.navigateTo(ticket);
-                      }}
-                    >
-                      <td>
-                        <Link to={`/help/support/ticket/${ticket.id}`}>
-                          {ticket.subject}
-                        </Link>
-                      </td>
-                      <td>{format(new Date(ticket.updated_at))}</td>
-                      <td>
-                        <Badge
-                          id={`ticket_${ticket.id}_badge`}
-                          value={ticket.status}
-                        />
-                      </td>
-                    </tr>
-                  )) : (
+          <SearchComponent
+            id="ticket-search-input"
+            className="ticketSearch"
+            label="Search tickets..."
+            onChange={this.handleSearch}
+          />
+
+          <Paginator
+            dataSize={sortedTickets.length}
+            pageSize={10}
+            onChange={this.handlePageChange}
+          >
+            <table className="tickets">
+              <thead>
+                <tr>
+                  <th>Subject</th>
+                  <th>Updated</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+                {tickets.resolved ? (
+                  <tbody>
+                    {tickets.data.length > 0 ? ticketResults : (
+                      <tr>
+                        <td>No tickets to show...</td>
+                      </tr>
+                    )}
+                  </tbody>
+                ) : (
+                  <tbody>
                     <tr>
-                      <td>No tickets to show...</td>
+                      <td>
+                        <Loader />
+                      </td>
                     </tr>
-                  )}
-                </tbody>
-              ) : (
-                <tbody>
-                  <tr>
-                    <td>
-                      <Loader />
-                    </td>
-                  </tr>
-                </tbody>
-              )}
-          </table>
+                  </tbody>
+                )}
+            </table>
+          </Paginator>
 
         </div>
       </div>
