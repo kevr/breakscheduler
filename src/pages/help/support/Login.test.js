@@ -93,7 +93,7 @@ describe('Login page', () => {
     // The Login form within the Login page
     const form = node.find("form");
 
-    // OK, Login
+    // Login and receive a 401 from the server.
     await act(async () => {
       form.simulate('submit', {
         preventDefault: () => {
@@ -112,7 +112,7 @@ describe('Login page', () => {
     axiosMock.onGet(mockPath("tickets"))
       .replyOnce(200, []);
 
-    // OK, Login
+    // OK, Login and receive a 200.
     await act(async () => {
       form.simulate('submit', {
         preventDefault: () => {
@@ -126,25 +126,6 @@ describe('Login page', () => {
     expect(node.find("tbody tr").length).toBe(1);
     expect(node.find("tbody tr").text())
       .toBe("No tickets to show...");
-
-    const user = userObject(false);
-    store.dispatch({
-      type: "SET_TICKETS",
-      tickets: [
-        createTicket(1, "Test Ticket", "Test Body", "open", user, []),
-        createTicket(2, "Another ticket", "Another body", "open", user, [])
-      ]
-    });
-
-    axiosMock.onGet(mockPath("users/me")).reply(401);
-
-    await act(async () => {
-      node.unmount();
-      node.mount();
-    });
-
-    // Expect the two tickets to be rendered.
-    expect(node.find("tbody tr").length).toBe(2);
   });
 
   test('can login as an Administrator', async () => {
