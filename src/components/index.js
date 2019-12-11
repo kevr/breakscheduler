@@ -13,6 +13,11 @@ import Reply from './Reply';
 import ReplyForm from './ReplyForm';
 import ReplyCollapse from './ReplyCollapse';
 import TicketControl from './TicketControl';
+import Paginator from './Paginator';
+<<<<<<< HEAD
+import Search from './Search';
+=======
+>>>>>>> f9384c5... Add Paginator component
 
 // All partials exported here should be mimicked in
 // the module's default export below.
@@ -27,7 +32,13 @@ export {
   Reply,
   ReplyForm,
   ReplyCollapse,
-  TicketControl
+  TicketControl,
+<<<<<<< HEAD
+  Paginator,
+  Search
+=======
+  Paginator
+>>>>>>> f9384c5... Add Paginator component
 };
 
 export default {
@@ -65,5 +76,15 @@ export default {
   // Administrator Ticket control widget.
   // Used for updating Ticket status, and other actions
   // requiring elevated privileges.
-  TicketControl
+  TicketControl,
+
+  // Data paginator
+<<<<<<< HEAD
+  Paginator,
+
+  // Search component
+  Search
+=======
+  Paginator
+>>>>>>> f9384c5... Add Paginator component
 };

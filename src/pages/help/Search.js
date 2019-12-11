@@ -3,19 +3,19 @@ import { connect } from 'react-redux';
 import M from 'materialize-css';
 import { getRequest } from '../../actions/API';
 import Modal from '../../components/Modal';
+import SearchComponent from '../../components/Search';
 
 class Search extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      rawString: '',
       searchTerms: []
     };
 
     // Memoization dict for lookups
     this.converted = {};
 
-    this.onSearchChange = this.onSearchChange.bind(this);
+    this.handleSearchChange = this.handleSearchChange.bind(this);
     this.triggerModal = this.triggerModal.bind(this);
   }
 
@@ -30,16 +30,8 @@ class Search extends Component {
     }
   }
 
-  onSearchChange(e) {
-    const raw = e.target.value.split(/\s(?=(?:[^"]|"[^"]*")*$)/)
-    const terms = raw.map((t) => {
-      return t.replace(new RegExp('"', 'g'), '');
-    });
-    console.log(terms);
-    this.setState({
-      rawString: e.target.value,
-      searchTerms: terms.filter((t) => t.length > 0)
-    });
+  handleSearchChange(terms) {
+    this.setState({ searchTerms: terms });
   }
 
   triggerModal(i) {
@@ -58,6 +50,7 @@ class Search extends Component {
     // Convert all terms to lowercase versions
     const terms = searchTerms.map(t => t.toLowerCase());
     console.log(`Terms: ${terms}`);
+
     // Include topics in the redux store if either their
     // subject or body includes one of the given searchTerms.
     // If we have no searchTerms, we provide every topic.
@@ -84,13 +77,11 @@ class Search extends Component {
     return (
       <div className="container">
         <div className="searchForm">
-          <div className="input-field">
-            <i className="material-icons prefix">search</i>
-            <input id="search-input" type="text"
-              value={this.state.rawString}
-              onChange={this.onSearchChange} />
-            <label htmlFor="search-input">{"Search help topics..."}</label>
-          </div>
+          <SearchComponent
+            id="search-input"
+            label="Search help topics..."
+            onChange={this.handleSearchChange} 
+          />
         </div>
 
         <div className="searchResults row">
