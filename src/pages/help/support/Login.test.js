@@ -1,21 +1,22 @@
 import React from 'react';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
-import { createStore } from 'redux';
 import { configure, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { act } from 'react-dom/test-utils';
-import Reducers from '../../../reducers';
 import Support from '../Support';
 import App from '../../../App';
 import {
   TestRouter,
   createHistory,
+  mockStore,
   mockPath
 } from 'TestUtil';
 import {
+  createUser,
+  createAdmin,
   createTicket
-} from 'mockTickets';
+} from 'MockObjects';
 
 configure({ adapter: new Adapter() });
 
@@ -25,21 +26,12 @@ describe('Login page', () => {
   let store;
   let container;
 
-  // User object that we'll use throughout these tests.
-  const userObject = (isAdmin) => ({
-    id: 1,
-    name: "Test User",
-    email: "test@example.com",
-    type: isAdmin ? "admin" : "user"
-  });
-
   beforeAll(() => {
     axiosMock = new MockAdapter(axios);
   });
 
   beforeEach(() => {
-    localStorage.clear();
-    store = createStore(Reducers);
+    store = mockStore();
     container = document.createElement("div");
     container.id = "root";
     document.body.appendChild(container);
@@ -53,6 +45,7 @@ describe('Login page', () => {
 
   test('can login', async () => {
     const history = createHistory("/help/support/login");
+    const user = createUser("Test User", "test@example.com");
 
     axiosMock.onGet(mockPath("users/me")).replyOnce(401);
 
@@ -102,15 +95,13 @@ describe('Login page', () => {
     });
     node.update();
     expect(history.location.pathname).toBe("/help/support/login");
-
+    
     axiosMock.onPost(mockPath("users/login"))
       .replyOnce(200, {
         token: "stubToken"
       });
-    axiosMock.onGet(mockPath("users/me"))
-      .replyOnce(200, userObject(false));
-    axiosMock.onGet(mockPath("tickets"))
-      .replyOnce(200, []);
+    axiosMock.onGet(mockPath("users/me")).replyOnce(200, user);
+    axiosMock.onGet(mockPath("tickets")).replyOnce(200, []);
 
     // OK, Login and receive a 200.
     await act(async () => {
@@ -130,6 +121,7 @@ describe('Login page', () => {
 
   test('can login as an Administrator', async () => {
     const history = createHistory("/help/support/login");
+    const admin = createAdmin("Admin User", "admin@example.com");
 
     let node;
     await act(async () => {
@@ -141,10 +133,6 @@ describe('Login page', () => {
         assignTo: document.getElementById("root")
       });
     });
-    // NOTE: This is actually very important after
-    // await act is run! In case we got any updates
-    // via promises during our mount stage, we want
-    // to reflect those changes here.
     node.update();
 
     const email = node.find("#email-input");
@@ -155,6 +143,7 @@ describe('Login page', () => {
         }
       });
     });
+    node.update();
 
     const password = node.find("#password-input");
     await act(async () => {
@@ -164,6 +153,7 @@ describe('Login page', () => {
         }
       });
     });
+    node.update();
 
     const isAdmin = node.find("#is-admin-input");
     await act(async () => {
@@ -173,6 +163,7 @@ describe('Login page', () => {
         }
       });
     });
+    node.update();
 
     const rememberMe = node.find("#remember-input");
     await act(async () => {
@@ -182,29 +173,22 @@ describe('Login page', () => {
         }
       });
     });
+    node.update();
 
     axiosMock.onPost(mockPath("users/admin/login"))
       .replyOnce(200, {
         token: "stubToken"
       });
-    axiosMock.onGet(mockPath("users/me"))
-      .replyOnce(200, userObject(true));
-    axiosMock.onGet(mockPath("tickets"))
-      .replyOnce(200, []);
+    axiosMock.onGet(mockPath("users/me")).replyOnce(200, admin);
+    axiosMock.onGet(mockPath("tickets")).replyOnce(200, []);
 
     const form = node.find("form");
 
     // OK, Login
-    let submitClicked = false;
     await act(async () => {
-      form.simulate('submit', {
-        preventDefault: () => {
-          submitClicked = true;
-        }
-      });
+      form.simulate('submit');
     });
     node.update();
-    expect(submitClicked).toBe(true);
 
     expect(history.location.pathname).toBe("/help/support");
 
@@ -213,32 +197,28 @@ describe('Login page', () => {
     expect(node.find("tbody tr").text())
       .toBe("No tickets to show...");
 
-    store.dispatch({
-      type: "SET_TICKETS",
-      tickets: [
-        createTicket(
-          1, "Test Ticket", "Test Body", "open", userObject(true), []
-        ),
-        createTicket(
-          2, "Another ticket", "Another body", "open", userObject(true), []
-        )
-      ]
-    });
+    // Update tickets in Redux with some admin tickets.
+    // A bit of a simulation of how our app flow works.
+    const tickets = [
+      createTicket("Test Ticket", "Test Body", "open", admin, []),
+      createTicket("Another ticket", "Another body", "open", admin, [])
+    ];
 
+    store.dispatch({ type: "SET_TICKETS", tickets: tickets });
+
+    // Now, remount our node, and mock some axios replies
+    // to trigger an error-walking code path.
     await act(async () => {
       node.unmount();
     });
 
     axiosMock.reset();
 
+    const stubToken = { token: "stubToken" };
     axiosMock.onPost(mockPath("users/admin/login"))
-      .reply(200, {
-        token: "stubToken"
-      });
-    axiosMock.onGet(mockPath("users/me"))
-      .replyOnce(401);
-    axiosMock.onGet(mockPath("users/me"))
-      .replyOnce(200, userObject(true));
+      .reply(200, stubToken);
+    axiosMock.onGet(mockPath("users/me")).replyOnce(401);
+    axiosMock.onGet(mockPath("users/me")).replyOnce(200, admin);
 
     await act(async () => {
       node.mount();
@@ -251,7 +231,8 @@ describe('Login page', () => {
 
   test('remembers a user logging in', async () => {
     const history = createHistory("/help/support/login");
-    
+    const user = createUser("Test User", "test@example.com");
+
     let node;
     await act(async () => {
       node = mount((
@@ -265,36 +246,31 @@ describe('Login page', () => {
     node.update();
 
     const email = node.find("#email-input");
-    const password = node.find("#password-input");
-    const rememberMe = node.find("#remember-input");
-
     await act(async () => {
       email.simulate('change', { target: { value: "test@example.com" } });
+    });
+    node.update();
+
+    const password = node.find("#password-input");
+    await act(async () => {
       password.simulate('change', { target: { value: "password" } });
+    });
+    node.update();
+
+    const rememberMe = node.find("#remember-input");
+    await act(async () => {
       rememberMe.simulate('change', { target: { checked: true } });
     });
-
-    const user = {
-      id: 1,
-      name: "Test User",
-      email: "test@example.com",
-      type: "user"
-    };
+    node.update();
 
     axiosMock.onPost(mockPath("users/login"))
       .replyOnce(200, { token: "stubToken" });
-    axiosMock.onGet(mockPath("users/me"))
-      .replyOnce(200, user);
-    axiosMock.onGet(mockPath("tickets"))
-      .replyOnce(200, []);
+    axiosMock.onGet(mockPath("users/me")).replyOnce(200, user);
+    axiosMock.onGet(mockPath("tickets")).replyOnce(200, []);
 
     const form = node.find("form");
     await act(async () => {
-      form.simulate('submit', {
-        preventDefault: () => {
-          // Do nothing.
-        }
-      });
+      form.simulate('submit');
     });
     node.update();
 
@@ -310,6 +286,7 @@ describe('Login page', () => {
     history.push("/help/support/login");
     expect(history.location.pathname).toBe("/help/support/login");
 
+    // Teardown DOM and rebuild a fresh one to mount onto.
     document.body.removeChild(container);
     container = document.createElement("div");
     container.id = "root";
@@ -317,10 +294,8 @@ describe('Login page', () => {
 
     axiosMock.onPost(mockPath("users/login"))
       .replyOnce(200, { token: "stubToken" });
-    axiosMock.onGet(mockPath("users/me"))
-      .replyOnce(200, user);
-    axiosMock.onGet(mockPath("tickets"))
-      .replyOnce(200, []);
+    axiosMock.onGet(mockPath("users/me")).replyOnce(200, user);
+    axiosMock.onGet(mockPath("tickets")).replyOnce(200, []);
 
     await act(async () => {
       node = mount((
@@ -336,8 +311,8 @@ describe('Login page', () => {
     // Expect that we got logged in again from our remembered details.
     expect(history.location.pathname).toBe("/help/support");
 
-    node.unmount();
     // Do it again, but with a bad login response
+    node.unmount();
     history.push("/help/support/login");
 
     document.body.removeChild(container);
@@ -345,12 +320,9 @@ describe('Login page', () => {
     container.id = "root";
     document.body.appendChild(container);
 
-    axiosMock.onPost(mockPath("users/login"))
-      .replyOnce(401, { token: "stubToken" });
-    axiosMock.onGet(mockPath("users/me"))
-      .replyOnce(401, user);
-    axiosMock.onGet(mockPath("tickets"))
-      .replyOnce(401, []);
+    axiosMock.onPost(mockPath("users/login")).replyOnce(401);
+    axiosMock.onGet(mockPath("users/me")).replyOnce(401);
+    axiosMock.onGet(mockPath("tickets")).replyOnce(401);
 
     await act(async () => {
       node = mount((
@@ -367,8 +339,9 @@ describe('Login page', () => {
   });
 
   test('remembers an admin user logging in', async () => {
-    const history = createHistory("/help/support/login");
-    
+    let history = createHistory("/help/support/login");
+    const admin = createAdmin("Test User", "test@example.com");
+
     let node;
     await act(async () => {
       node = mount((
@@ -393,27 +366,14 @@ describe('Login page', () => {
       rememberMe.simulate('change', { target: { checked: true } });
     });
 
-    const user = {
-      id: 1,
-      name: "Test User",
-      email: "test@example.com",
-      type: "admin"
-    };
-
     axiosMock.onPost(mockPath("users/admin/login"))
       .replyOnce(200, { token: "stubToken" });
-    axiosMock.onGet(mockPath("users/me"))
-      .replyOnce(200, user);
-    axiosMock.onGet(mockPath("tickets"))
-      .replyOnce(200, []);
+    axiosMock.onGet(mockPath("users/me")).replyOnce(200, admin);
+    axiosMock.onGet(mockPath("tickets")).replyOnce(200, []);
 
     const form = node.find("form");
     await act(async () => {
-      form.simulate('submit', {
-        preventDefault: () => {
-          // Do nothing.
-        }
-      });
+      form.simulate('submit');
     });
     node.update();
 
@@ -425,7 +385,6 @@ describe('Login page', () => {
       node.unmount();
     });
 
-    // history.push to Login again.
     history.push("/help/support/login");
     expect(history.location.pathname).toBe("/help/support/login");
 
@@ -436,10 +395,8 @@ describe('Login page', () => {
 
     axiosMock.onPost(mockPath("users/admin/login"))
       .replyOnce(200, { token: "stubToken" });
-    axiosMock.onGet(mockPath("users/me"))
-      .replyOnce(200, user);
-    axiosMock.onGet(mockPath("tickets"))
-      .replyOnce(200, []);
+    axiosMock.onGet(mockPath("users/me")).replyOnce(200, admin);
+    axiosMock.onGet(mockPath("tickets")).replyOnce(200, []);
 
     await act(async () => {
       node = mount((
@@ -455,21 +412,26 @@ describe('Login page', () => {
     // Expect that we got logged in again from our remembered details.
     expect(history.location.pathname).toBe("/help/support");
 
-    node.unmount();
     // Do it again, but with a bad login response
-    history.push("/help/support/login");
+    node.unmount();
+
+    // Reinitialize our references
+    // NOTE: We should try to actually simulate a complete
+    // rememberedLogin flow. Even though we have full coverage,
+    // we aren't exactly testing the case where rememberedLogin
+    // is null or valid.
+    history = createHistory("/help/support/login");
+    store = mockStore();
 
     document.body.removeChild(container);
     container = document.createElement("div");
     container.id = "root";
     document.body.appendChild(container);
 
-    axiosMock.onPost(mockPath("users/login"))
-      .replyOnce(401, { token: "stubToken" });
-    axiosMock.onGet(mockPath("users/me"))
-      .replyOnce(401, user);
-    axiosMock.onGet(mockPath("tickets"))
-      .replyOnce(401, []);
+    axiosMock.reset();
+    axiosMock.onPost(mockPath("users/login")).replyOnce(401);
+    axiosMock.onGet(mockPath("users/me")).replyOnce(401);
+    axiosMock.onGet(mockPath("tickets")).replyOnce(401);
 
     await act(async () => {
       node = mount((
@@ -482,6 +444,7 @@ describe('Login page', () => {
     });
     node.update();
 
+    expect(history.location.pathname).toBe("/help/support/login");
   });
 
   test('login with then get an error from getSession', async () => {
@@ -503,16 +466,11 @@ describe('Login page', () => {
     node.update();
 
     const email = node.find("#email-input");
-    const password = node.find("#password-input");
-    const form = node.find("form");
 
     // Reply with a valid login, then we store the token.
     axiosMock.onPost(mockPath("users/login"))
-      .reply(200, {
-        token: "stubToken"
-      });
+      .reply(200, { token: "stubToken" });
 
-    let submitClicked = false;
     await act(async () => {
       email.simulate('change', {
         target: {
@@ -522,6 +480,7 @@ describe('Login page', () => {
     });
     node.update();
 
+    const password = node.find("#password-input");
     await act(async () => {
       password.simulate('change', {
         target: {
@@ -531,16 +490,12 @@ describe('Login page', () => {
     });
     node.update();
 
+    const form = node.find("form");
     await act(async () => {
-      form.simulate('submit', {
-        preventDefault: () => {
-          submitClicked = true;
-        }
-      });
+      form.simulate('submit');
     });
     node.update();
 
-    expect(submitClicked).toBe(true);
     expect(history.location.pathname).toBe("/help/support/login");
   });
 
@@ -563,14 +518,10 @@ describe('Login page', () => {
     node.update();
 
     const email = node.find("#email-input");
-    const password = node.find("#password-input");
-    const form = node.find("form");
 
     // Reply with a valid login, then we store the token.
-    axiosMock.onPost(mockPath("users/login"))
-      .reply(401);
+    axiosMock.onPost(mockPath("users/login")).reply(401);
 
-    let submitClicked = false;
     await act(async () => {
       email.simulate('change', {
         target: {
@@ -580,6 +531,7 @@ describe('Login page', () => {
     });
     node.update();
 
+    const password = node.find("#password-input");
     await act(async () => {
       password.simulate('change', {
         target: {
@@ -589,16 +541,12 @@ describe('Login page', () => {
     });
     node.update();
 
+    const form = node.find("form");
     await act(async () => {
-      form.simulate('submit', {
-        preventDefault: () => {
-          submitClicked = true;
-        }
-      });
+      form.simulate('submit');
     });
     node.update();
 
-    expect(submitClicked).toBe(true);
     expect(history.location.pathname).toBe("/help/support/login");
 
     node.update();

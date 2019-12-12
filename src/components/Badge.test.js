@@ -1,13 +1,11 @@
 import React from 'react';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
-import { createStore } from 'redux';
 import { configure, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { act } from 'react-dom/test-utils';
 import Badge from './Badge';
 
-// Configure enzyme
 configure({ adapter: new Adapter() });
 
 describe('Badge component', () => {

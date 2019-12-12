@@ -5,6 +5,8 @@ import React from 'react';
 import { Router } from 'react-router';
 import { createMemoryHistory } from 'history';
 import { Provider } from 'react-redux';
+import { createStore } from 'redux';
+import Reducers from '../reducers';
 import config from '../config.json';
 
 // A simple component that sets up a test environment
@@ -51,3 +53,4 @@ export const mockPath = (endpoint) =>
 export const flushPromises = () =>
   new Promise(resolve => setImmediate(resolve));
 
+export const mockStore = () => createStore(Reducers);

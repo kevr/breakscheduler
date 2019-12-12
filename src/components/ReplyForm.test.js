@@ -14,8 +14,10 @@ import {
   flushPromises
 } from 'TestUtil';
 import {
-  createTicket
-} from 'mockTickets';
+  createUser,
+  createTicket,
+  createReply
+} from 'MockObjects';
 
 // Setup enzyme
 configure({ adapter: new Adapter() });
@@ -26,12 +28,9 @@ describe('ReplyForm component', () => {
   let store;
   let container;
 
-  const user = {
-    id: 1,
-    name: "Test User",
-    email: "test@example.com",
-    type: "user"
-  };
+  // A reusable user object.
+  const user = createUser("Test User", "test@example.com");
+  const ticket = createTicket("Test ticket", "Test body", "open", user, []);
 
   beforeAll(() => {
     axiosMock = new MockAdapter(axios);
@@ -53,12 +52,8 @@ describe('ReplyForm component', () => {
   });
 
   test('submits a reply to a Ticket', async () => {
-    const history = createHistory("/help/support/ticket/1");
-
-    const tickets = [
-      createTicket(1, "Test ticket", "Test body", "open", user, [])
-    ];
-    const ticket = tickets[0];
+    const history = createHistory(`/help/support/ticket/${ticket.id}`);
+    const tickets = [ticket];
 
     store.dispatch({ type: "SET_SESSION", session: user });
     store.dispatch({ type: "SET_TICKETS", tickets: tickets });
@@ -78,19 +73,13 @@ describe('ReplyForm component', () => {
     });
     node.update();
 
-    const reply = {
-      id: 1,
-      ticket_id: ticket.id,
-      body: "Reply body",
-      user: user
-    };
-
+    const reply = createReply(1, ticket.id, "Reply body", user);
     axiosMock.onPost(mockPath("tickets/1/replies")).reply(200, reply);
 
-    const body = node.find("#reply-body-input");
+    const replyBodyInput = node.find("#reply-body-input");
     const replyForm = node.find("#reply-form");
     await act(async () => {
-      body.simulate('change', {
+      replyBodyInput.simulate('change', {
         target: {
           value: reply.body
         }
@@ -106,19 +95,13 @@ describe('ReplyForm component', () => {
     });
     node.update();
 
-    console.log(store.getState());
-    console.log(store.getState().tickets.data[0]);
     expect(store.getState().tickets.data[0].replies.length)
       .toBe(1);
   });
 
   test('submits a Reply and closes a Ticket', async () => {
-    const history = createHistory("/help/support/ticket/1");
-
-    const tickets = [
-      createTicket(1, "Test ticket", "Test body", "open", user, [])
-    ];
-    const ticket = tickets[0];
+    const history = createHistory(`/help/support/ticket/${ticket.id}`);
+    const tickets = [ticket];
 
     store.dispatch({ type: "SET_SESSION", session: user });
     store.dispatch({ type: "SET_TICKETS", tickets: tickets });
@@ -138,13 +121,7 @@ describe('ReplyForm component', () => {
     });
     node.update();
 
-    const reply = {
-      id: 1,
-      ticket_id: ticket.id,
-      body: "Reply body",
-      user: user
-    };
-
+    const reply = createReply(1, ticket.id, "Reply body", user);
     const updatedTicket = Object.assign({}, ticket, {
       status: "closed",
       replies: [reply]
@@ -152,16 +129,19 @@ describe('ReplyForm component', () => {
     axiosMock.onPost(mockPath("tickets/1/replies")).reply(200, reply);
     axiosMock.onPatch(mockPath("tickets/1")).reply(200, updatedTicket);
 
-    const body = node.find("#reply-body-input");
+    const replyBodyInput = node.find("#reply-body-input");
     const dropdownTrigger = node.find(".dropdown-trigger");
 
-    const replyForm = node.find("#reply-form");
     await act(async () => {
-      body.simulate('change', {
+      replyBodyInput.simulate('change', {
         target: {
           value: reply.body
         }
       });
+    });
+    node.update();
+
+    await act(async () => {
       dropdownTrigger.simulate('click');
     });
     node.update();
@@ -171,39 +151,22 @@ describe('ReplyForm component', () => {
     // Send Reply and Close button in the dropdown.
     const listItem = dropdown.find("li").at(1);
     const dropdownButton = listItem;
-    const anchor = listItem.find("a");
+    const sendReplyAndCloseButton = listItem.find("a");
 
     await act(async () => {
-      // Same thing as clicking dropdownButton; this <a> is a child.
-      anchor.simulate('click', {
-        preventDefault: () => {
-          console.log("anchor prevented");
-        }
-      });
+      sendReplyAndCloseButton.simulate('click');
     });
     node.update();
 
-    console.log(dropdownButton.html());
-
-    // We expect the form to have submitted and resolved
-    // promises at this point.
-    console.log(store.getState());
-    console.log(store.getState().tickets.data[0]);
     expect(store.getState().tickets.data[0].replies.length)
       .toBe(1);
     expect(store.getState().tickets.data[0].status).toBe("closed");
-
   });
 
   test('http error while submitting Reply and closing a Ticket', async () => {
-    const history = createHistory("/help/support/ticket/1");
+    const history = createHistory(`/help/support/ticket/${ticket.id}`);
+    const tickets = [ticket];
 
-    const tickets = [
-      createTicket(1, "Test ticket", "Test body", "open", user, [])
-    ];
-    const ticket = tickets[0];
-
-    localStorage.setItem("@authToken", "stubToken");
     store.dispatch({ type: "SET_SESSION", session: user });
     store.dispatch({ type: "SET_TICKETS", tickets: tickets });
 
@@ -222,12 +185,7 @@ describe('ReplyForm component', () => {
     });
     node.update();
 
-    const reply = {
-      id: 1,
-      ticket_id: ticket.id,
-      body: "Reply body",
-      user: user
-    };
+    const reply = createReply(1, ticket.id, "Reply body", user);
 
     const updatedTicket = Object.assign({}, ticket, {
       status: "closed",
@@ -236,13 +194,13 @@ describe('ReplyForm component', () => {
     axiosMock.onPost(mockPath("tickets/1/replies")).reply(200, reply);
     axiosMock.onPatch(mockPath("tickets/1")).reply(500);
 
-    const body = node.find("#reply-body-input");
+    const replyBodyInput = node.find("#reply-body-input");
     const dropdownTrigger = node.find(".dropdown-trigger");
 
     const replyForm = node.find("#reply-form");
 
     await act(async () => {
-      body.simulate('change', {
+      replyBodyInput.simulate('change', {
         target: {
           value: ''
         }
@@ -251,7 +209,7 @@ describe('ReplyForm component', () => {
     node.update();
 
     await act(async () => {
-      node.find("form").simulate('submit');
+      replyForm.simulate('submit');
     });
     node.update();
 
@@ -259,7 +217,7 @@ describe('ReplyForm component', () => {
       .toBe("Reply body is required.");
 
     await act(async () => {
-      body.simulate('change', {
+      replyBodyInput.simulate('change', {
         target: {
           value: reply.body
         }
@@ -277,23 +235,15 @@ describe('ReplyForm component', () => {
     // Send Reply and Close button in the dropdown.
     const listItem = dropdown.find("li").at(1);
     const dropdownButton = listItem;
-    const anchor = listItem.find("a");
+    const sendReplyAndCloseButton = listItem.find("a");
 
     await act(async () => {
-      // Click this for coverage: does nothing.
-      anchor.simulate('click', {
-        preventDefault: () => {
-          console.log("anchor prevented");
-        }
-      });
+      sendReplyAndCloseButton.simulate('click');
     });
     node.update();
 
-    console.log(dropdownButton.html());
-
     expect(store.getState().tickets.data[0].replies.length)
       .toBe(1);
-
     expect(node.find("#reply-form-error").text())
       .toBe("Encountered a server error while updating ticket state.");
   });

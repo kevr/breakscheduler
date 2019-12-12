@@ -1,20 +1,20 @@
 import React from 'react';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
-import { createStore } from 'redux';
 import { act } from 'react-dom/test-utils';
 import { configure, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import Reducers from '../../../reducers';
+import App from '../../../App';
 import {
   TestRouter,
   createHistory,
+  mockStore,
   mockPath
 } from 'TestUtil';
-import Create from './Create';
-import App from '../../../App';
-import Support from '../Support';
-import PropTypes from 'prop-types';
+import {
+  createUser,
+  createTicket
+} from 'MockObjects';
 
 configure({ adapter: new Adapter() });
 
@@ -29,7 +29,7 @@ describe('Create ticket page', () => {
   });
 
   beforeEach(() => {
-    store = createStore(Reducers);
+    store = mockStore();
     container = document.createElement("div");
     container.id = "root";
     document.body.appendChild(container);
@@ -43,13 +43,7 @@ describe('Create ticket page', () => {
 
   test('renders', async () => {
     const history = createHistory("/help/support/createTicket");
-
-    const user = {
-      id: 1,
-      name: "Test User",
-      email: "test@example.com",
-      type: "user"
-    };
+    const user = createUser("Test User", "test@example.com");
 
     axiosMock.onGet(mockPath("users/me")).reply(200, user);
     axiosMock.onGet(mockPath("tickets")).reply(200, []);
@@ -104,29 +98,17 @@ describe('Create ticket page', () => {
     expect(node.find("#create-ticket-form-error").text())
       .toBe("An error occurred while creating this ticket.");
 
-    const ticketCreated = {
-      id: 1,
-      subject: "Test subject",
-      body: "Test body",
-      user: user,
-      status: "open",
-      replies: []
-    };
+    const createdTicket =
+      createTicket("Test subject", "Test body", "open", user, []);
+    axiosMock.onPost(mockPath("tickets")).replyOnce(200, createdTicket);
 
-    axiosMock.onPost(mockPath("tickets")).replyOnce(200, ticketCreated);
-
-    submitClicked = false;
     await act(async () => {
-      form.simulate('submit', {
-        preventDefault: () => {
-          submitClicked = true;
-        }
-      });
+      form.simulate('submit');
     });
-    expect(submitClicked).toBe(true);
     node.update();
 
-    expect(history.location.pathname).toBe("/help/support/ticket/1");
+    expect(history.location.pathname)
+      .toBe(`/help/support/ticket/${createdTicket.id}`);
   });
 
 });

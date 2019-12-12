@@ -1,5 +1,4 @@
 import React from 'react';
-import { createStore } from 'redux';
 import {
   configure,
   mount,
@@ -10,12 +9,15 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import { act } from 'react-dom/test-utils';
 import UserManual from './UserManual';
-import Reducers from '../../reducers';
 import {
   TestRouter,
   createHistory,
+  mockStore,
   mockPath
 } from 'TestUtil';
+import {
+  createArticle
+} from 'MockObjects';
 
 configure({ adapter: new Adapter() });
 
@@ -30,7 +32,7 @@ describe('User Manual page', () => {
   });
 
   beforeEach(() => {
-    store = createStore(Reducers);
+    store = mockStore();
     container = document.createElement('div');
     container.id = "root";
     document.body.appendChild(container);
@@ -67,11 +69,7 @@ describe('User Manual page', () => {
 
     // Click on the nav button
     await act(async () => {
-      trigger.simulate('click', {
-        preventDefault: () => {
-          return true;
-        }
-      });
+      trigger.simulate('click');
     });
     node.update();
 
@@ -90,11 +88,11 @@ describe('User Manual page', () => {
 
   test('renders with multiple articles', async () => {
     const history = createHistory("/help");
-
-    axiosMock.onGet(mockPath("articles")).reply(200, [
-      { id: 1, topic: "Article 1", body: "First article written." },
-      { id: 2, topic: "Article 2", body: "Second article written." }
-    ]);
+    const articles = [
+      createArticle("Article 1", "First article written."),
+      createArticle("Article 2", "Second article written.")
+    ];
+    axiosMock.onGet(mockPath("articles")).reply(200, articles);
 
     let node;
     await act(async () => {
@@ -116,11 +114,7 @@ describe('User Manual page', () => {
 
     // Click on the nav button
     await act(async () => {
-      trigger.simulate('click', {
-        preventDefault: () => {
-          return true;
-        }
-      });
+      trigger.simulate('click');
     });
     node.update();
 
@@ -131,9 +125,11 @@ describe('User Manual page', () => {
     // Second <a> found in the sidenav.
     // Click the second link, expect the sidenav to close.
     const secondLink = sidenav.find("a").at(1);
-    secondLink.simulate('click', {});
-
+    await act(async () => {
+      secondLink.simulate('click');
+    });
     node.update();
+
     expect(node.find(".sidenav.open").exists()).toBe(false);
   });
 

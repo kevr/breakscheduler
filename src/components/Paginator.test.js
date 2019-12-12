@@ -4,7 +4,6 @@ import Adapter from 'enzyme-adapter-react-16';
 import { act } from 'react-dom/test-utils';
 import Paginator from './Paginator';
 
-// Configure enzyme
 configure({ adapter: new Adapter() });
 
 describe('Paginator component', async () => {

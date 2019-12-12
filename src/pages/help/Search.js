@@ -14,9 +14,9 @@ class Search extends Component {
 
     // Memoization dict for lookups
     this.converted = {};
+    this.modals = {};
 
     this.handleSearchChange = this.handleSearchChange.bind(this);
-    this.triggerModal = this.triggerModal.bind(this);
   }
 
   componentDidMount() {
@@ -32,12 +32,6 @@ class Search extends Component {
 
   handleSearchChange(terms) {
     this.setState({ searchTerms: terms });
-  }
-
-  triggerModal(i) {
-    var elem = document.getElementById(`modal${i}`);
-    var instance = M.Modal.getInstance(elem);
-    instance.open();
   }
 
   render() {
@@ -87,23 +81,25 @@ class Search extends Component {
         <div className="searchResults row">
           {filtered.map((topic, i) => (
             <span key={i}>
-              <Modal id={i}>
-                <h4>{topic.subject}</h4>
-                <p>{topic.body}</p>
-              </Modal>
               <div className="col s6 m6 l4 xl3"
                 style={{
                   padding: "4px"
                 }}
               >
-                <div className="searchResult topic card"
-                  onClick={e => this.triggerModal(i)}
+                <Modal
+                  id={i}
+                  trigger={(
+                    <div className="searchResult topic card">
+                      <div className="card-content">
+                        <span className="card-title">{topic.subject}</span>
+                        <p>{topic.body}</p>
+                      </div>
+                    </div>
+                  )}
                 >
-                  <div className="card-content">
-                    <span className="card-title">{topic.subject}</span>
-                    <p>{topic.body}</p>
-                  </div>
-                </div>
+                  <h4>{topic.subject}</h4>
+                  <p>{topic.body}</p>
+                </Modal>
               </div>
             </span>
           ))}

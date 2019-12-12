@@ -24,12 +24,6 @@ class Team extends Component {
     });
   }
 
-  triggerModal(i) {
-    var elem = document.getElementById(`modal${i}`);
-    var instance = M.Modal.getInstance(elem);
-    instance.open();
-  }
-
   render() {
     const { members } = this.state;
     const n = Math.ceil((members.length / 4) % 4);
@@ -66,20 +60,24 @@ class Team extends Component {
             <div className="row" key={i}>
             {members.slice(i, i + 4).map((member, c) => (
               <div className="col s3" key={c}>
-                <Modal id={c}>
+                <Modal
+                  id={c}
+                  trigger={(
+                    <div className="card memberCard">
+                      <div className="card-image">
+                        <img src={member.avatar} alt={member.name} />
+                      </div>
+                      <div className="card-content">
+                        <div className="textCenter memberName">{member.name}</div>
+                        <div className="textCenter memberTitle">{member.title}</div>
+                      </div>
+                    </div>
+                  )}
+                >
                   <h4>{member.name}</h4>
                   <div className="memberTitle">{member.title}</div>
                   <p>{member.summary}</p>
                 </Modal>
-                <div className="card memberCard" onClick={e => this.triggerModal(c)}>
-                  <div className="card-image">
-                    <img src={member.avatar} alt={member.name} />
-                  </div>
-                  <div className="card-content">
-                    <div className="textCenter memberName">{member.name}</div>
-                    <div className="textCenter memberTitle">{member.title}</div>
-                  </div>
-                </div>
               </div>
             ))}
             </div>
