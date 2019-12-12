@@ -24,7 +24,14 @@ class ReplyCollapse extends Component {
   }
 
   collapse() {
-    this.instance.close();
+    this.instances.map(instance => {
+      instance.close();
+      return null;
+    });
+
+    if(this.props.onReply) {
+      this.props.onReply();
+    }
   }
 
   render() {

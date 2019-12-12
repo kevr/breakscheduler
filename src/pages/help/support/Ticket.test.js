@@ -355,12 +355,13 @@ describe('Ticket page', () => {
     });
     node.update();
 
+    expect(node.find("select").instance().value).toBe("open");
     expect(node.find("#status-badge").at(1).text()).toBe("Open");
 
     let control = node.find(".ticketControl");
     expect(control.exists()).toBe(true);
 
-    const select = control.find("select");
+    let select = control.find("select");
     await act(async () => {
       select.simulate('change', {
         target: {
@@ -378,7 +379,7 @@ describe('Ticket page', () => {
     expect(button.exists()).toBe(true);
     expect(button.text()).toBe("Save Changes");
 
-    axiosMock.onPatch(mockPath("tickets/1")).reply(500);
+    axiosMock.onPatch(mockPath("tickets/1")).replyOnce(500);
 
     await act(async () => {
       button.simulate('click');
@@ -393,7 +394,7 @@ describe('Ticket page', () => {
     });
 
     axiosMock.onPatch(mockPath("tickets/1"))
-      .reply(200, updatedTicket);
+      .replyOnce(200, updatedTicket);
 
     await act(async () => {
       button.simulate('click');
@@ -401,6 +402,7 @@ describe('Ticket page', () => {
     node.update();
     control = node.find(".ticketControl");
 
+    expect(node.find("select").instance().value).toBe("closed");
     expect(node.find("#status-badge").at(1).text()).toBe("Closed");
 
     await act(async () => {
@@ -425,15 +427,15 @@ describe('Ticket page', () => {
     });
 
     axiosMock.onPatch(mockPath("tickets/1"))
-      .reply(200, updatedTicket);
+      .replyOnce(200, updatedTicket);
 
     await act(async () => {
       button.simulate('click');
     });
-
     node.update();
     control = node.find(".ticketControl");
 
+    expect(node.find("select").instance().value).toBe("escalated");
     expect(node.find("#status-badge").at(1).text()).toBe("Escalated");
 
     // Back to open
@@ -459,7 +461,7 @@ describe('Ticket page', () => {
     });
 
     axiosMock.onPatch(mockPath("tickets/1"))
-      .reply(200, updatedTicket);
+      .replyOnce(200, updatedTicket);
 
     await act(async () => {
       button.simulate('click');
@@ -469,6 +471,131 @@ describe('Ticket page', () => {
     control = node.find(".ticketControl");
 
     expect(node.find("#status-badge").at(1).text()).toBe("Open");
+
+    // COPIED
+    const ticketControl = node.find(".ticketControl");
+    
+    select = ticketControl.find("#status-select").at(1);
+    const expectSelectValue = (value) => {
+      select.update();
+      expect(select.instance().value).toBe(value);
+    };
+
+    expectSelectValue("open");
+    
+    const replyCollapse = node.find(".addReply");
+    await act(async () => {
+      replyCollapse.simulate('click');
+    });
+
+    const replyForm = replyCollapse.find("#reply-form");
+    const replyBody = replyForm.find("#reply-body-input");
+
+    await act(async () => {
+      replyBody.simulate('change', {
+        target: {
+          value: "Blah"
+        }
+      });
+    });
+    node.update();
+    
+    const replyDropdownTrigger = replyForm.find(".dropdown-trigger");
+    await act(async () => {
+      replyDropdownTrigger.simulate('click');
+    });
+    node.update();
+
+    const replyDropdown = replyForm.find("#reply-dropdown");
+    const replySendAndClose = replyDropdown.find("li").at(1).find("a");
+
+    const newReply = {
+      id: 10,
+      ticket_id: 1,
+      body: "Blah",
+      user: user
+    };
+
+    const newTicket = Object.assign({}, updatedTicket, {
+      status: "closed",
+      replies: updatedTicket.replies.concat(newReply)
+    });
+
+    // Mock POST to add reply, then PATCH to close the ticket
+    axiosMock.onPost(mockPath("tickets/1/replies"))
+      .replyOnce(200, newReply);
+    axiosMock.onPatch(mockPath("tickets/1"))
+      .replyOnce(200, newTicket);
+
+    await act(async () => {
+      replySendAndClose.simulate('click');
+    });
+    node.update();
+
+    await act(async () => {
+      replyForm.simulate('submit');
+    });
+    node.update();
+
+    expectSelectValue("closed");
+    /*
+    const body = node.find("#reply-body-input");
+    const dropdownTrigger = node.find(".addReply .dropdown-trigger");
+
+    const replyForm = node.find("#reply-form");
+    await act(async () => {
+      body.simulate('change', {
+        target: {
+          value: "Blah"
+        }
+      });
+      dropdownTrigger.simulate('click');
+    });
+    node.update();
+
+    const dropdown = node.find(".dropdown-content");
+
+    // Send Reply and Close button in the dropdown.
+    const listItem = dropdown.find("li").at(1);
+    const dropdownButton = listItem;
+    const anchor = listItem.find("a");
+
+    const newReply = {
+      id: 10,
+      ticket_id: 1,
+      body: "Blah",
+      user: user
+    };
+
+    updatedTicket = Object.assign({}, updatedTicket, {
+      status: "closed",
+      replies: updatedTicket.replies.concat(newReply)
+    });
+
+    axiosMock.onPost("tickets/1/replies")
+      .replyOnce(200, {
+        id: 10,
+        ticket_id: 1,
+        body: "Blah",
+        user: user
+      });
+    axiosMock.onPatch("tickets/1")
+      .replyOnce(200, updatedTicket);
+
+    await act(async () => {
+      // Same thing as clicking dropdownButton; this <a> is a child.
+      anchor.simulate('click', {
+        preventDefault: () => {
+          console.log("anchor prevented");
+        }
+      });
+    });
+    node.update();
+
+    expect(node.find("select").instance().value).toBe("closed");
+    select.update();
+    expect(select.instance().value).toBe("closed");
+    */
 
     // Unmount our node.
     await act(async () => {

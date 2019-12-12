@@ -10,6 +10,18 @@ import {
 } from '../../../components';
 
 class Ticket extends Component {
+  constructor(props) {
+    super(props);
+    this.handleReply = this.handleReply.bind(this);
+  }
+
+  handleReply() {
+    if(this.ticketControl) {
+      console.log("handleReply called resetState on TicketControl");
+      this.ticketControl.resetState();
+    }
+  }
+
   render() {
     console.log("Ticket.render");
     // If tickets are not yet resolved, display a loader.
@@ -65,7 +77,12 @@ class Ticket extends Component {
         {/* If the viewer is an Administrator, display our TicketControl */}
         {isAdmin(this.props.session) && (
           <div className="row">
-            <TicketControl ticket={ticket} />
+            <TicketControl
+              ref={(c) => {
+                this.ticketControl = c;
+              }}
+              ticket={ticket}
+            />
           </div>
         )}
 
@@ -123,7 +140,10 @@ class Ticket extends Component {
           <div>
             {/* If our ticket status is closed, we'll hide the widget */}
             {ticket.status !== "closed" && (
-              <ReplyCollapse ticket={ticket} />
+              <ReplyCollapse
+                ticket={ticket}
+                onReply={this.handleReply}
+              />
             )}
           </div>
         </div>

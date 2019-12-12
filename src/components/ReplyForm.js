@@ -161,7 +161,11 @@ class ReplyForm extends Component {
               hidden={item === this.state.buttonText}
               onClick={e => {
                 this.setState({ buttonText: item }, () => {
-                  this.handleSubmit(e);
+                  // We mock the event we pass to this.handleSubmit here,
+                  // because it's not actually a form submission.
+                  this.handleSubmit({
+                    preventDefault: () => {}
+                  });
                 });
               }}
             >

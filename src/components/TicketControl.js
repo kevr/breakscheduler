@@ -13,10 +13,18 @@ class TicketControl extends Component {
       error: null
     };
 
+    this.resetState = this.resetState.bind(this);
     this.isModified = this.isModified.bind(this);
 
     this.handleStatusChange = this.handleStatusChange.bind(this);
     this.handleSave = this.handleSave.bind(this);
+  }
+
+  resetState() {
+    this.setState({
+      status: this.props.ticket.status,
+      error: null
+    });
   }
 
   // Handle this.state.status change
@@ -121,4 +129,4 @@ const mapDispatch = (dispatch, ownProps) => ({
   })
 });
 
-export default connect(null, mapDispatch)(TicketControl);
+export default connect(null, mapDispatch, null, { forwardRef: true })(TicketControl);
