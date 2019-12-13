@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import M from 'materialize-css';
 import {
@@ -79,7 +80,7 @@ class ReplyForm extends Component {
               // copy of the Ticket being updated.
               console.log(ticket);
               this.props.setTicket(ticket);
-              this.props.collapse(); // Collapse dialog
+              this.props.onReply();
             })
             .catch(error => {
               console.error(error);
@@ -88,7 +89,7 @@ class ReplyForm extends Component {
               });
             });
         } else {
-          this.props.collapse(); // Collapse dialog
+          this.props.onReply();
         }
 
       });
@@ -178,6 +179,11 @@ class ReplyForm extends Component {
     );
   }
 }
+
+ReplyForm.propTypes = {
+  ticket: PropTypes.object.isRequired,
+  onReply: PropTypes.func
+};
 
 const mapDispatch = (dispatch, ownProps) => ({
   addReply: (reply) =>dispatch({
