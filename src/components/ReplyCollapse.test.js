@@ -11,6 +11,11 @@ import ReplyCollapse from './ReplyCollapse';
 import {
   mockPath
 } from 'TestUtil';
+import {
+  createUser,
+  createTicket,
+  createReply
+} from 'MockObjects';
 
 configure({ adapter: new Adapter() });
 
@@ -20,12 +25,9 @@ describe('ReplyCollapse component', () => {
   let store;
   let container;
 
-  const user = {
-    id: 1,
-    name: "Test User",
-    email: "test@example.com",
-    type: "user"
-  };
+  const user = createUser("Test User", "test@example.com");
+  const ticket = createTicket("Test ticket", "Test body", "open", user, []);
+  const reply = createReply(ticket.id, "Test reply", user);
 
   beforeAll(() => {
     axiosMock = new MockAdapter(axios);
@@ -45,24 +47,8 @@ describe('ReplyCollapse component', () => {
   });
 
   test('collapses after replying without onReply', async () => {
-
-    const ticket = {
-      id: 1,
-      subject: "Test ticket",
-      body: "Test body",
-      user: user,
-      replies: []
-    };
-
-    const reply = {
-      id: 1,
-      ticket_id: 1,
-      body: "Test reply",
-      user: user
-    };
-
     let gotPost = false;
-    axiosMock.onPost(mockPath("tickets/1/replies"))
+    axiosMock.onPost(mockPath(`tickets/${ticket.id}/replies`))
       .replyOnce((config) => {
         gotPost = true;
         return [200, reply];
@@ -112,24 +98,8 @@ describe('ReplyCollapse component', () => {
   });
 
   test('calls provided onReply after replying', async () => {
-
-    const ticket = {
-      id: 1,
-      subject: "Test ticket",
-      body: "Test body",
-      user: user,
-      replies: []
-    };
-
-    const reply = {
-      id: 1,
-      ticket_id: 1,
-      body: "Test reply",
-      user: user
-    };
-
     let gotPost = false;
-    axiosMock.onPost(mockPath("tickets/1/replies"))
+    axiosMock.onPost(mockPath(`tickets/${ticket.id}/replies`))
       .replyOnce((config) => {
         gotPost = true;
         return [200, reply];
@@ -169,7 +139,7 @@ describe('ReplyCollapse component', () => {
     await act(async () => {
       replyBodyInput.simulate('change', {
         target: {
-          value: "Test reply"
+          value: reply.body
         }
       });
     });

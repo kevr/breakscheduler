@@ -2,14 +2,14 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-const UserWidget = ({ userData, clearSession }) => (
+const UserWidget = ({ session, clearSession }) => (
   <div className="userWidget">
-    {userData.isValid ? (
+    {session.isValid ? (
       <div className="sessionControl row">
         <span className="userEmail textSmall left">
           {/* Show an optional [admin] tag after the user email
               in the case where the user is an administrator. */}
-          {`Logged in as ${userData.email}`}{userData.type === "admin" && " [admin]"}
+          {`Logged in as ${session.email}`}{session.type === "admin" && " [admin]"}
         </span>
         <span className="widgets right">
           <Link
@@ -24,10 +24,8 @@ const UserWidget = ({ userData, clearSession }) => (
             alt="Logout"
             onClick={(e) => {
               e.preventDefault();
-
-              if(window.confirm("Are you sure you want to logout?")) {
+              if(window.confirm("Are you sure you want to logout?"))
                 clearSession();
-              }
             }}
           >
             {"Logout"}
@@ -46,6 +44,10 @@ const UserWidget = ({ userData, clearSession }) => (
   </div>
 );
 
+const mapState = (state, ownProps) => ({
+  session: state.session
+});
+
 const mapDispatch = (dispatch, ownProps) => ({
   clearSession: () => {
     localStorage.setItem("@authToken", null);
@@ -55,4 +57,4 @@ const mapDispatch = (dispatch, ownProps) => ({
   }
 });
 
-export default connect(null, mapDispatch)(UserWidget);
+export default connect(mapState, mapDispatch)(UserWidget);

@@ -1,60 +1,59 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore } from 'redux';
 import { act } from 'react-dom/test-utils';
-import { MemoryRouter } from 'react-router-dom';
+import MockAdapter from 'axios-mock-adapter';
+import axios from 'axios';
 import {
   render,
   fireEvent,
   waitForElement
 } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
-import MockAdapter from 'axios-mock-adapter';
-import axios from 'axios';
 import Team from './Team';
-import config from '../../config.json';
-import Reducers from '../../reducers';
 import {
   TestRouter,
   createHistory,
+  mockStore,
   mockPath
 } from 'TestUtil';
+import {
+  createMember
+} from 'MockObjects';
 
-let axiosMock;
-let container;
-let store;
+describe('Team page', () => {
 
-beforeAll(() => {
-  axiosMock = new MockAdapter(axios);
-});
+  let axiosMock;
+  let container;
+  let store;
 
-beforeEach(() => {
-  store = createStore(Reducers);
-  container = document.createElement('div');
-  container.id = "root";
-  document.body.appendChild(container);
-});
+  beforeAll(() => {
+    axiosMock = new MockAdapter(axios);
+  });
 
-afterEach(() => {
-  axiosMock.reset();
-  document.body.removeChild(container);
-  container = null;
-});
+  beforeEach(() => {
+    store = mockStore();
+    container = document.createElement('div');
+    container.id = "root";
+    document.body.appendChild(container);
+  });
 
-describe('Team Page', () => {
+  afterEach(() => {
+    axiosMock.reset();
+    document.body.removeChild(container);
+    container = null;
+  });
+
   test('shows all users', async () => {
     const history = createHistory("/about/team");
 
-    axiosMock.onGet(mockPath("members")).reply(200, [
-      {
-        id: 1,
-        name: "Kevin Morris",
-        email: "kevr.gtalk@gmail.com",
-        summary: "A cool guy.",
-        title: "Software Engineer",
-        avatar: ""
-      }
-    ]);
+    const member = createMember(
+      "Kevin Morris",
+      "kevr.gtalk@gmail.com",
+      "A cool guy.",
+      "Software Engineer"
+    );
+    const members = [member];
+
+    axiosMock.onGet(mockPath("members")).reply(200, members);
 
     await act(async () => {
       render(
@@ -77,16 +76,15 @@ describe('Team Page', () => {
   test('card click triggers modal with summary', async () => {
     const history = createHistory("/about/team");
 
-    axiosMock.onGet(mockPath("members")).reply(200, [
-      {
-        id: 1,
-        name: "Kevin Morris",
-        email: "kevr.gtalk@gmail.com",
-        summary: "A cool guy.",
-        title: "Software Engineer",
-        avatar: ""
-      }
-    ]);
+    const member = createMember(
+      "Kevin Morris",
+      "kevr.gtalk@gmail.com",
+      "A cool guy.",
+      "Software Engineer"
+    );
+    const members = [member];
+
+    axiosMock.onGet(mockPath("members")).reply(200, members);
 
     await act(async () => {
       render(
@@ -107,6 +105,6 @@ describe('Team Page', () => {
 
     expect(modal.querySelector(".modal-content p").textContent)
       .toBe("A cool guy.");
-
   });
+
 });

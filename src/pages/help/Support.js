@@ -22,7 +22,7 @@ class Support extends Component {
     return (
       <div className="container">
         <div className="row">
-          <UserWidget userData={session} />
+          <UserWidget session={session} />
         </div>
 
         <div className="Content">

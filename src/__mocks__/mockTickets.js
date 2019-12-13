@@ -1,7 +1,8 @@
 import React from 'react';
 
-export const createTicket = (id, subject, body, status, user, replies) => ({
-  id,
+let ticketId = 0;
+export const createTicket = (subject, body, status, user, replies) => ({
+  id: ++ticketId,
   subject,
   body,
   status,
@@ -11,8 +12,9 @@ export const createTicket = (id, subject, body, status, user, replies) => ({
   updated_at: (new Date()).toUTCString()
 });
 
-export const createReply = (id, ticket_id, body, user) => ({
-  id,
+let replyId = 0;
+export const createReply = (ticket_id, body, user) => ({
+  id: ++replyId,
   ticket_id,
   body,
   user,

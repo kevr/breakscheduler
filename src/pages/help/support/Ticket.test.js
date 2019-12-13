@@ -1,5 +1,4 @@
 import React from 'react';
-import { createStore } from 'redux';
 import { configure, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import {
@@ -11,19 +10,22 @@ import { act } from 'react-dom/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import App from '../../../App';
-import Reducers from '../../../reducers';
 import {
   TestRouter,
   createHistory,
   mockPath,
+  mockStore,
   flushPromises
 } from 'TestUtil';
 import {
+  createUser,
+  createAdmin,
   createTicket,
   createReply,
+  createReplyChild,
   addReply,
   removeReply
-} from 'mockTickets';
+} from 'MockObjects';
 
 configure({ adapter: new Adapter() });
 
@@ -33,30 +35,17 @@ describe('Ticket page', () => {
   let store;
   let container;
 
-  // persistent data to use between tests
-  let user;
-  let ticketId;
+  const user = createUser("Test User", "test@example.com");
 
   beforeAll(() => {
     axiosMock = new MockAdapter(axios);
   });
 
   beforeEach(() => {
-    store = createStore(Reducers);
+    store = mockStore();
     container = document.createElement("div");
     container.id = "root";
     document.body.appendChild(container);
-
-    // Our mocked up user
-    user = {
-      id: 1,
-      name: "Test User",
-      email: "test@example.com",
-      type: "user"
-    };
-    
-    // Our mocked up ticketId value.
-    ticketId = 1;
   });
 
   afterEach(() => {
@@ -66,18 +55,15 @@ describe('Ticket page', () => {
   });
 
   test('renders correctly after mounting', async () => {
-    const history = createHistory(`/help/support/ticket/${ticketId}`);
-
     const replies = [
-      createReply(1, ticketId, "Reply one", user),
-      createReply(2, ticketId, "Reply two", user)
+      createReplyChild("Reply one"),
+      createReplyChild("Reply two")
     ];
+    const ticket =
+      createTicket("Test ticket", "Ticket body", "open", user, replies);
+    const tickets = [ticket];
 
-    const tickets = [
-      createTicket(
-        ticketId, "Test ticket", "Ticket body", "open", user, replies
-      )
-    ];
+    const history = createHistory(`/help/support/ticket/${ticket.id}`);
 
     axiosMock.onGet(mockPath("users/me")).reply(200, user);
     axiosMock.onGet(mockPath("tickets")).reply(200, tickets);
@@ -94,23 +80,22 @@ describe('Ticket page', () => {
     });
     node.update();
 
-    const ticket = node.find(".ticket");
-    expect(ticket.exists()).toBe(true);
+    const ticketNode = node.find(".ticket");
+    expect(ticketNode.exists()).toBe(true);
 
     // Expect that this Ticket page is rendering the ticket
     // located in our Redux store.
-    expect(ticket.find(".card-title .col.s10").text()).toBe("Test ticket");
+    expect(ticketNode.find(".card-title .col.s10").text()).toBe("Test ticket");
   });
 
   // A huge test that uses the entire Ticket page to
   // reply to the ticket and perform other various tasks.
   test('can be navigated and edited', async () => {
-    const history = createHistory(`/help/support/ticket/${ticketId}`);
+    const ticket = createTicket("Test ticket", "Ticket body", "open", user);
+    const tickets = [ticket];
 
-    // Mock up some tickets.
-    const tickets = [
-      createTicket(ticketId, "Test ticket", "Ticket body", "open", user, [])
-    ];
+    const history = createHistory(`/help/support/ticket/${ticket.id}`);
+
     axiosMock.onGet(mockPath("users/me")).reply(200, user);
     axiosMock.onGet(mockPath("tickets")).reply(200, tickets);
 
@@ -151,7 +136,7 @@ describe('Ticket page', () => {
     node.update();
 
     // First, we'll mock an error to test that code path
-    axiosMock.onPost(mockPath(`tickets/${ticketId}/replies`))
+    axiosMock.onPost(mockPath(`tickets/${ticket.id}/replies`))
       .replyOnce(500);
 
     // Submit the replyForm
@@ -169,10 +154,10 @@ describe('Ticket page', () => {
 
     expect(node.find("#reply-form-error").text())
       .toBe("Unable to add reply. See the browser inspector for details.");
-
-    // Now, mock a response that was successful
-    axiosMock.onPost(mockPath(`tickets/${ticketId}/replies`))
-      .replyOnce(200, createReply(1, ticketId, "Test reply", user));
+    
+    const reply = createReply(ticket.id, "Test reply", user);
+    axiosMock.onPost(mockPath(`tickets/${ticket.id}/replies`))
+      .replyOnce(200, reply);
 
     // Submit again, with a proper network mock
     await act(async () => {
@@ -189,8 +174,8 @@ describe('Ticket page', () => {
     expect(replies.length).toBe(1);
 
     // Now, begin to edit a reply.
-    let reply = replies.at(0);
-    let editButton = reply.find(".editButton");
+    let replyNode = replies.at(0);
+    let editButton = replyNode.find(".editButton");
     expect(editButton.exists()).toBe(true);
 
     await act(async () => {
@@ -199,13 +184,13 @@ describe('Ticket page', () => {
     node.update();
 
     // We can cancel an edit.
-    const cancelButton = reply.update().find(".cancelButton");
+    const cancelButton = replyNode.update().find(".cancelButton");
     await act(async () => {
       cancelButton.simulate('click');
     });
     node.update();
 
-    editButton = reply.find(".editButton");
+    editButton = replyNode.find(".editButton");
     await act(async () => {
       editButton.simulate('click');
     });
@@ -214,7 +199,7 @@ describe('Ticket page', () => {
     const replyEditor = await waitForElement(() => {
       return node.update().find(".replyEditor").first();
     });
-    reply = node.find(".ticketReply").first();
+    replyNode = node.find(".ticketReply").first();
 
     // const replyEditor = reply.find(".replyEditor");
     expect(replyEditor.exists()).toBe(true);
@@ -254,7 +239,7 @@ describe('Ticket page', () => {
     node.update();
 
     // We can try to edit the reply again, with a 500 API server error.
-    axiosMock.onPatch(mockPath(`tickets/${ticketId}/replies/1`))
+    axiosMock.onPatch(mockPath(`tickets/${ticket.id}/replies/${reply.id}`))
       .replyOnce(500);
 
     await act(async () => {
@@ -266,18 +251,21 @@ describe('Ticket page', () => {
       .toBe("Encountered a server error while saving reply edits.");
 
     // Now we can update our reply successfully.
-    axiosMock.onPatch(mockPath(`tickets/${ticketId}/replies/1`))
-      .replyOnce(200, createReply(1, ticketId, "Edited reply", user));
+    const updatedReply = Object.assign({}, reply, {
+      body: "Edited reply"
+    });
+    axiosMock.onPatch(mockPath(`tickets/${ticket.id}/replies/${reply.id}`))
+      .replyOnce(200, updatedReply);
 
     await act(async () => {
       replySaveButton.simulate('click');
     });
     node.update();
-    reply = node.find(".ticketReply").first();
+    replyNode = node.find(".ticketReply").first();
 
     // We can also delete a reply.
     const deleteButton = await waitForElement(() => {
-      return reply.update().find(".deleteButton").first();
+      return replyNode.update().find(".deleteButton").first();
     });
 
     window.confirm = jest.fn().mockImplementation((message) => {
@@ -296,7 +284,7 @@ describe('Ticket page', () => {
     });
 
     // First mock out an error.
-    axiosMock.onDelete(mockPath(`tickets/${ticketId}/replies/1`))
+    axiosMock.onDelete(mockPath(`tickets/${ticket.id}/replies/${reply.id}`))
       .replyOnce(500);
 
     await act(async () => {
@@ -308,8 +296,8 @@ describe('Ticket page', () => {
       .toBe("Encountered a server error while deleting reply.");
 
     // Then, delete the reply successfully.
-    axiosMock.onDelete(mockPath(`tickets/${ticketId}/replies/1`))
-      .replyOnce(200);
+    axiosMock.onDelete(mockPath(`tickets/${ticket.id}/replies/${reply.id}`))
+      .replyOnce(204);
 
     await act(async () => {
       deleteButton.simulate('click');
@@ -324,24 +312,19 @@ describe('Ticket page', () => {
     await act(async () => {
       history.push("/help/support");
     });
+
+    expect(history.location.pathname).toBe("/help/support");
   });
 
   test('control a ticket as Administrator', async () => {
-    const history = createHistory("/help/support/ticket/1");
-    localStorage.setItem("@authToken", "stubToken");
+    const admin = createAdmin("Admin User", "admin@example.com");
+    const ticket = createTicket("Test ticket", "Test body", "open", admin);
+    const tickets = [ticket];
 
-    const admin = {
-      id: 2,
-      name: "Admin User",
-      email: "admin@example.com",
-      type: "admin"
-    };
-
-    const ticket =
-      createTicket(1, "Test ticket", "Test body", "open", admin, []);
+    const history = createHistory(`/help/support/ticket/${ticket.id}`);
 
     axiosMock.onGet(mockPath("users/me")).reply(200, admin);
-    axiosMock.onGet(mockPath("tickets")).reply(200, [ticket]);
+    axiosMock.onGet(mockPath("tickets")).reply(200, tickets);
 
     let node;
     await act(async () => {
@@ -355,6 +338,7 @@ describe('Ticket page', () => {
     });
     node.update();
 
+    // This is bad!
     expect(node.find("select").instance().value).toBe("open");
     expect(node.find("#status-badge").at(1).text()).toBe("Open");
 
@@ -379,7 +363,7 @@ describe('Ticket page', () => {
     expect(button.exists()).toBe(true);
     expect(button.text()).toBe("Save Changes");
 
-    axiosMock.onPatch(mockPath("tickets/1")).replyOnce(500);
+    axiosMock.onPatch(mockPath(`tickets/${ticket.id}`)).replyOnce(500);
 
     await act(async () => {
       button.simulate('click');
@@ -393,7 +377,7 @@ describe('Ticket page', () => {
       status: "closed"
     });
 
-    axiosMock.onPatch(mockPath("tickets/1"))
+    axiosMock.onPatch(mockPath(`tickets/${ticket.id}`))
       .replyOnce(200, updatedTicket);
 
     await act(async () => {
@@ -426,7 +410,7 @@ describe('Ticket page', () => {
       status: "escalated"
     });
 
-    axiosMock.onPatch(mockPath("tickets/1"))
+    axiosMock.onPatch(mockPath(`tickets/${ticket.id}`))
       .replyOnce(200, updatedTicket);
 
     await act(async () => {
@@ -459,8 +443,7 @@ describe('Ticket page', () => {
     updatedTicket = Object.assign({}, ticket, {
       status: "open"
     });
-
-    axiosMock.onPatch(mockPath("tickets/1"))
+    axiosMock.onPatch(mockPath(`tickets/${ticket.id}`))
       .replyOnce(200, updatedTicket);
 
     await act(async () => {
@@ -522,9 +505,9 @@ describe('Ticket page', () => {
     });
 
     // Mock POST to add reply, then PATCH to close the ticket
-    axiosMock.onPost(mockPath("tickets/1/replies"))
+    axiosMock.onPost(mockPath(`tickets/${ticket.id}/replies`))
       .replyOnce(200, newReply);
-    axiosMock.onPatch(mockPath("tickets/1"))
+    axiosMock.onPatch(mockPath(`tickets/${ticket.id}`))
       .replyOnce(200, newTicket);
 
     await act(async () => {

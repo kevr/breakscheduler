@@ -1,20 +1,20 @@
 import React from 'react';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
-import { createStore } from 'redux';
 import { configure, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { act } from 'react-dom/test-utils';
-import Reducers from '../../../reducers';
-import {
-  createTicket
-} from 'mockTickets';
+import App from '../../../App';
 import {
   TestRouter,
   createHistory,
+  mockStore,
   mockPath
 } from 'TestUtil';
-import App from '../../../App';
+import {
+  createUser,
+  createTicket
+} from 'MockObjects';
 
 // Configure enzyme
 configure({ adapter: new Adapter() });
@@ -25,34 +25,23 @@ describe('Dashboard page', () => {
   let store;
   let container;
 
-  let user;
-  let tickets;
+  const user = createUser("Test User", "test@example.com");
+  const tickets = [ 
+    createTicket("Closed ticket", "Closed body", "closed", user, []),
+    createTicket("Open ticket", "Open body", "open", user, []),
+    createTicket("Escalated ticket", "Escalated body", "escalated", user, []),
+    createTicket("Closed ticket", "Closed body", "closed", user, [])
+  ];
 
   beforeAll(() => {
     axiosMock = new MockAdapter(axios);
   });
 
   beforeEach(() => {
-    localStorage.clear();
-    store = createStore(Reducers);
+    store = mockStore();
     container = document.createElement("div");
     container.id = "root";
     document.body.appendChild(container);
-
-    user = {
-      id: 1,
-      name: "Test User",
-      email: "test@example.com",
-      type: "user"
-    };
-
-    // We order these in this way to cover all sort situations.
-    tickets = [
-      createTicket(1, "Closed ticket", "Closed body", "closed", user, []),
-      createTicket(2, "Open ticket", "Open body", "open", user, []),
-      createTicket(3, "Escalated ticket", "Escalated body", "escalated", user, []),
-      createTicket(4, "Closed ticket", "Closed body", "closed", user, [])
-    ];
 
   });
 
@@ -65,8 +54,6 @@ describe('Dashboard page', () => {
   test('clicking a Ticket in the table routes to that ticket', async () => {
     const history = createHistory("/help/support");
 
-    // Setup and mock on-mount requests.
-    localStorage.setItem("@authToken", "stubToken");
     axiosMock.onGet(mockPath("users/me")).reply(200, user);
     axiosMock.onGet(mockPath("tickets")).reply(200, tickets);
 
@@ -114,8 +101,6 @@ describe('Dashboard page', () => {
   test('searching Tickets returns the proper results', async () => {
     const history = createHistory("/help/support");
 
-    // Setup and mock on-mount requests.
-    localStorage.setItem("@authToken", "stubToken");
     axiosMock.onGet(mockPath("users/me")).reply(200, user);
     axiosMock.onGet(mockPath("tickets")).reply(200, tickets);
 

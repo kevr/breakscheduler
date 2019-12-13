@@ -77,7 +77,6 @@ class ReplyForm extends Component {
             .then(ticket => {
               // If we're given a valid response, then update Redux's
               // copy of the Ticket being updated.
-              // NOTE: Why is setTicket being called three times?
               console.log(ticket);
               this.props.setTicket(ticket);
               this.props.collapse(); // Collapse dialog
