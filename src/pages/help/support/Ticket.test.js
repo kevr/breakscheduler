@@ -514,11 +514,7 @@ describe('Ticket page', () => {
     });
     node.update();
 
-    await act(async () => {
-      replyForm.simulate('submit');
-    });
-    node.update();
-
+    // We should have changed to closed status.
     expectSelectValue("closed");
 
     // Unmount our node.

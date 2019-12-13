@@ -44,7 +44,7 @@ class ReplyCollapse extends Component {
           <div className="collapsible-body">
             <ReplyForm
               ticket={this.props.ticket}
-              collapse={this.collapse}
+              onReply={this.collapse}
             />
           </div>
         </li>
