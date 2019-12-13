@@ -455,7 +455,6 @@ describe('Ticket page', () => {
 
     expect(node.find("#status-badge").at(1).text()).toBe("Open");
 
-    // COPIED
     const ticketControl = node.find(".ticketControl");
     
     select = ticketControl.find("#status-select").at(1);
@@ -492,13 +491,13 @@ describe('Ticket page', () => {
     const replyDropdown = replyForm.find("#reply-dropdown");
     const replySendAndClose = replyDropdown.find("li").at(1).find("a");
 
+    // Could use some modernization
     const newReply = {
       id: 10,
       ticket_id: 1,
       body: "Blah",
       user: user
     };
-
     const newTicket = Object.assign({}, updatedTicket, {
       status: "closed",
       replies: updatedTicket.replies.concat(newReply)
@@ -521,64 +520,6 @@ describe('Ticket page', () => {
     node.update();
 
     expectSelectValue("closed");
-    /*
-    const body = node.find("#reply-body-input");
-    const dropdownTrigger = node.find(".addReply .dropdown-trigger");
-
-    const replyForm = node.find("#reply-form");
-    await act(async () => {
-      body.simulate('change', {
-        target: {
-          value: "Blah"
-        }
-      });
-      dropdownTrigger.simulate('click');
-    });
-    node.update();
-
-    const dropdown = node.find(".dropdown-content");
-
-    // Send Reply and Close button in the dropdown.
-    const listItem = dropdown.find("li").at(1);
-    const dropdownButton = listItem;
-    const anchor = listItem.find("a");
-
-    const newReply = {
-      id: 10,
-      ticket_id: 1,
-      body: "Blah",
-      user: user
-    };
-
-    updatedTicket = Object.assign({}, updatedTicket, {
-      status: "closed",
-      replies: updatedTicket.replies.concat(newReply)
-    });
-
-    axiosMock.onPost("tickets/1/replies")
-      .replyOnce(200, {
-        id: 10,
-        ticket_id: 1,
-        body: "Blah",
-        user: user
-      });
-    axiosMock.onPatch("tickets/1")
-      .replyOnce(200, updatedTicket);
-
-    await act(async () => {
-      // Same thing as clicking dropdownButton; this <a> is a child.
-      anchor.simulate('click', {
-        preventDefault: () => {
-          console.log("anchor prevented");
-        }
-      });
-    });
-    node.update();
-
-    expect(node.find("select").instance().value).toBe("closed");
-    select.update();
-    expect(select.instance().value).toBe("closed");
-    */
 
     // Unmount our node.
     await act(async () => {
