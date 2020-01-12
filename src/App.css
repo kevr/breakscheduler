@@ -1,3 +1,8 @@
+@font-face {
+  font-family: "Patua One";
+  src: url("/fonts/PatuaOne-Regular.ttf");
+}
+
 /**
  * html, body and #root should all be flexing vertically
  * to consume at least the entire page.
@@ -183,5 +188,20 @@ li.tab > a.active {
 
 .error:before {
   content: "Error: ";
+}
+
+.error {
+  font-size: 12px;
+  color: #ff6e6e;
+}
+
+.success {
+  font-size: 12px;
+  color: #6ecc43;
+}
+
+.brand-logo {
+  font-family: "Patua One";
+  font-size: 42px !important;
 }
 
