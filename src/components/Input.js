@@ -38,7 +38,6 @@ Input.propTypes = {
   ]),
   onChange: PropTypes.func.isRequired,
 
-  // 
   valid: PropTypes.bool,
   invalidText: PropTypes.string
 };
