@@ -46,7 +46,8 @@ describe('MessageUtil', () => {
   });
 
   test('networkError returns the right string', async () => {
-    expect(networkError()).toBe("Unable to update your details due to a network issue.");
+    expect(networkError())
+      .toBe("Unable to update your details due to a network issue.");
   });
 
   test('validationError returns identity', async () => {
