@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import M from 'materialize-css';
 import { getRequest } from '../../actions/API';
 import Modal from '../../components/Modal';
 import SearchComponent from '../../components/Search';

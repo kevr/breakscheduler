@@ -61,6 +61,9 @@ class Dashboard extends Component {
           return ticket.subject.toLowerCase()
             .includes(searchTerm.toLowerCase());
         });
+        // We only map these items to filter out sorted tickets.
+        // Return null here to get rid of a warning.
+        return null;
       });
     }
 
