@@ -60,31 +60,25 @@ describe('Settings page', () => {
     });
     node.update();
 
-    const nameInput = node.find("input#name-input");
+    const nameInput = node.update().find("input#name-input");
     await act(async () => {
       nameInput.simulate('change', {
         target: {
           value: "New Name"
         }
       });
+      node.update();
     });
-    node.update();
 
     // Let's update the name for now. This will allow us to check validation
     // functions.
     let updatedUser = Object.assign({}, user, {
       name: "New Name",
-      email: "test@example.org"
+      email: "changed@example.org"
     });
 
     axiosMock.onPatch(mockPath("users/me")).reply(200, updatedUser);
     axiosMock.onGet(mockPath("users/me")).reply(200, updatedUser);
-
-    let submitButton = node.find(".saveTrigger");
-    await act(async () => {
-      submitButton.simulate('click');
-    });
-    node.update();
 
     const emailInput = node.find("input#email-input");
     await act(async () => {
@@ -93,8 +87,14 @@ describe('Settings page', () => {
           value: "changed@example.com"
         }
       });
-      node.update();
     });
+    node.update();
+
+    let submitButton = node.find(".saveTrigger");
+    await act(async () => {
+      submitButton.simulate('click');
+    });
+    node.update();
 
     const passwordInput = node.find("input#password-input");
     let confirmInput = node.find("input#confirm-input");
