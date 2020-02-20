@@ -26,6 +26,7 @@ class Help extends Component {
             <Route exact path="/help/search" component={Search} />
             <Route exact path="/help/support" component={Support} />
             <Route exact path="/help/support/login" component={Support} />
+            <Route exact path="/help/support/settings" component={Support} />
             <Route exact path="/help/support/ticket/:id" component={Support} />
             <Route exact path="/help/support/createTicket" component={Support} />
             <Route exact path="/help" component={UserManual} />

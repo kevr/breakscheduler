@@ -42,6 +42,12 @@ export const deleteRequest = (endpoint) =>
 export const getSession = () =>
   getRequest("users/me").then(response => response.data);
 
+export const updateSession = (data) => {
+  console.debug("updateSession()");
+  console.debug(data);
+  return patchRequest("users/me", data).then(response => response.data);
+};
+
 export const getTickets = () =>
   getRequest("tickets").then(response => response.data);
 

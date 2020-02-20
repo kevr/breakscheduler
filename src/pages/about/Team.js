@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import M from 'materialize-css';
 import Layout from '../Layout';
 import Modal from '../../components/Modal';
 import { getRequest } from '../../actions/API';
