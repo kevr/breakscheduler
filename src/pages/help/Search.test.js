@@ -106,11 +106,29 @@ test('Search page renders filtered topics', async () => {
   });
   node.update();
 
+  let manualCheckbox = node.find("input#user-manual-checkbox");
+  await act(async () => {
+    manualCheckbox.simulate('change', {
+      target: {
+        checked: true
+      }});
+  });
+  node.update();
+
+  let qnaCheckbox = node.find("input#qna-checkbox");
+  await act(async () => {
+    qnaCheckbox.simulate('change', {
+      target: {
+        checked: true
+      }});
+  });
+  node.update();
+
   // How is there just one?
   let cards = node.find(".card");
   expect(cards.length).toBe(3);
 
-  const searchInput = node.find("#search-input").at(1);
+  const searchInput = node.find("input#search-input");
 
   // Type "Test" into the search input widget
   await act(async () => {

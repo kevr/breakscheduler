@@ -3,12 +3,19 @@ import { connect } from 'react-redux';
 import { getRequest } from '../../actions/API';
 import Modal from '../../components/Modal';
 import SearchComponent from '../../components/Search';
+import {
+  TextInput,
+  Checkbox
+} from '../../components/Input';
 
 class Search extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      searchTerms: []
+      searchTerms: [],
+
+      userManualFilter: false,
+      qnaFilter: false
     };
 
     // Memoization dict for lookups
@@ -44,10 +51,31 @@ class Search extends Component {
     const terms = searchTerms.map(t => t.toLowerCase());
     console.log(`Terms: ${terms}`);
 
+    let qnaFilter = (topics) => {
+      return topics;
+    };
+    if(this.state.qnaFilter) {
+      qnaFilter = (topics) => {
+        return topics;
+      };
+    }
+
+    let manualFilter = (topics) => {
+      return topics;
+    };
+    if(this.state.userManualFilter) {
+      manualFilter = (topics) => {
+        return topics;
+      };
+    }
+
+    console.log("User Manual: " + this.state.userManualFilter);
+    console.log("QnA: " + this.state.qnaFilter);
+
     // Include topics in the redux store if either their
     // subject or body includes one of the given searchTerms.
     // If we have no searchTerms, we provide every topic.
-    const filtered = topics.filter((topic) => {
+    let filtered = topics.filter((topic) => {
       const hasTerm = terms.some((term) => {
         // Convert and memoize topics
         if(!self.converted.hasOwnProperty(topic.id)) {
@@ -67,6 +95,10 @@ class Search extends Component {
       return terms.length === 0 || hasTerm;
     });
 
+    // Filter different types of topics. These functions are identity
+    // functions if the filter checkboxes are not activated.
+    filtered = manualFilter(qnaFilter(filtered));
+
     return (
       <div className="container">
         <div className="searchForm">
@@ -75,6 +107,36 @@ class Search extends Component {
             label="Search help topics..."
             onChange={this.handleSearchChange} 
           />
+
+          <div className="row">
+            <div className="input-field">
+              <div>
+                <label className="aligned">{"Search Filters"}</label>
+              </div>
+              <div>
+                <Checkbox
+                  id="user-manual-checkbox"
+                  className="aligned"
+                  label="User Manual"
+                  checked={this.state.userManualFilter}
+                  onChange={(e) => {
+                    this.setState({
+                      userManualFilter: !this.state.userManualFilter
+                    });
+                  }}
+                />
+                <Checkbox
+                  id="qna-checkbox"
+                  className="aligned"
+                  label="QnA"
+                  checked={this.state.qnaFilter}
+                  onChange={(e) => {
+                    this.setState({ qnaFilter: !this.state.qnaFilter });
+                  }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="searchResults row">

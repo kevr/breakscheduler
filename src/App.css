@@ -209,3 +209,10 @@ li.tab > a.active {
   font-size: 42px !important;
 }
 
+.aligned {
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+
+
