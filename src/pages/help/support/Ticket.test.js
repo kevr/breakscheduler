@@ -14,8 +14,7 @@ import {
   TestRouter,
   createHistory,
   mockPath,
-  mockStore,
-  flushPromises
+  mockStore
 } from 'TestUtil';
 import {
   createUser,

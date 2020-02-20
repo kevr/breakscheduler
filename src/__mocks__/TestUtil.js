@@ -38,19 +38,4 @@ export const createHistory = (route) => {
 export const mockPath = (endpoint) =>
   `${config.apiPrefix}/${endpoint}`;
 
-// (Credit: https://medium.com/@lucksp_22012/
-// jest-enzyme-react-testing-with-async-componentdidmount-7c4c99e77d2d)
-//
-// A simple async function used in tests to wait
-// until pending promises in React are resolved.
-// Particularly useful for an enzyme comp workflow,
-// an example of mounting and waiting for promises:
-//
-// const root = mount(<Component />);
-// await flushPromises();
-// expect(root.find(".textField").text()).toBe("Component Text");
-//
-export const flushPromises = () =>
-  new Promise(resolve => setImmediate(resolve));
-
 export const mockStore = () => createStore(Reducers);

@@ -10,8 +10,7 @@ import ReplyForm from './ReplyForm';
 import {
   TestRouter,
   createHistory,
-  mockPath,
-  flushPromises
+  mockPath
 } from 'TestUtil';
 import {
   createUser,
