@@ -4,7 +4,6 @@ import { getRequest } from '../../actions/API';
 import Modal from '../../components/Modal';
 import SearchComponent from '../../components/Search';
 import {
-  TextInput,
   Checkbox
 } from '../../components/Input';
 
