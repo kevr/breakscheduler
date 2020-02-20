@@ -13,6 +13,10 @@ html {
   flex-direction: column;
 }
 
+body {
+  min-width: 800px;
+}
+
 body, #root {
   display: flex;
   flex-direction: column;
