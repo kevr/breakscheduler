@@ -44,9 +44,7 @@ class Settings extends Component {
 
     // Validation functions
     this.isModified = this.isModified.bind(this);
-    this.confirmValid = this.confirmValid.bind(this);
     this.validate = this.validate.bind(this);
-    this.validateInputs = this.validateInputs.bind(this);
     this.getModified = this.getModified.bind(this);
 
     // Submission function
@@ -54,35 +52,16 @@ class Settings extends Component {
   }
 
   componentDidMount() {
-    let name = '';
-    if(this.props.session.name !== undefined)
-      name = this.props.session.name;
-    let email = '';
-    if(this.props.session.email !== undefined)
-      email = this.props.session.email;
-    this.setState({
-      name: name,
-      email: email
-    });
+    const { name, email } = this.props.session;
+    this.setState({ name: name, email: email });
   }
 
   isModified() {
-    // Just make sure there's some matching password. Let the
-    // server take care of deciding if it's good or not.
-    const passwordValid = () => {
-      return this.state.password.length > 0
-        && this.state.password === this.state.password_confirmation;
-    };
-
     // The page is modified if either name, email or passwords
     // are properly modified.
     return this.state.name !== this.props.session.name
       || this.state.email !== this.props.session.email
-      || passwordValid();
-  }
-
-  confirmValid() {
-    return this.state.password_confirmation === this.state.password;
+      || !this.validate();
   }
 
   validate() {
@@ -90,7 +69,7 @@ class Settings extends Component {
     // should take care of valid formatting.
 
     if(this.state.password.length > 0) {
-      let good = this.state.password.length >= 6;
+      const good = this.state.password.length >= 6;
       if(!good) {
         return "Password must be at least six characters.";
       }
@@ -101,11 +80,6 @@ class Settings extends Component {
     }
 
     return null;
-  }
-
-  validateInputs() {
-    return this.state.password === this.state.password_confirmation
-      && this.state.password.length > 0;
   }
 
   // This function simply constructs and returns an object
@@ -138,7 +112,7 @@ class Settings extends Component {
 
     let error = this.validate();
     if(error) {
-      this.setMessage("error", validationError(error));
+      this.props.setMessage("error", validationError(error));
       return;
     }
 
@@ -269,9 +243,6 @@ const mapDispatch = (dispatch, ownProps) => ({
     type: "SET_MESSAGE",
     messageClass: messageClass,
     string: string
-  }),
-  clearMessage: () => dispatch({
-    type: "CLEAR_MESSAGE"
   })
 });
 

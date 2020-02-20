@@ -41,7 +41,7 @@ describe('Settings page', () => {
     container = null;
   });
 
-  test('renders', async () => {
+  test('renders and can be used', async () => {
     const history = createHistory("/help/support/settings");
     const user = createUser("Test User", "test@example.com");
 
@@ -60,7 +60,7 @@ describe('Settings page', () => {
     });
     node.update();
 
-    const nameInput = node.find("#name-input").at(1);
+    const nameInput = node.find("input#name-input");
     await act(async () => {
       nameInput.simulate('change', {
         target: {
@@ -70,53 +70,134 @@ describe('Settings page', () => {
     });
     node.update();
 
-    const emailInput = node.find("#email-input").at(1);
+    // Let's update the name for now. This will allow us to check validation
+    // functions.
+    let updatedUser = Object.assign({}, user, {
+      name: "New Name",
+      email: "test@example.org"
+    });
+
+    axiosMock.onPatch(mockPath("users/me")).reply(200, updatedUser);
+    axiosMock.onGet(mockPath("users/me")).reply(200, updatedUser);
+
+    let submitButton = node.find(".saveTrigger");
+    await act(async () => {
+      submitButton.simulate('click');
+    });
+    node.update();
+
+    const emailInput = node.find("input#email-input");
     await act(async () => {
       emailInput.simulate('change', {
         target: {
           value: "changed@example.com"
         }
       });
+      node.update();
     });
-    node.update();
 
-    const passwordInput = node.find("#password-input").at(1);
+    const passwordInput = node.find("input#password-input");
+    let confirmInput = node.find("input#confirm-input");
+
+    // Simulate changing the password to something < 6 characters.
+    await act(async () => {
+      passwordInput.simulate('change', {
+        target: {
+          value: "haha"
+        }
+      });
+      node.update();
+    });
+
+    await act(async () => {
+      confirmInput.simulate('change', {
+        target: {
+          value: "haha"
+        }
+      });
+      node.update();
+    });
+
+    submitButton = node.find(".saveTrigger");
+    // This submit button should fail to submitting anything due to
+    // the password being < 6 characters. It will also set an error
+    // message.
+    await act(async () => {
+      submitButton.simulate('click');
+      node.update();
+    });
+
+    // Alright, let's change it to a validly accepted password.
     await act(async () => {
       passwordInput.simulate('change', {
         target: {
           value: "haha1234"
         }
       });
+      node.update();
     });
-    node.update();
-    
-    console.log(node.find("#confirm-input"));
-    const confirmInput = node.find("#confirm-input").at(1);
+
+    confirmInput = node.find("input#confirm-input");
+    await act(async () => {
+      confirmInput.simulate('change', {
+        target: {
+          value: "haha123"
+        }
+      });
+      node.update();
+    });
+    // Password mismatches confirmation
+
+    confirmInput = node.find("input#confirm-input");
+    expect(confirmInput.hasClass("invalid")).toBe(true);
+
+    submitButton = node.find(".saveTrigger");
+    // Try to submit now, but we can't.
+    await act(async () => {
+      submitButton.simulate('click');
+      node.update();
+    });
+
     await act(async () => {
       confirmInput.simulate('change', {
         target: {
           value: "haha1234"
         }
       });
+      node.update();
     });
-    node.update();
+    // Password now matches confirmation
 
-    const updatedUser = Object.assign({}, user, {
-      name: "New Name",
+    confirmInput = node.find("input#confirm-input");
+
+    // Failing. Why?
+    expect(confirmInput.update().hasClass("invalid")).toBe(false);
+
+    // Mock a bad response from the API server.
+    axiosMock.onPatch(mockPath("users/me")).reply(500);
+    await act(async () => {
+      submitButton.simulate('click');
+      node.update();
+    });
+    // Expect that the HTTP error was displayed
+
+    updatedUser = Object.assign({}, updatedUser, {
       email: "changed@example.com"
     });
     axiosMock.onPatch(mockPath("users/me"))
       .reply(200, updatedUser);
     axiosMock.onGet(mockPath("users/me"))
       .replyOnce(200, updatedUser);
-    const submitButton = node.find(".saveTrigger");
     await act(async () => {
       submitButton.simulate('click');
+      node.update();
     });
-    node.update();
 
     expect(store.getState().session.name).toBe("New Name");
     expect(store.getState().session.email).toBe("changed@example.com");
+  });
+
+  test('password mismatches confirmation', async () => {
   });
 
 });
