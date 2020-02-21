@@ -52,44 +52,34 @@ class Search extends Component {
       };
     }
 
+    // Every topic available; topics and articles
     let root = this.props.topics.data.concat(this.props.articles.data);
-    console.log(root);
+
     let topics = [];
-    // If we have filters, filter subsets of topics
+    // If we have filters set, filter out subsets of topics by
+    // their filter functions.
     if(this.state.userManualFilter || this.state.qnaFilter) {
       if(this.state.userManualFilter)
         topics = manualFilter(root);
       if(this.state.qnaFilter)
         topics = topics.concat(qnaFilter(root));
     } else {
+      // If no filters were provided, all topics are candidates
       topics = root;
     }
 
-    console.log("User Manual: " + this.state.userManualFilter);
-    console.log("QnA: " + this.state.qnaFilter);
-
-    // Include topics in the redux store if either their
-    // subject or body includes one of the given searchTerms.
-    // If we have no searchTerms, we provide every topic.
+    // Return a topic if no terms are given or it exists in the search.
     let filtered = topics.filter((topic) => {
-      const hasTerm = terms.some((term) => {
-        // Convert and memoize topics
-        if(!self.converted.hasOwnProperty(topic.id)) {
-          self.converted[topic.id] = {
-            subject: topic.subject.toLowerCase(),
-            body: null
-          }
-        }
-        return self.converted[topic.id].subject.includes(term);
-      }) || terms.some((term) => {
-        // Convert bodies if needed
-        if(!self.converted[topic.id].body) {
-          self.converted[topic.id].body = topic.body.toLowerCase();
-        }
-        return self.converted[topic.id].body.includes(term);
+      let exists = false;
+      terms.map((term) => {
+        if(topic.subject.toLowerCase().includes(term.toLowerCase()))
+          exists = true;
+        else if(topic.body.toLowerCase().includes(term.toLowerCase()))
+          exists = true;
       });
-      return terms.length === 0 || hasTerm;
+      return terms.length === 0 || exists;
     });
+    // filtered is the final candidate for display data
 
     return (
       <div className="container">
@@ -100,7 +90,7 @@ class Search extends Component {
             onChange={this.handleSearchChange} 
           />
 
-          <div className="row">
+          <div className="row rowAligned">
             <div className="input-field">
               <div>
                 <label className="aligned">{"Search Filters"}</label>
@@ -132,13 +122,17 @@ class Search extends Component {
         </div>
 
         <div className="searchResults row">
+          <div>
+            <label>Results</label>
+          </div>
           <ArticleBarrier>
             <TopicBarrier>
               {filtered.map((topic, i) => (
                 <span key={i}>
                   <div className="col s6 m6 l4 xl3"
                     style={{
-                      padding: "4px"
+                      paddingLeft: "4px",
+                      paddingRight: "4px"
                     }}
                   >
                     <Modal
@@ -146,8 +140,17 @@ class Search extends Component {
                       trigger={(
                         <div className="searchResult topic card">
                           <div className="card-content">
-                            <span className="card-title">{topic.subject}</span>
-                            <p>{topic.body}</p>
+                            {topic.type === "topic" ? (
+                              <div>
+                                <span className="card-title">{topic.subject}</span>
+                                <p>{topic.body}</p>
+                              </div>
+                            ) : (
+                              <div>
+                                <label>Article</label>
+                                <span className="card-title">{topic.subject}</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}

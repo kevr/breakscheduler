@@ -214,5 +214,12 @@ li.tab > a.active {
   margin-right: 6px;
 }
 
+.searchResults {
+  margin-top: 0px;
+}
 
+/* Override row's margin-bottom */
+.row {
+  margin-bottom: 0px;
+}
 
