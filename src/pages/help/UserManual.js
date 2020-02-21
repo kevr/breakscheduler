@@ -5,6 +5,7 @@ import sanitizeHtml from 'sanitize-html';
 import M from 'materialize-css';
 import { getArticles } from '../../actions/API';
 import config from '../../config.json';
+import ArticleBarrier from '../../components/ArticleBarrier';
 
 class UserManual extends Component {
   constructor(props) {
@@ -46,16 +47,6 @@ class UserManual extends Component {
     M.Sidenav.init(elems, options);
     // Save sidenav instance
     this.sidenav = M.Sidenav.getInstance(elems[0]);
-
-    if(!this.props.articles.resolved) {
-      getArticles().then(articles => {
-        console.log(articles);
-        this.props.setArticles(articles);
-      }).catch(error => {
-        console.error("Received an error while fetching articles");
-        this.props.clearArticles();
-      });
-    }
   }
 
   componentWillUnmount() {
@@ -160,16 +151,18 @@ class UserManual extends Component {
                 </p>
               </div>
 
-              {articles.map((article) => (
-                <div id={`article_${article.id}`}
-                  className="Article textCenter" key={article.id}>
-                  <h5 className="articleTitle">{article.subject}</h5>
-                  <p className="textJustify"
-                    dangerouslySetInnerHTML={{
-                      __html: sanitized(article.body)
-                    }} />
-                </div>
-              ))}
+              <ArticleBarrier>
+                {articles.map((article) => (
+                  <div id={`article_${article.id}`}
+                    className="Article textCenter" key={article.id}>
+                    <h5 className="articleTitle">{article.subject}</h5>
+                    <p className="textJustify"
+                      dangerouslySetInnerHTML={{
+                        __html: sanitized(article.body)
+                      }} />
+                  </div>
+                ))}
+              </ArticleBarrier>
 
             </div>
           </div>
@@ -185,14 +178,4 @@ const mapState = (state, ownProps) => ({
   articles: state.articles
 });
 
-const mapDispatch = (dispatch, ownProps) => ({
-  setArticles: (articles) =>
-    dispatch({
-      type: "SET_ARTICLES",
-      articles: articles
-    }),
-  clearArticles: () =>
-    dispatch({ type: "CLEAR_ARTICLES" }),
-});
-
-export default connect(mapState, mapDispatch)(UserManual);
+export default connect(mapState)(UserManual);
