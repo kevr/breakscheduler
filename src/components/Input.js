@@ -28,7 +28,7 @@ const Input = (props) => {
 };
 
 Input.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   className: PropTypes.string,
   id: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
@@ -72,7 +72,7 @@ export const Checkbox = (props) => {
 
 Checkbox.propTypes = {
   id: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   checked: PropTypes.bool.isRequired
 };
