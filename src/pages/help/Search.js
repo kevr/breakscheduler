@@ -53,33 +53,45 @@ class Search extends Component {
     let self = this;
 
     const { searchTerms } = this.state;
-    const { topics } = this.props;
-    console.log(`Topics: ${topics.length}`);
 
     // Convert all terms to lowercase versions
     const terms = searchTerms.map(t => t.toLowerCase());
     console.log(`Terms: ${terms}`);
 
-    let qnaFilter = (topics) => {
-      return topics;
-    };
+    let qnaFilter = null;
     if(this.state.qnaFilter) {
       qnaFilter = (topics) => {
-        return topics;
+        return topics.filter(topic => topic.type === "topic");
       };
     }
 
-    let manualFilter = (topics) => {
-      return topics;
-    };
+    let manualFilter = null;
     if(this.state.userManualFilter) {
       manualFilter = (topics) => {
-        return topics;
+        return topics.filter(topic => topic.type === "article");
       };
+    }
+
+    let root = this.props.topics.concat(this.props.articles.data);
+    let topics = [];
+    // If we have filters, filter subsets of topics
+    if(this.state.userManualFilter || this.state.qnaFilter) {
+      if(this.state.userManualFilter)
+        topics = manualFilter(root);
+      if(this.state.qnaFilter)
+        topics = topics.concat(qnaFilter(root));
+    } else {
+      topics = root;
     }
 
     console.log("User Manual: " + this.state.userManualFilter);
     console.log("QnA: " + this.state.qnaFilter);
+
+    // Use either the `subject` or `title` member as a source for the
+    // `subject` field of a topic here.
+    topics = topics.map((topic) => Object.assign({}, topic, {
+      subject: topic.subject !== undefined ? topic.subject : topic.title
+    }));
 
     // Include topics in the redux store if either their
     // subject or body includes one of the given searchTerms.
@@ -103,10 +115,6 @@ class Search extends Component {
       });
       return terms.length === 0 || hasTerm;
     });
-
-    // Filter different types of topics. These functions are identity
-    // functions if the filter checkboxes are not activated.
-    filtered = manualFilter(qnaFilter(filtered));
 
     return (
       <div className="container">

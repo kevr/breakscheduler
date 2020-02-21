@@ -143,26 +143,51 @@ test('Search page renders filtered topics', async () => {
   });
   node.update();
 
+  // By default, no filters are used. Expect all articles and topics
+  // to be present on the Search page.
+  let cards = node.find(".card");
+  expect(cards.length).toBe(5);
+
+  // Test with User Manual alone checked.
   let manualCheckbox = node.find("input#user-manual-checkbox");
   await act(async () => {
     manualCheckbox.simulate('change', {
       target: {
         checked: true
-      }});
+      }
+    });
   });
   node.update();
 
+  cards = node.find(".card");
+  expect(cards.length).toBe(2);
+
+  // Test with User Manual and QnA checked
   let qnaCheckbox = node.find("input#qna-checkbox");
   await act(async () => {
     qnaCheckbox.simulate('change', {
       target: {
         checked: true
-      }});
+      }
+    });
   });
   node.update();
 
-  // How is there just one?
-  let cards = node.find(".card");
+  cards = node.find(".card");
+  expect(cards.length).toBe(5);
+
+  // Test with QnA checked, but not User Manual
+  manualCheckbox.update();
+  await act(async () => {
+    manualCheckbox.simulate('change', {
+      target: {
+        checked: false
+      }
+    });
+  });
+  node.update();
+
+  cards = node.find(".card");
   expect(cards.length).toBe(3);
 
   const searchInput = node.find("input#search-input");
