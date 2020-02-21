@@ -46,6 +46,7 @@ test('Search page default cards', async () => {
   const topics = [topic];
 
   axiosMock.onGet(mockPath("topics")).reply(200, topics);
+  axiosMock.onGet(mockPath("articles")).reply(200, []);
 
   let node;
   await act(async () => {
@@ -84,6 +85,35 @@ test('Search page default cards', async () => {
   // so we manually test against Modal in Modal.test.js.
 });
 
+test('Search page gets 500 from API', async () => {
+  const history = createHistory("/help/search");
+  const topics = [
+    createTopic("Test Subject", "Test body."),
+    createTopic("Second One", "Next."),
+    createTopic("Another One", "Third one.")
+  ];
+
+  axiosMock.onGet(mockPath("topics")).reply(500);
+
+  // Reply with some mocked out articles to trigger the article typing path
+  // on line 189 of Search.js
+  axiosMock.onGet(mockPath("articles")).reply(500);
+
+  let node;
+  await act(async () => {
+    node = mount((
+      <TestRouter store={store} history={history}>
+        <Search />
+      </TestRouter>
+    ), {
+      assignTo: document.getElementById("root")
+    });
+  });
+  node.update();
+
+  expect(node.find(".card").length).toBe(0);
+});
+
 test('Search page renders filtered topics', async () => {
   const history = createHistory("/help/search");
   const topics = [
@@ -93,6 +123,13 @@ test('Search page renders filtered topics', async () => {
   ];
 
   axiosMock.onGet(mockPath("topics")).reply(200, topics);
+
+  // Reply with some mocked out articles to trigger the article typing path
+  // on line 189 of Search.js
+  axiosMock.onGet(mockPath("articles")).reply(200, [
+    { id: 1, body: "Article Body 1", title: "Article 1" },
+    { id: 2, body: "Article Body 2", title: "Article 2" },
+  ]);
 
   let node;
   await act(async () => {

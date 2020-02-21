@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { getRequest } from '../../actions/API';
+import {
+  getRequest,
+  getArticles
+} from '../../actions/API';
 import Modal from '../../components/Modal';
 import SearchComponent from '../../components/Search';
 import {
@@ -31,8 +34,15 @@ class Search extends Component {
       getRequest("topics").then((response) => {
         console.log(response.data);
         pushTopics(response.data);
-      });
+      }).catch(error => this.props.clearTopics());
     }
+
+    if(!this.props.articles.resolved) {
+      getArticles()
+        .then(articles => this.props.setArticles(articles))
+        .catch(error => this.props.clearArticles());
+    }
+
   }
 
   handleSearchChange(terms) {
@@ -170,16 +180,35 @@ class Search extends Component {
 }
 
 const mapState = (state, ownProps) => ({
-  topics: state.topics
+  topics: state.topics.map((topic) => {
+    return Object.assign({}, topic, {
+      type: "topic"
+    })
+  }),
+  articles: Object.assign({}, state.articles, {
+    data: state.articles.data.map((article) => {
+        return Object.assign({}, article, {
+          type: "article"
+        })
+    })
+  })
 });
 
 const mapDispatch = (dispatch, ownProps) => ({
-  pushTopics: (topics) => {
+  pushTopics: (topics) =>
     dispatch({
       type: "PUSH_TOPICS",
       topics: topics
-    });
-  }
+    }),
+  clearTopics: () =>
+    dispatch({ type: "CLEAR_TOPICS" }),
+  setArticles: (articles) =>
+    dispatch({
+      type: "SET_ARTICLES",
+      articles: articles
+    }),
+  clearArticles: () =>
+    dispatch({ type: "CLEAR_ARTICLES" }),
 });
 
 export default connect(mapState, mapDispatch)(Search);
