@@ -120,7 +120,7 @@ class UserManual extends Component {
                     this.sidenav.close();
                   }}
                 >
-                  {article.title}
+                  {article.subject}
                 </a>
               </li>
             ))}
