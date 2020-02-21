@@ -94,3 +94,6 @@ export const deleteReply = (data) => {
 export const getArticles = () =>
   getRequest("articles").then(response => response.data);
 
+export const getTopics = () =>
+  getRequest("topics").then(response => response.data);
+

@@ -2,13 +2,16 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
   getRequest,
-  getArticles
+  getArticles,
+  getTopics
 } from '../../actions/API';
 import Modal from '../../components/Modal';
 import SearchComponent from '../../components/Search';
 import {
   Checkbox
 } from '../../components/Input';
+import ArticleBarrier from '../../components/ArticleBarrier';
+import TopicBarrier from '../../components/TopicBarrier';
 
 class Search extends Component {
   constructor(props) {
@@ -25,24 +28,6 @@ class Search extends Component {
     this.modals = {};
 
     this.handleSearchChange = this.handleSearchChange.bind(this);
-  }
-
-  componentDidMount() {
-    console.log(`Current topic count on mount: ${this.props.topics.length}`);
-    if(this.props.topics.length === 0) {
-      const { pushTopics } = this.props;
-      getRequest("topics").then((response) => {
-        console.log(response.data);
-        pushTopics(response.data);
-      }).catch(error => this.props.clearTopics());
-    }
-
-    if(!this.props.articles.resolved) {
-      getArticles()
-        .then(articles => this.props.setArticles(articles))
-        .catch(error => this.props.clearArticles());
-    }
-
   }
 
   handleSearchChange(terms) {
@@ -72,7 +57,8 @@ class Search extends Component {
       };
     }
 
-    let root = this.props.topics.concat(this.props.articles.data);
+    let root = this.props.topics.data.concat(this.props.articles.data);
+    console.log(root);
     let topics = [];
     // If we have filters, filter subsets of topics
     if(this.state.userManualFilter || this.state.qnaFilter) {
@@ -151,40 +137,47 @@ class Search extends Component {
         </div>
 
         <div className="searchResults row">
-          {filtered.map((topic, i) => (
-            <span key={i}>
-              <div className="col s6 m6 l4 xl3"
-                style={{
-                  padding: "4px"
-                }}
-              >
-                <Modal
-                  id={i}
-                  trigger={(
-                    <div className="searchResult topic card">
-                      <div className="card-content">
-                        <span className="card-title">{topic.subject}</span>
-                        <p>{topic.body}</p>
-                      </div>
-                    </div>
-                  )}
-                >
-                  <h4>{topic.subject}</h4>
-                  <p>{topic.body}</p>
-                </Modal>
-              </div>
-            </span>
-          ))}
+          <ArticleBarrier>
+            <TopicBarrier>
+              {filtered.map((topic, i) => (
+                <span key={i}>
+                  <div className="col s6 m6 l4 xl3"
+                    style={{
+                      padding: "4px"
+                    }}
+                  >
+                    <Modal
+                      id={i}
+                      trigger={(
+                        <div className="searchResult topic card">
+                          <div className="card-content">
+                            <span className="card-title">{topic.subject}</span>
+                            <p>{topic.body}</p>
+                          </div>
+                        </div>
+                      )}
+                    >
+                      <h4>{topic.subject}</h4>
+                      <p>{topic.body}</p>
+                    </Modal>
+                  </div>
+                </span>
+              ))}
+            </TopicBarrier>
+          </ArticleBarrier>
         </div>
+
       </div>
     )
   }
 }
 
 const mapState = (state, ownProps) => ({
-  topics: state.topics.map((topic) => {
-    return Object.assign({}, topic, {
-      type: "topic"
+  topics: Object.assign({}, state.topics, {
+    data: state.topics.data.map((topic) => {
+      return Object.assign({}, topic, {
+        type: "topic"
+      });
     })
   }),
   articles: Object.assign({}, state.articles, {
@@ -196,21 +189,4 @@ const mapState = (state, ownProps) => ({
   })
 });
 
-const mapDispatch = (dispatch, ownProps) => ({
-  pushTopics: (topics) =>
-    dispatch({
-      type: "PUSH_TOPICS",
-      topics: topics
-    }),
-  clearTopics: () =>
-    dispatch({ type: "CLEAR_TOPICS" }),
-  setArticles: (articles) =>
-    dispatch({
-      type: "SET_ARTICLES",
-      articles: articles
-    }),
-  clearArticles: () =>
-    dispatch({ type: "CLEAR_ARTICLES" }),
-});
-
-export default connect(mapState, mapDispatch)(Search);
+export default connect(mapState)(Search);

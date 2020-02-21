@@ -1,14 +1,24 @@
 
-export const PUSH_TOPICS = "PUSH_TOPICS";
+export const SET_TOPICS = "SET_TOPICS";
 export const CLEAR_TOPICS = "CLEAR_TOPICS";
 
-const TopicsReducer = (state = [], action) => {
+const DEFAULT_STATE = {
+  resolved: false,
+  data: []
+};
+
+const TopicsReducer = (state = DEFAULT_STATE, action) => {
   switch(action.type) {
-    case PUSH_TOPICS:
+    case SET_TOPICS:
       console.log(action.topics);
-      return state.concat(action.topics);
+      return Object.assign({}, DEFAULT_STATE, {
+        resolved: true,
+        data: action.topics
+      });
     case CLEAR_TOPICS:
-      return [];
+      return Object.assign({}, DEFAULT_STATE, {
+        resolved: true
+      });
     default:
       return state;
   }
