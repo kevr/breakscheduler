@@ -223,3 +223,16 @@ li.tab > a.active {
   margin-bottom: 0px;
 }
 
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.clear {
+  float: none;
+  clear: both;
+}
+
