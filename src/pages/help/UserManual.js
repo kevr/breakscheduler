@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import jQuery from 'jquery';
 import sanitizeHtml from 'sanitize-html';
 import M from 'materialize-css';
-import { getRequest } from '../../actions/API';
+import { getArticles } from '../../actions/API';
 import config from '../../config.json';
 
 class UserManual extends Component {
@@ -17,11 +18,6 @@ class UserManual extends Component {
     };
 
     this.resizeFn = this.resizeFn.bind(this);
-    
-    var self = this;
-    getRequest("articles").then((response) => {
-      self.setState({ articles: response.data });
-    });
   }
 
   resizeFn() {
@@ -51,6 +47,16 @@ class UserManual extends Component {
     M.Sidenav.init(elems, options);
     // Save sidenav instance
     this.sidenav = M.Sidenav.getInstance(elems[0]);
+
+    if(!this.props.articles.resolved) {
+      getArticles().then(articles => {
+        console.log(articles);
+        this.props.setArticles(articles);
+      }).catch(error => {
+        console.error("Received an error while fetching articles");
+        this.props.clearArticles();
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -60,9 +66,11 @@ class UserManual extends Component {
   render() {
     // Height delta, used to produce margins properly for our sidenav.
     const {
-      navHeight,
-      articles
+      navHeight
     } = this.state;
+
+    // Use redux article store
+    const articles = this.props.articles.data;
 
     // HTML Sanitization helper function. This function takes
     // an article body and sanitizes it with the allowedTags
@@ -174,4 +182,18 @@ class UserManual extends Component {
   }
 }
 
-export default UserManual;
+const mapState = (state, ownProps) => ({
+  articles: state.articles
+});
+
+const mapDispatch = (dispatch, ownProps) => ({
+  setArticles: (articles) =>
+    dispatch({
+      type: "SET_ARTICLES",
+      articles: articles
+    }),
+  clearArticles: () =>
+    dispatch({ type: "CLEAR_ARTICLES" }),
+});
+
+export default connect(mapState, mapDispatch)(UserManual);

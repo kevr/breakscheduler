@@ -44,6 +44,26 @@ describe('User Manual page', () => {
     container = null;
   });
 
+  test('bad server response causes catch path', async () => {
+    const history = createHistory("/help");
+
+    axiosMock.onGet(mockPath("articles")).reply(500);
+
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <UserManual />
+        </TestRouter>
+      ), {
+        attachTo: document.getElementById("root")
+      });
+    });
+
+    // We should have Preamble + the two mocked REST articles.
+    expect(node.find(".Article").length).toBe(1);
+  });
+
   test('renders', async () => {
     const history = createHistory("/help");
 
@@ -84,6 +104,10 @@ describe('User Manual page', () => {
     node.update();
 
     expect(node.find(".sidenav.open").exists()).toBe(false);
+
+    // Unmount and mount again to test article persistence
+    node.unmount();
+    node.mount();
   });
 
   test('renders with multiple articles', async () => {
