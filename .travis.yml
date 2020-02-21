@@ -4,4 +4,4 @@ node_js:
 install:
     npm install
 script:
-    npm run coverage 2>&1 | egrep -q 'All Files.*|.*100.*'
+    npm run coverage 2>&1 | egrep -q '^.*All files\s+\|\s+100\s\|\s+100\s\|\s+100\s\|\s+100.*$'
