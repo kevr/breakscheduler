@@ -227,6 +227,22 @@ test('Search page renders filtered topics', async () => {
   card = cards.at(0);
   expect(card.find(".card-title").text()).toBe("Second One");
   expect(card.find("p").text()).toBe("Next.");
+
+  // Type "Second" into the search input widget
+  await act(async () => {
+    searchInput.simulate('change', {
+      target: {
+        value: "\"Third one.\""
+      }
+    });
+  });
+  node.update();
+
+  cards = node.find(".card");
+  expect(cards.length).toBe(1);
+
+  card = cards.at(0);
+  expect(card.find(".card-title").text()).toBe("Another One");
 });
 
 test('Re-render of Search page does not call API', async () => {
