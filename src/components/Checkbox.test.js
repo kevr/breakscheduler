@@ -63,7 +63,7 @@ describe('Checkbox component', () => {
           id="some-id"
           label="Some Label"
           className="targetCheckbox"
-          defaultChecked={checked}
+          checked={checked}
           onChange={onChange}
         />
       ), {

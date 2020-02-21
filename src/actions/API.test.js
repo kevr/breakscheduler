@@ -12,7 +12,8 @@ import {
   deleteTicket,
   addReply,
   updateReply,
-  deleteReply
+  deleteReply,
+  getArticles
 } from './API';
 import { mockPath } from 'TestUtil';
 import {
@@ -167,6 +168,18 @@ describe('API', () => {
     await deleteReply(newReply).then(statusCode => {
       expect(statusCode).toBe(204);
     });
+  });
+
+  test('can get articles', async () => {
+    axiosMock.onGet(mockPath("articles"))
+      .reply(200, ['article1', 'article2']);
+
+    let response;
+    await getArticles().then((articles) => {
+      response = articles;
+    });
+
+    expect(response).toEqual(['article1', 'article2'])
   });
 
 });

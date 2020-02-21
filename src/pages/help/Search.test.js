@@ -46,6 +46,7 @@ test('Search page default cards', async () => {
   const topics = [topic];
 
   axiosMock.onGet(mockPath("topics")).reply(200, topics);
+  axiosMock.onGet(mockPath("articles")).reply(200, []);
 
   let node;
   await act(async () => {
@@ -84,7 +85,7 @@ test('Search page default cards', async () => {
   // so we manually test against Modal in Modal.test.js.
 });
 
-test('Search page renders filtered topics', async () => {
+test('Search page gets 500 from API', async () => {
   const history = createHistory("/help/search");
   const topics = [
     createTopic("Test Subject", "Test body."),
@@ -92,7 +93,11 @@ test('Search page renders filtered topics', async () => {
     createTopic("Another One", "Third one.")
   ];
 
-  axiosMock.onGet(mockPath("topics")).reply(200, topics);
+  axiosMock.onGet(mockPath("topics")).reply(500);
+
+  // Reply with some mocked out articles to trigger the article typing path
+  // on line 189 of Search.js
+  axiosMock.onGet(mockPath("articles")).reply(500);
 
   let node;
   await act(async () => {
@@ -106,26 +111,83 @@ test('Search page renders filtered topics', async () => {
   });
   node.update();
 
+  expect(node.find(".card").length).toBe(0);
+});
+
+test('Search page renders filtered topics', async () => {
+  const history = createHistory("/help/search");
+  const topics = [
+    createTopic("Test Subject", "Test body."),
+    createTopic("Second One", "Next."),
+    createTopic("Another One", "Third one.")
+  ];
+
+  axiosMock.onGet(mockPath("topics")).reply(200, topics);
+
+  // Reply with some mocked out articles to trigger the article typing path
+  // on line 189 of Search.js
+  axiosMock.onGet(mockPath("articles")).reply(200, [
+    { id: 1, body: "Article Body 1", title: "Article 1" },
+    { id: 2, body: "Article Body 2", title: "Article 2" },
+  ]);
+
+  let node;
+  await act(async () => {
+    node = mount((
+      <TestRouter store={store} history={history}>
+        <Search />
+      </TestRouter>
+    ), {
+      assignTo: document.getElementById("root")
+    });
+  });
+  node.update();
+
+  // By default, no filters are used. Expect all articles and topics
+  // to be present on the Search page.
+  let cards = node.find(".card");
+  expect(cards.length).toBe(5);
+
+  // Test with User Manual alone checked.
   let manualCheckbox = node.find("input#user-manual-checkbox");
   await act(async () => {
     manualCheckbox.simulate('change', {
       target: {
         checked: true
-      }});
+      }
+    });
   });
   node.update();
 
+  cards = node.find(".card");
+  expect(cards.length).toBe(2);
+
+  // Test with User Manual and QnA checked
   let qnaCheckbox = node.find("input#qna-checkbox");
   await act(async () => {
     qnaCheckbox.simulate('change', {
       target: {
         checked: true
-      }});
+      }
+    });
   });
   node.update();
 
-  // How is there just one?
-  let cards = node.find(".card");
+  cards = node.find(".card");
+  expect(cards.length).toBe(5);
+
+  // Test with QnA checked, but not User Manual
+  manualCheckbox.update();
+  await act(async () => {
+    manualCheckbox.simulate('change', {
+      target: {
+        checked: false
+      }
+    });
+  });
+  node.update();
+
+  cards = node.find(".card");
   expect(cards.length).toBe(3);
 
   const searchInput = node.find("input#search-input");
