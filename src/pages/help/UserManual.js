@@ -13,7 +13,6 @@ class UserManual extends Component {
       winHeight: 0,
       navHeight: "100vh",
       navWidth: 0,
-      articles: [],
       sidenavOpen: false
     };
 
@@ -164,7 +163,7 @@ class UserManual extends Component {
               {articles.map((article) => (
                 <div id={`article_${article.id}`}
                   className="Article textCenter" key={article.id}>
-                  <h5 className="articleTitle">{article.title}</h5>
+                  <h5 className="articleTitle">{article.subject}</h5>
                   <p className="textJustify"
                     dangerouslySetInnerHTML={{
                       __html: sanitized(article.body)

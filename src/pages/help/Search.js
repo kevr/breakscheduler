@@ -87,12 +87,6 @@ class Search extends Component {
     console.log("User Manual: " + this.state.userManualFilter);
     console.log("QnA: " + this.state.qnaFilter);
 
-    // Use either the `subject` or `title` member as a source for the
-    // `subject` field of a topic here.
-    topics = topics.map((topic) => Object.assign({}, topic, {
-      subject: topic.subject !== undefined ? topic.subject : topic.title
-    }));
-
     // Include topics in the redux store if either their
     // subject or body includes one of the given searchTerms.
     // If we have no searchTerms, we provide every topic.

@@ -127,8 +127,8 @@ test('Search page renders filtered topics', async () => {
   // Reply with some mocked out articles to trigger the article typing path
   // on line 189 of Search.js
   axiosMock.onGet(mockPath("articles")).reply(200, [
-    { id: 1, body: "Article Body 1", title: "Article 1" },
-    { id: 2, body: "Article Body 2", title: "Article 2" },
+    { id: 1, body: "Article Body 1", subject: "Article 1" },
+    { id: 2, body: "Article Body 2", subject: "Article 2" },
   ]);
 
   let node;

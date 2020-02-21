@@ -90,9 +90,9 @@ export const createTopic = (subject, body) => ({
 });
 
 let articleId = 0;
-export const createArticle = (topic, body) => ({
+export const createArticle = (subject, body) => ({
   id: ++articleId,
-  topic: topic,
+  subject: subject,
   body: body
 });
 
