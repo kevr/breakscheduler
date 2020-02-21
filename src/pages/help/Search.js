@@ -1,10 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {
-  getRequest,
-  getArticles,
-  getTopics
-} from '../../actions/API';
 import Modal from '../../components/Modal';
 import SearchComponent from '../../components/Search';
 import {

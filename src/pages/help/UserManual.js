@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import jQuery from 'jquery';
 import sanitizeHtml from 'sanitize-html';
 import M from 'materialize-css';
-import { getArticles } from '../../actions/API';
 import config from '../../config.json';
 import ArticleBarrier from '../../components/ArticleBarrier';
 
