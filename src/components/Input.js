@@ -108,19 +108,29 @@ Textarea.defaultProps = {
 
 export const Button = (props) => (
   <button
-    className={`btn red lighten-2 ${props.disabled ? "disabled" : ""}`}
+    id={props.id}
+    className={`btn red lighten-2 ${props.disabled ? "disabled" : ""} ${props.className}`}
     type="submit"
+    onClick={props.onClick}
   >
     {props.children}
   </button>
 );
 
 Button.propTypes = {
-  disabled: PropTypes.bool
+  id: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
+  className: PropTypes.string
 };
 
 Button.defaultProps = {
-  disabled: false
+  disabled: false,
+
+  // By default, just give it an empty className.
+  className: "",
+
+  // Default onClick prop. Does nothing.
+  onClick: (e) => {},
 };
 
 Input.TextInput = TextInput;
