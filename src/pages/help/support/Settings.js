@@ -212,7 +212,9 @@ class Settings extends Component {
         <div className="row">
           <div className="col s12">
             <Button
+              id="save-button"
               disabled={!this.isValid() || !this.isModified()}
+              onClick={this.handleSave}
             >
               {"Save Changes"}
             </Button>

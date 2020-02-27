@@ -90,7 +90,7 @@ describe('Settings page', () => {
     });
     node.update();
 
-    let submitButton = node.find(".saveTrigger");
+    let submitButton = node.find("button#save-button");
     await act(async () => {
       submitButton.simulate('click');
     });
@@ -118,7 +118,7 @@ describe('Settings page', () => {
       node.update();
     });
 
-    submitButton = node.find(".saveTrigger");
+    submitButton = node.find("button#save-button");
     // This submit button should fail to submitting anything due to
     // the password being < 6 characters. It will also set an error
     // message.
@@ -151,7 +151,7 @@ describe('Settings page', () => {
     confirmInput = node.find("input#confirm-input");
     expect(confirmInput.hasClass("invalid")).toBe(true);
 
-    submitButton = node.find(".saveTrigger");
+    submitButton = node.find("button#save-button");
     // Try to submit now, but we can't.
     await act(async () => {
       submitButton.simulate('click');
