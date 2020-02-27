@@ -44,7 +44,7 @@ class Navbar extends Component {
           <NavItem label="The Team" to="/about/team" />
           <NavItem label="Contact Us" to="/about/contact" />
         </ul>
-        <nav>
+        <nav id="main-navigation">
           <div className="nav-wrapper">
             <div className="container">
               <a href="#!" className="brand-logo left">{config.appName}</a>

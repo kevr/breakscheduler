@@ -3,6 +3,11 @@ import Layout from './Layout';
 import config from '../config.json';
 import mainDashboard from '../assets/maindashboard.jpg';
 import Image from 'react-image';
+import { Link } from 'react-router-dom';
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { Carousel } from 'react-responsive-carousel';
+
+import constructionImage from '../assets/hires/construction.jpg';
 
 class Landing extends Component {
   constructor(props) {
@@ -46,43 +51,61 @@ class Landing extends Component {
   }
 
   render() {
+    const images = [
+      { src: constructionImage, legend: "Get Work Done" },
+      { src: constructionImage, legend: "Stay Up To Date" },
+      { src: constructionImage, legend: "Automate Your Schedules" },
+    ];
+
     return (
       <Layout>
-        <div className="container">
-
-          <div className="row">
-            <div className="col s12" style={{ height: this.getScreenHeight() }}>
-              <Image
-                style={{ float: "right", margin: "6px" }}
-                src={mainDashboard}
-                alt={config.appName}
-                width={"500px"}
-                height={"auto"}
-              ></Image>
-              <h4>Welcome</h4>
-              <p className="textMedium">{`${config.appName} is an automated solution to managing employee breaks and work schedules. Completely simplify your scheduling of repetitive tasks with the click of a button!`}</p>
-              <p className="textMedium">{`Add up to 50 employees, generate exports and imports, notify staff by email; all without any manual intervention!`}</p>
-              <div className="clear" />
-            </div>
-          </div>
-
-          <div className="row">
-            <div className="col s12" style={{ height: this.getFullHeight() }}>
-              <Image
-                style={{ float: "left", margin: "6px" }}
-                src={mainDashboard}
-                alt={config.appName}
-                width={"500px"}
-                height={"auto"}
-              ></Image>
-              <h4 className="textRight">Welcome</h4>
-              <p className="textMedium">{`${config.appName} is an automated solution to managing employee breaks and work schedules. Completely simplify your scheduling of repetitive tasks with the click of a button!`}</p>
-              <p className="textMedium">{`Add up to 50 employees, generate exports and imports, notify staff by email; all without any manual intervention!`}</p>
-              <div className="clear" />
-            </div>
-          </div>
-
+        <div>
+          <Carousel
+            className="carousel-wrapper"
+            showArrows={true}
+            infiniteLoop={true}
+            autoPlay={true}
+            showThumbs={false}
+          >
+            {images.map((image, i) => (
+              <div key={i}>
+                <img src={image.src} />
+                <p className="legend">{image.legend}</p>
+              </div>
+            ))}
+          </Carousel>
         </div>
+        <div className="widePageFrame pageSection">
+          <div className="textCenter">
+            <h4 className="frameTitle">Total Control</h4>
+            <p className="frameText">{"Some overly detailed text about how much control this program can give you. "}<Link to="/product">Get it here.</Link></p>
+            <img
+              className="frameImage"
+              src={mainDashboard}
+            />
+          </div>
+        </div>
+
+        <div className="widePageFrame pageSection">
+          <div className="textCenter">
+            <h4 className="frameTitle textLeft">Product Features</h4>
+            <p className="frameText">{"Some overly detailed text about how much control this program can give you. Visit our "}<Link to="/features">Features</Link>{" page to see them all!"}</p>
+            <ul>
+              <li><span>{"Feature one"}</span></li>
+              <li><span>{"Feature two"}</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="widePageFrame pageSection">
+          <div className="textCenter">
+            <h4 className="frameTitle textRight">Help Directory</h4>
+            <p className="frameText">{"Some overly detailed text about how much control this program can give you. Visit our "}<Link to="/features">Features</Link>{" page to see them all!"}</p>
+          </div>
+        </div>
+
+
+
       </Layout>
     )
   }

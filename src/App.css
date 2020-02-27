@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+
 @font-face {
   font-family: "Patua One";
   src: url("/fonts/PatuaOne-Regular.ttf");
@@ -234,5 +236,66 @@ li.tab > a.active {
 .clear {
   float: none;
   clear: both;
+}
+
+.pageFrame {
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+.widePageFrame {
+  position: relative;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.frameTitle {
+  margin-top: 0;
+}
+
+.frameTitle {
+  font-weight: bold;
+  color: grey;
+}
+
+.frameTitle,
+.frameText
+{
+  font-family: "Open Sans";
+}
+
+.frameImage {
+  width: 50%;
+  height: auto;
+}
+
+/* Page section colors */
+.pageSection {
+  padding-right: 100px;
+  padding-left: 100px;
+}
+
+.pageSection:nth-child(odd) {
+  background-color: white;
+}
+
+.pageSection:nth-child(even) {
+  background-color: #f7fafb;
+}
+
+.Layout {
+  padding-top: 64px;
+}
+
+.sidenav {
+  z-index: 999999;
+}
+#main-navigation {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
 }
 
