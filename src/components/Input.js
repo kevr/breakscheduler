@@ -81,9 +81,53 @@ Checkbox.defaultProps = {
   className: ""
 };
 
+export const Textarea = (props) => {
+  return (
+    <div className={props.className}>
+      <textarea
+        id={props.id}
+        className="materialize-textarea"
+        value={props.value}
+        onChange={props.onChange}
+      />
+      <label htmlFor={props.id}>{props.label}</label>
+    </div>
+  );
+};
+
+Textarea.propTypes = {
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.string.isRequired
+};
+
+Textarea.defaultProps = {
+  className: ""
+};
+
+export const Button = (props) => (
+  <button
+    className={`btn red lighten-2 ${props.disabled ? "disabled" : ""}`}
+    type="submit"
+  >
+    {props.children}
+  </button>
+);
+
+Button.propTypes = {
+  disabled: PropTypes.bool
+};
+
+Button.defaultProps = {
+  disabled: false
+};
+
 Input.TextInput = TextInput;
 Input.PasswordInput = PasswordInput;
 Input.EmailInput = EmailInput;
 Input.Checkbox = Checkbox;
+Input.Textarea = Textarea;
+Input.Button = Button;
 
 export default Input;

@@ -30,8 +30,6 @@ class Search extends Component {
   }
 
   render() {
-    let self = this;
-
     const { searchTerms } = this.state;
 
     // Convert all terms to lowercase versions
@@ -76,6 +74,7 @@ class Search extends Component {
           exists = true;
         else if(topic.body.toLowerCase().includes(term.toLowerCase()))
           exists = true;
+        return null;
       });
       return terms.length === 0 || exists;
     });

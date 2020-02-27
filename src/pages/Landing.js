@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Layout from './Layout';
 import config from '../config.json';
 import mainDashboard from '../assets/maindashboard.jpg';
-import Image from 'react-image';
 import { Link } from 'react-router-dom';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
@@ -69,7 +68,7 @@ class Landing extends Component {
           >
             {images.map((image, i) => (
               <div key={i}>
-                <img src={image.src} />
+                <img src={image.src} alt={image.legend} />
                 <p className="legend">{image.legend}</p>
               </div>
             ))}
@@ -80,6 +79,7 @@ class Landing extends Component {
             <h4 className="frameTitle">Total Control</h4>
             <p className="frameText">{"Some overly detailed text about how much control this program can give you. "}<Link to="/product">Get it here.</Link></p>
             <img
+              alt={`${config.appName} Dashboard`}
               className="frameImage"
               src={mainDashboard}
             />

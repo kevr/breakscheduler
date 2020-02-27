@@ -12,12 +12,16 @@ import { Breadcrumb } from '../../../components';
 import {
   TextInput,
   PasswordInput,
-  EmailInput
+  EmailInput,
+  Button
 } from '../../../components/Input';
 import {
   networkError,
   validationError
 } from '../../../lib/MessageUtil';
+import {
+  validateEmail
+} from '../../../lib/Validation';
 
 class Settings extends Component {
   constructor(props) {
@@ -46,6 +50,7 @@ class Settings extends Component {
     this.isModified = this.isModified.bind(this);
     this.validate = this.validate.bind(this);
     this.getModified = this.getModified.bind(this);
+    this.isValid = this.isValid.bind(this);
 
     // Submission function
     this.handleSave = this.handleSave.bind(this);
@@ -61,7 +66,11 @@ class Settings extends Component {
     // are properly modified.
     return this.state.name !== this.props.session.name
       || this.state.email !== this.props.session.email
-      || !this.validate();
+      || (this.state.password.length > 0 && this.state.password === this.state.password_confirmation);
+  }
+
+  isValid() {
+    return validateEmail(this.state.email);
   }
 
   validate() {
@@ -202,12 +211,11 @@ class Settings extends Component {
 
         <div className="row">
           <div className="col s12">
-            <button
-              className={`saveTrigger primary btn red lighten-2 ${this.isModified() ? "" : "disabled"}`}
-              onClick={this.handleSave}
+            <Button
+              disabled={!this.isValid() || !this.isModified()}
             >
               {"Save Changes"}
-            </button>
+            </Button>
           </div>
         </div>
 

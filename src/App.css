@@ -292,10 +292,23 @@ li.tab > a.active {
 .sidenav {
   z-index: 999999;
 }
+
 #main-navigation {
   position: fixed;
   z-index: 1;
   top: 0;
   left: 0;
 }
+
+/* We should by default hide .helper-text */
+input.validate + .helper-text {
+  display: none;
+}
+
+/* In the case where our input is flagged invalid, display .helper-text */
+input.validate.invalid + .helper-text {
+  display: block;
+}
+
+
 
