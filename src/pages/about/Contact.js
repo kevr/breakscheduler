@@ -61,7 +61,7 @@ class Contact extends Component {
           <div className="row">
 
             <div className="col s6">
-              <p className="flowText">
+              <p className="flowText textJustify">
                 {"Test"}
               </p>
             </div>
@@ -69,6 +69,7 @@ class Contact extends Component {
             <div className="col s6">
               <Card title="Contact Form">
                 <form
+                  id="contact-form"
                   onSubmit={this.onSubmit}
                 >
                   <div>

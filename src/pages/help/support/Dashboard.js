@@ -8,7 +8,7 @@ import {
   Breadcrumb,
   Paginator
 } from '../../../components';
-import SearchComponent from '../../../components/Search';
+import SearchBar from '../../../components/SearchBar';
 
 class Dashboard extends Component {
   constructor(props) {
@@ -117,7 +117,7 @@ class Dashboard extends Component {
             </Link>
           </div>
 
-          <SearchComponent
+          <SearchBar
             id="ticket-search-input"
             className="ticketSearch"
             label="Search tickets..."

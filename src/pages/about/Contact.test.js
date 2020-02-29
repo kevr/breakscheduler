@@ -158,8 +158,7 @@ describe('Contact page', () => {
     node.update();
 
     expect(node.find("button#send-button").hasClass("disabled")).toBe(false);
-    let sendButton = node.find("button#send-button");
-    let form = node.find("form").first();
+    let form = node.find("form#contact-form");
     
     await act(async () => {
       form.simulate('submit');;

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 // callback actions when data is changed. This
 // component abstracts away the parsing of Search
 // criteria.
-class Search extends Component {
+class SearchBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -47,7 +47,7 @@ class Search extends Component {
   }
 }
 
-Search.propTypes = {
+SearchBar.propTypes = {
   // ID to use for the input element
   id: PropTypes.string.isRequired,
 
@@ -58,8 +58,8 @@ Search.propTypes = {
   onChange: PropTypes.func.isRequired,
 };
 
-Search.defaultProps = {
+SearchBar.defaultProps = {
   className: null
 };
 
-export default Search;
+export default SearchBar;

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Modal from '../../components/Modal';
-import SearchComponent from '../../components/Search';
+import SearchBar from '../../components/SearchBar';
 import {
   Checkbox
 } from '../../components/Input';
@@ -83,7 +83,7 @@ class Search extends Component {
     return (
       <div className="container">
         <div className="searchForm">
-          <SearchComponent
+          <SearchBar
             id="search-input"
             label="Search help topics..."
             onChange={this.handleSearchChange} 
