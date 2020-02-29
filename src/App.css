@@ -312,5 +312,19 @@ input.validate.invalid + .helper-text {
   display: block;
 }
 
+.Page[title="Contact Us"] .container {
+  position: absolute;
 
+  left: 0;
+  right: 0;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  margin: 0 auto;
+}
+
+.card .message {
+  margin-top: 16px;
+}
 
