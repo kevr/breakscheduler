@@ -261,7 +261,9 @@ li.tab > a.active {
 }
 
 .frameTitle,
-.frameText
+.frameText,
+.flowText,
+.flowTitle
 {
   font-family: "Open Sans";
 }

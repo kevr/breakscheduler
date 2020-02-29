@@ -97,3 +97,9 @@ export const getArticles = () =>
 export const getTopics = () =>
   getRequest("topics").then(response => response.data);
 
+// postContact is not meant to return any json data in a successful
+// query. For this reason, we do not provide a .then wrap to simplify
+// data for us.
+//
+export const postContact = (data) => postRequest("contact", data);
+

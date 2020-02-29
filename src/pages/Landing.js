@@ -9,46 +9,6 @@ import { Carousel } from 'react-responsive-carousel';
 import constructionImage from '../assets/hires/construction.jpg';
 
 class Landing extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      navHeight: 0,
-      rootHeight: 0
-    };
-
-    this.onResize = this.onResize.bind(this);
-    this.getScreenHeight = this.getScreenHeight.bind(this);
-    this.getFullHeight = this.getFullHeight.bind(this);
-  }
-
-  componentDidMount() {
-    this.onResize(); // Fire this once on mount
-    window.addEventListener("resize", this.onResize);
-  }
-  
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.onResize);
-  }
-
-  onResize() {
-    // Update local height states when we resize; causes a re-render
-    // if our heights differ.
-    this.setState({
-      navHeight: document.querySelector("nav").clientHeight,
-      rootHeight: document.getElementById("root").clientHeight
-    });
-  }
-
-  getScreenHeight() {
-    // Just get the height of the portion of the window below the navbar
-    return (this.state.rootHeight - this.state.navHeight) + "px";
-  }
-
-  getFullHeight() {
-    // Get the entire height of the window
-    return this.state.rootHeight + "px";
-  }
-
   render() {
     const images = [
       { src: constructionImage, legend: "Get Work Done" },
