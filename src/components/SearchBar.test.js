@@ -2,7 +2,7 @@ import React from 'react';
 import { configure, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { act } from 'react-dom/test-utils';
-import SearchComponent from './Search';
+import SearchBar from './SearchBar';
 
 configure({ adapter: new Adapter() });
 
@@ -25,7 +25,7 @@ describe('Search component', () => {
     let node;
     await act(async () => {
       node = mount((
-        <SearchComponent
+        <SearchBar
           id="search-component"
           label="Search..."
           onChange={(t) => {}}
@@ -42,7 +42,7 @@ describe('Search component', () => {
     let node;
     await act(async () => {
       node = mount((
-        <SearchComponent
+        <SearchBar
           id="search-component"
           className="searchComponent"
           label="Search..."
@@ -65,7 +65,7 @@ describe('Search component', () => {
     let node;
     await act(async () => {
       node = mount((
-        <SearchComponent
+        <SearchBar
           id="search-component"
           className="searchComponent"
           label="Search..."
