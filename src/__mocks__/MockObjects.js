@@ -24,20 +24,20 @@ export const createExtraUser = (name, email) => ({
 
 // Ticket-related mocks
 let ticketId = 0;
-export const createTicket = (subject, body, status, user, replies = []) => {
+export const createTicket = (subject, body, status, email, replies = []) => {
   ++ticketId;
   return {
     id: ticketId,
     subject: subject,
     body: body,
     status: status,
-    user: user,
+    email: email,
 
     // Assign ticket_id and user to all child replies
     replies: replies.map(reply => {
       return Object.assign({}, reply, {
         ticket_id: ticketId,
-        user: user
+        email: email
       })
     }),
 
@@ -51,7 +51,7 @@ export const createReply = (ticket_id, body, user) => ({
   id: ++replyId,
   ticket_id,
   body,
-  user,
+  email: user.email,
   created_at: (new Date()).toUTCString(),
   updated_at: (new Date()).toUTCString()
 });

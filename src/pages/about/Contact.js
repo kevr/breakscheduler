@@ -10,7 +10,7 @@ import {
 import Card from '../../components/Card';
 import { validateEmail } from '../../lib/Validation';
 import {
-  postContact
+  addTicket
 } from '../../actions/API';
 
 class Contact extends Component {
@@ -28,7 +28,7 @@ class Contact extends Component {
   onSubmit(e) {
     e.preventDefault();
 
-    postContact(this.state)
+    addTicket(this.state)
       .then(response => {
         this.setState({
           email: '',

@@ -51,7 +51,7 @@ class Reply extends Component {
       reply,
       removeReply
     } = this.props;
-    deleteReply(reply)
+    deleteReply(reply, this.props.authKey)
       .then(statusCode => {
         console.log(
           `Deleted Reply(${reply.id}) in Ticket(${reply.ticket_id})
@@ -82,6 +82,10 @@ class Reply extends Component {
       setReply
     } = this.props;
 
+    const updatedReply = Object.assign({}, reply, {
+      body: this.state.body
+    });
+
     // First, set status state to loading, then
     // attempt to update the reply. If any error
     // is encountered, we'll set the error state
@@ -89,7 +93,7 @@ class Reply extends Component {
     // and errors. Otherwise, we'll just set the
     // updated reply.
     this.setState({ status: "loading" }, () => {
-      updateReply(reply).then(reply => {
+      updateReply(updatedReply, this.props.authKey).then(reply => {
           setReply(reply);
           this.setState({
             body: reply.body,
@@ -105,32 +109,6 @@ class Reply extends Component {
           });
         });
     });
-      /*
-      patchRequest(`tickets/${reply.ticket_id}/replies/${reply.id}`, {
-        body: this.state.body
-      })
-        .then((response) => {
-          const reply = response.data;
-
-          // Then, update our component state 'body' field to the new reply
-          this.setState({
-            body: reply.body,
-            edit: false,
-            error: null,
-            status: "updated"
-          }, () => {
-            this.props.setReply(reply);
-            console.log("handleSave end");
-          });
-        }).catch((error) => {
-          // Otherwise, we got an API error.
-          console.error(error);
-          this.setState({
-            error: "Encountered a server error while saving reply edits."
-          });
-        });
-    });
-    */
   }
 
   handleCancel(e) {
@@ -139,7 +117,6 @@ class Reply extends Component {
 
   render() {
     const {
-      session,
       reply
     } = this.props;
 
@@ -160,7 +137,7 @@ class Reply extends Component {
     return (
       <div className="ticketReply card">
         <div className="replyContent card-content">
-          {reply.user.id === session.id && (
+          {this.props.isOwner && (
             <div className="controlBox right">
               {!this.state.edit && (
                 <div className="right">
@@ -236,13 +213,17 @@ class Reply extends Component {
 
         <div className="card-action">
           <span className="textSmall">
-            {`updated ${dateUpdated.toString()} by ${reply.user.email}`}
+            {`updated ${dateUpdated.toString()} by ${reply.email}`}
           </span>
         </div>
       </div>
     );
   }
 }
+
+const mapState = (state, ownProps) => ({
+  session: state.session
+});
 
 const mapDispatch = (dispatch, ownProps) => ({
   setReply: (reply) => dispatch({
@@ -255,4 +236,4 @@ const mapDispatch = (dispatch, ownProps) => ({
   })
 });
 
-export default connect(null, mapDispatch)(Reply);
+export default connect(mapState, mapDispatch)(Reply);

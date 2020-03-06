@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import qs from 'query-string';
 import {
   Loader,
   Reply,
@@ -8,10 +9,16 @@ import {
   ReplyCollapse,
   TicketControl
 } from '../../../components';
+import {
+  getTicket
+} from '../../../actions/API';
 
 class Ticket extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      loading: true
+    };
     this.handleReply = this.handleReply.bind(this);
   }
 
@@ -22,17 +29,42 @@ class Ticket extends Component {
     }
   }
 
+  // In order to properly load a Ticket, we first need to perform
+  // an ajax request to API for the ticket in question.
+  //
+  // After, we need to either setTicket or clearTicket, then
+  // falsify the loading state of this component. This order
+  // must be held true to avoid data races.
+  //
+  componentDidMount() {
+    const id = this.props.match.params.id;
+    const params = qs.parse(this.props.location.search);
+    const key = params.key;
+
+    getTicket(id, key)
+      .then(ticket => {
+        this.props.setTicket(ticket);
+        this.setState({ loading: false });
+      })
+      .catch(error => {
+        this.props.clearTicket();
+        this.setState({ loading: false });
+      });
+  }
+
   render() {
     console.log("Ticket.render");
-    // If tickets are not yet resolved, display a loader.
-    if(!this.props.tickets.resolved) {
+    if(this.state.loading) {
       return <Loader />;
-    } else {
-      console.log(`Tickets: ${JSON.stringify(this.props.tickets.data)}`);
     }
 
-    const id = this.props.match.params.id;
-    const ticket = this.props.tickets.data.find(t => t.id.toString() === id);
+    const ticket = this.props.ticket.data;
+
+    // Optional authentication key
+    const params = qs.parse(this.props.location.search);
+    const key = params.key;
+
+    console.log("Ticket.key = " + key);
 
     if(!ticket) {
       console.error("Rendering ticket page for ticket that does not exist");
@@ -58,6 +90,14 @@ class Ticket extends Component {
     }
     console.log(`Rendering ${JSON.stringify(ticket)}`);
 
+    let email;
+    // Set *our* email depending on our auth state
+    if(!this.props.session.isValid) {
+      email = ticket.email;
+    } else {
+      email = this.props.session.email;
+    }
+
     // Breadcrumb items we'll use for <Breadcrumb> when rendering.
     const breadcrumb = [
       { to: "/help/support", text: "Dashboard" },
@@ -82,6 +122,7 @@ class Ticket extends Component {
                 this.ticketControl = c;
               }}
               ticket={ticket}
+              authKey={key}
             />
           </div>
         )}
@@ -116,7 +157,7 @@ class Ticket extends Component {
 
               <div className="card-action">
                 <span className="textSmall">
-                  {`created by ${ticket.user.email}`}
+                  {`created by ${ticket.email}`}
                 </span>
               </div>
 
@@ -131,8 +172,9 @@ class Ticket extends Component {
             {ticket.replies.map((reply) => (
               <Reply
                 key={reply.id}
-                session={this.props.session}
                 reply={reply}
+                authKey={key}
+                isOwner={email === reply.email}
               />
             ))}
           </div>
@@ -142,6 +184,7 @@ class Ticket extends Component {
             {ticket.status !== "closed" && (
               <ReplyCollapse
                 ticket={ticket}
+                authKey={key}
                 onReply={this.handleReply}
               />
             )}
@@ -154,7 +197,19 @@ class Ticket extends Component {
 
 const mapState = (state, ownProps) => ({
   session: state.session,
-  tickets: state.tickets
+  ticket: state.ticket
 });
 
-export default connect(mapState, null)(Ticket);
+const mapDispatch = (dispatch, ownProps) => ({
+  setTicket: (ticket) =>
+    dispatch({
+      type: "SET_TICKET",
+      ticket: ticket
+    }),
+  clearTicket: () =>
+    dispatch({
+      type: "CLEAR_TICKET"
+    })
+});
+
+export default connect(mapState, mapDispatch)(Ticket);

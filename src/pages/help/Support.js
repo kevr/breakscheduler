@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import UserWidget from '../../components/UserWidget';
 import { SupportRouter } from './support';
-import AuthenticationBarrier from '../../components/AuthenticationBarrier';
 
 class Support extends Component {
   componentDidUpdate(lastProps) {
@@ -26,9 +25,7 @@ class Support extends Component {
         </div>
 
         <div className="Content">
-          <AuthenticationBarrier>
-            <SupportRouter />
-          </AuthenticationBarrier>
+          <SupportRouter />
         </div>
       </div>
     )

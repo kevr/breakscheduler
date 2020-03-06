@@ -108,7 +108,7 @@ describe('Create ticket page', () => {
     node.update();
 
     expect(history.location.pathname)
-      .toBe(`/help/support/ticket/${createdTicket.id}`);
+      .toBe(`/help/support/tickets/${createdTicket.id}`);
   });
 
 });

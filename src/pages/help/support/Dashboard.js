@@ -25,7 +25,7 @@ class Dashboard extends Component {
   }
 
   navigateTo(ticket) {
-    this.props.history.push(`/help/support/ticket/${ticket.id}`);
+    this.props.history.push(`/help/support/tickets/${ticket.id}`);
   }
 
   handlePageChange(dataStart, dataEnd) {
@@ -87,7 +87,7 @@ class Dashboard extends Component {
             }}
           >
             <td>
-              <Link to={`/help/support/ticket/${ticket.id}`}>
+              <Link to={`/help/support/tickets/${ticket.id}`}>
                 {ticket.subject}
               </Link>
             </td>

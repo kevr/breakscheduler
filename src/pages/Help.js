@@ -23,13 +23,26 @@ class Help extends Component {
 
         <div className="TabContent">
           <Switch>
-            <Route exact path="/help/search" component={Search} />
-            <Route exact path="/help/support" component={Support} />
-            <Route exact path="/help/support/login" component={Support} />
-            <Route exact path="/help/support/settings" component={Support} />
-            <Route exact path="/help/support/ticket/:id" component={Support} />
-            <Route exact path="/help/support/createTicket" component={Support} />
+            {/* User Manual */}
             <Route exact path="/help" component={UserManual} />
+
+            {/* Search */}
+            <Route exact path="/help/search" component={Search} />
+
+            {/* Dashboard */}
+            <Route exact path="/help/support" component={Support} />
+
+            {/* Login */}
+            <Route exact path="/help/support/login" component={Support} />
+
+            {/* Account Settings */}
+            <Route exact path="/help/support/settings" component={Support} />
+
+            {/* Ticket */}
+            <Route exact path="/help/support/tickets/:id" component={Support} />
+
+            {/* Create */}
+            <Route exact path="/help/support/createTicket" component={Support} />
           </Switch>
         </div>
       </Layout>

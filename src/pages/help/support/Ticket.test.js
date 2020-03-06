@@ -59,13 +59,13 @@ describe('Ticket page', () => {
       createReplyChild("Reply two")
     ];
     const ticket =
-      createTicket("Test ticket", "Ticket body", "open", user, replies);
+      createTicket("Test ticket", "Ticket body", "open", user.email, replies);
     const tickets = [ticket];
 
-    const history = createHistory(`/help/support/ticket/${ticket.id}`);
+    const history = createHistory(`/help/support/tickets/${ticket.id}`);
 
     axiosMock.onGet(mockPath("users/me")).reply(200, user);
-    axiosMock.onGet(mockPath("tickets")).reply(200, tickets);
+    axiosMock.onGet(mockPath(`tickets/${ticket.id}`)).reply(200, ticket);
 
     let node;
     await act(async () => {
@@ -90,13 +90,13 @@ describe('Ticket page', () => {
   // A huge test that uses the entire Ticket page to
   // reply to the ticket and perform other various tasks.
   test('can be navigated and edited', async () => {
-    const ticket = createTicket("Test ticket", "Ticket body", "open", user);
+    const ticket = createTicket("Test ticket", "Ticket body", "open", user.email);
     const tickets = [ticket];
 
-    const history = createHistory(`/help/support/ticket/${ticket.id}`);
+    const history = createHistory(`/help/support/tickets/${ticket.id}`);
 
     axiosMock.onGet(mockPath("users/me")).reply(200, user);
-    axiosMock.onGet(mockPath("tickets")).reply(200, tickets);
+    axiosMock.onGet(mockPath(`tickets/${ticket.id}`)).reply(200, ticket);
 
     // Mount the node at /help/support/ticket/:id
     let node;
@@ -317,13 +317,13 @@ describe('Ticket page', () => {
 
   test('control a ticket as Administrator', async () => {
     const admin = createAdmin("Admin User", "admin@example.com");
-    const ticket = createTicket("Test ticket", "Test body", "open", admin);
+    const ticket = createTicket("Test ticket", "Test body", "open", admin.email);
     const tickets = [ticket];
 
-    const history = createHistory(`/help/support/ticket/${ticket.id}`);
+    const history = createHistory(`/help/support/tickets/${ticket.id}`);
 
     axiosMock.onGet(mockPath("users/me")).reply(200, admin);
-    axiosMock.onGet(mockPath("tickets")).reply(200, tickets);
+    axiosMock.onGet(mockPath(`tickets/${ticket.id}`)).reply(200, ticket);
 
     let node;
     await act(async () => {
@@ -523,10 +523,10 @@ describe('Ticket page', () => {
   });
 
   test('renders not found details for ticket', async () => {
-    const history = createHistory("/help/support/ticket/666");
+    const history = createHistory("/help/support/tickets/666");
 
     axiosMock.onGet(mockPath("users/me")).reply(200, user);
-    axiosMock.onGet(mockPath("tickets")).reply(200, []);
+    axiosMock.onGet(mockPath("tickets/666")).reply(404);
 
     let node;
     await act(async () => {

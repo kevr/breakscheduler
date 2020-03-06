@@ -26,7 +26,7 @@ describe('ReplyCollapse component', () => {
   let container;
 
   const user = createUser("Test User", "test@example.com");
-  const ticket = createTicket("Test ticket", "Test body", "open", user, []);
+  const ticket = createTicket("Test ticket", "Test body", "open", user.email);
   const reply = createReply(ticket.id, "Test reply", user);
 
   beforeAll(() => {
@@ -47,6 +47,8 @@ describe('ReplyCollapse component', () => {
   });
 
   test('collapses after replying without onReply', async () => {
+    store.dispatch({ type: "SET_TICKET", ticket: ticket });
+
     let gotPost = false;
     axiosMock.onPost(mockPath(`tickets/${ticket.id}/replies`))
       .replyOnce((config) => {
@@ -98,6 +100,8 @@ describe('ReplyCollapse component', () => {
   });
 
   test('calls provided onReply after replying', async () => {
+    store.dispatch({ type: "SET_TICKET", ticket: ticket });
+
     let gotPost = false;
     axiosMock.onPost(mockPath(`tickets/${ticket.id}/replies`))
       .replyOnce((config) => {

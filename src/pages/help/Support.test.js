@@ -285,13 +285,11 @@ describe('Support page', () => {
   });
 
   test('Ticket page renders', async () => {
-    const ticket = createTicket("Ticket 1", "Ticket body 1", "open", user, []);
-    const tickets = [ticket];
-
-    const history = createHistory(`/help/support/ticket/${ticket.id}`);
+    const ticket = createTicket("Ticket 1", "Ticket body 1", "open", user.email);
+    const history = createHistory(`/help/support/tickets/${ticket.id}`);
 
     axiosMock.onGet(mockPath("users/me")).reply(200, user);
-    axiosMock.onGet(mockPath("tickets")).reply(200, tickets);
+    axiosMock.onGet(mockPath(`tickets/${ticket.id}`)).reply(200, ticket);
 
     let node;
     await act(async () => {

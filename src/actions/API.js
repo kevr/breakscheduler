@@ -43,13 +43,19 @@ export const getSession = () =>
   getRequest("users/me").then(response => response.data);
 
 export const updateSession = (data) => {
-  console.debug("updateSession()");
-  console.debug(data);
   return patchRequest("users/me", data).then(response => response.data);
 };
 
 export const getTickets = () =>
   getRequest("tickets").then(response => response.data);
+
+export const getTicket = (id, key) => {
+  let path = `tickets/${id}`;
+  if(key) {
+    path = path + `?key=${key}`;
+  }
+  return getRequest(path).then(response => response.data);
+}
 
 // Session
 export const userLogin = (data) => {
@@ -62,33 +68,56 @@ export const addTicket = (data) =>
   postRequest("tickets", data)
     .then(response => response.data);
 
-export const updateTicket = (data) =>
-  patchRequest(`tickets/${data.id}`, data)
+export const updateTicket = (data, key) => {
+  const ticketId = data.id;
+
+  let path = `tickets/${ticketId}`;
+  if(key) {
+    path = path + `?key=${key}`;
+  }
+
+  return patchRequest(path, data)
     .then(response => response.data);
+}
 
 export const deleteTicket = (data) =>
   deleteRequest(`tickets/${data.id}`)
     .then(response => response.status);
 
 // Ticket replies
-export const addReply = (data) => {
+export const addReply = (data, key) => {
   const ticketId = data.ticket_id;
-  return postRequest(`tickets/${ticketId}/replies`, data)
-    .then(response => response.data);
+
+  let path = `tickets/${ticketId}/replies`;
+  if(key) {
+    path = path + `?key=${key}`;
+  }
+
+  return postRequest(path, data).then(response => response.data);
 }
 
-export const updateReply = (data) => {
+export const updateReply = (data, key) => {
   const replyId = data.id;
   const ticketId = data.ticket_id;
-  return patchRequest(`tickets/${ticketId}/replies/${replyId}`, data)
-    .then(response => response.data);
+
+  let path = `tickets/${ticketId}/replies/${replyId}`;
+  if(key) {
+    path = path + `?key=${key}`;
+  }
+
+  return patchRequest(path, data).then(response => response.data);
 }
 
-export const deleteReply = (data) => {
+export const deleteReply = (data, key) => {
   const replyId = data.id;
   const ticketId = data.ticket_id;
-  return deleteRequest(`tickets/${ticketId}/replies/${replyId}`)
-    .then(response => response.status);
+
+  let path = `tickets/${ticketId}/replies/${replyId}`;
+  if(key) {
+    path = path + `?key=${key}`;
+  }
+
+  return deleteRequest(path).then(response => response.status);
 }
 
 export const getArticles = () =>
@@ -96,10 +125,4 @@ export const getArticles = () =>
 
 export const getTopics = () =>
   getRequest("topics").then(response => response.data);
-
-// postContact is not meant to return any json data in a successful
-// query. For this reason, we do not provide a .then wrap to simplify
-// data for us.
-//
-export const postContact = (data) => postRequest("contact", data);
 

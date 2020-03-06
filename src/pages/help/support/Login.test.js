@@ -264,9 +264,9 @@ describe('Login page', () => {
     node.update();
 
     axiosMock.onPost(mockPath("users/login"))
-      .replyOnce(200, { token: "stubToken" });
-    axiosMock.onGet(mockPath("users/me")).replyOnce(200, user);
-    axiosMock.onGet(mockPath("tickets")).replyOnce(200, []);
+      .reply(200, { token: "stubToken" });
+    axiosMock.onGet(mockPath("users/me")).reply(200, user);
+    axiosMock.onGet(mockPath("tickets")).reply(200, []);
 
     const form = node.find("form");
     await act(async () => {
@@ -293,9 +293,9 @@ describe('Login page', () => {
     document.body.appendChild(container);
 
     axiosMock.onPost(mockPath("users/login"))
-      .replyOnce(200, { token: "stubToken" });
-    axiosMock.onGet(mockPath("users/me")).replyOnce(200, user);
-    axiosMock.onGet(mockPath("tickets")).replyOnce(200, []);
+      .reply(200, { token: "stubToken" });
+    axiosMock.onGet(mockPath("users/me")).reply(200, user);
+    axiosMock.onGet(mockPath("tickets")).reply(200, []);
 
     await act(async () => {
       node = mount((
@@ -320,9 +320,9 @@ describe('Login page', () => {
     container.id = "root";
     document.body.appendChild(container);
 
-    axiosMock.onPost(mockPath("users/login")).replyOnce(401);
-    axiosMock.onGet(mockPath("users/me")).replyOnce(401);
-    axiosMock.onGet(mockPath("tickets")).replyOnce(401);
+    axiosMock.onPost(mockPath("users/login")).reply(401);
+    axiosMock.onGet(mockPath("users/me")).reply(401);
+    axiosMock.onGet(mockPath("tickets")).reply(401);
 
     await act(async () => {
       node = mount((

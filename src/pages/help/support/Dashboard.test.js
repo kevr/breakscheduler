@@ -94,7 +94,7 @@ describe('Dashboard page', () => {
 
     const ticket = tickets[0];
     expect(history.location.pathname)
-      .toBe(`/help/support/ticket/${ticket.id}`);
+      .toBe(`/help/support/tickets/${ticket.id}`);
   });
 
   // To be implemented.

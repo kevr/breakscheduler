@@ -36,11 +36,13 @@ class TicketControl extends Component {
   handleSave(e) {
     e.preventDefault();
 
+    console.log(this.props.ticket);
+
     // Fill up postData if we have modified content.
     let postData = {
       id: this.props.ticket.id
     };
-
+    
     // We'll have to update this to be strict when we add
     // more configurables in ticketControl. For now, we only
     // have the status option, which makes this a forced path
@@ -53,7 +55,7 @@ class TicketControl extends Component {
     if(this.state.status !== this.props.ticket.status)
       postData.status = this.state.status;
 
-    updateTicket(postData)
+    updateTicket(postData, this.props.authKey)
       .then(ticket => {
         this.setState({
           status: postData.status

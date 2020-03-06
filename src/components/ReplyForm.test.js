@@ -52,10 +52,9 @@ describe('ReplyForm component', () => {
 
   test('submits a reply to a Ticket', async () => {
     const history = createHistory(`/help/support/ticket/${ticket.id}`);
-    const tickets = [ticket];
 
     store.dispatch({ type: "SET_SESSION", session: user });
-    store.dispatch({ type: "SET_TICKETS", tickets: tickets });
+    store.dispatch({ type: "SET_TICKET", ticket: ticket });
 
     let node;
     await act(async () => {
@@ -94,16 +93,15 @@ describe('ReplyForm component', () => {
     });
     node.update();
 
-    expect(store.getState().tickets.data[0].replies.length)
+    expect(store.getState().ticket.data.replies.length)
       .toBe(1);
   });
 
   test('submits a Reply and closes a Ticket', async () => {
     const history = createHistory(`/help/support/ticket/${ticket.id}`);
-    const tickets = [ticket];
 
     store.dispatch({ type: "SET_SESSION", session: user });
-    store.dispatch({ type: "SET_TICKETS", tickets: tickets });
+    store.dispatch({ type: "SET_TICKET", ticket: ticket });
 
     let node;
     await act(async () => {
@@ -157,17 +155,15 @@ describe('ReplyForm component', () => {
     });
     node.update();
 
-    expect(store.getState().tickets.data[0].replies.length)
-      .toBe(1);
-    expect(store.getState().tickets.data[0].status).toBe("closed");
+    expect(store.getState().ticket.data.replies.length).toBe(1);
+    expect(store.getState().ticket.data.status).toBe("closed");
   });
 
   test('http error while submitting Reply and closing a Ticket', async () => {
     const history = createHistory(`/help/support/ticket/${ticket.id}`);
-    const tickets = [ticket];
 
     store.dispatch({ type: "SET_SESSION", session: user });
-    store.dispatch({ type: "SET_TICKETS", tickets: tickets });
+    store.dispatch({ type: "SET_TICKET", ticket: ticket });
 
     let node;
     await act(async () => {
@@ -241,8 +237,7 @@ describe('ReplyForm component', () => {
     });
     node.update();
 
-    expect(store.getState().tickets.data[0].replies.length)
-      .toBe(1);
+    expect(store.getState().ticket.data.replies.length).toBe(1);
     expect(node.find("#reply-form-error").text())
       .toBe("Encountered a server error while updating ticket state.");
   });

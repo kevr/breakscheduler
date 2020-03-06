@@ -38,7 +38,7 @@ class App extends React.Component {
           <Route exact path="/help/support/settings" component={Help} />
 
           {/* Manage support tickets. */}
-          <Route exact path="/help/support/ticket/:id" component={Help} />
+          <Route exact path="/help/support/tickets/:id" component={Help} />
           <Route exact path="/help/support/createTicket" component={Help} />
 
           {/* Product download and retrieval page. */}

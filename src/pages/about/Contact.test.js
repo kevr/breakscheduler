@@ -46,7 +46,7 @@ describe('Contact page', () => {
 
     // Mock up an error response from the server. This should cause an error
     // message at the bottom of the contact form.
-    axiosMock.onPost(mockPath("contact")).reply(500);
+    axiosMock.onPost(mockPath("tickets")).reply(500);
 
     let node;
     await act(async () => {
@@ -167,7 +167,7 @@ describe('Contact page', () => {
 
     expect(node.find(".error").length).toBe(1);
 
-    axiosMock.onPost(mockPath("contact")).reply(200);
+    axiosMock.onPost(mockPath("tickets")).reply(200);
     await act(async () => {
       form.simulate('submit');;
     });

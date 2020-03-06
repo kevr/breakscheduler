@@ -51,8 +51,8 @@ class Navbar extends Component {
               <ul id="nav-mobile" className="right">
                 <NavItem label="Home" to="/" />
                 <NavItem label="Features" to="/features" />
-                <NavItem label="Help" to="/help" />
                 <NavItem label="Get It" to="/product" />
+                <NavItem label="Help" to="/help" />
                 <li className={isNested ? "active" : ""}>
                   <a className="dropdown-trigger" href="#!"
                      data-target="about-dropdown">About</a>

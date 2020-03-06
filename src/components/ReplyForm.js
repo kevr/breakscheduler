@@ -48,8 +48,13 @@ class ReplyForm extends Component {
       return;
     }
 
-    const { ticket } = this.props;
+    const {
+      ticket,
+      session
+    } = this.props;
+
     const replyData = {
+      email: session.email,
       body: this.state.body,
       ticket_id: ticket.id
     };
@@ -58,9 +63,11 @@ class ReplyForm extends Component {
       return text === "Send Reply and Close";
     };
 
+    console.log("reply key: " + this.props.key);
+
     // There is some kind of Redux/Promise race here. Perhaps
     // we should be able to await for certain Promises to finish...
-    addReply(replyData).then(reply => {
+    addReply(replyData, this.props.authKey).then(reply => {
       this.setState({ error: null, body: '' }, () => {
 
         // Add our new reply to the Ticket in Redux
@@ -185,8 +192,12 @@ ReplyForm.propTypes = {
   onReply: PropTypes.func
 };
 
+const mapState = (state, ownProps) => ({
+  session: state.session
+});
+
 const mapDispatch = (dispatch, ownProps) => ({
-  addReply: (reply) =>dispatch({
+  addReply: (reply) => dispatch({
     type: "ADD_REPLY",
     reply: reply
   }),
@@ -196,4 +207,4 @@ const mapDispatch = (dispatch, ownProps) => ({
   })
 });
 
-export default connect(null, mapDispatch)(ReplyForm);
+export default connect(mapState, mapDispatch)(ReplyForm);

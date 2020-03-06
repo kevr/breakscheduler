@@ -39,7 +39,7 @@ class Create extends Component {
         this.props.addTicket(ticket);
 
         // Redirect to the ticket we just created!
-        this.props.history.push(`/help/support/ticket/${ticket.id}`);
+        this.props.history.push(`/help/support/tickets/${ticket.id}`);
       });
     }).catch((error) => {
       console.error(error);
