@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Layout from './Layout';
-import config from '../config.json';
 
 const Features = () => (
   <Layout pageTitle="Features">

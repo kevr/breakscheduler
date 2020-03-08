@@ -1,18 +1,72 @@
 import React, { Component } from 'react';
 import Layout from './Layout';
-import logo from '../logo.svg';
 import config from '../config.json';
+import mainDashboard from '../assets/maindashboard.jpg';
+import { Link } from 'react-router-dom';
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { Carousel } from 'react-responsive-carousel';
 
-const Landing = () => (
-  <Layout>
-    <header className="App-header">
-      <div className="container">
-        <p className="text-center">
-          A simple solution to managing employee breaks and work schedules, {config.appName} was developed to completely remove the necessity of manual book keeping and notifications.
-        </p>
-      </div>
-    </header>
-  </Layout>
-);
+import constructionImage from '../assets/hires/construction.jpg';
+
+class Landing extends Component {
+  render() {
+    const images = [
+      { src: constructionImage, legend: "Get Work Done" },
+      { src: constructionImage, legend: "Stay Up To Date" },
+      { src: constructionImage, legend: "Automate Your Schedules" },
+    ];
+
+    return (
+      <Layout>
+        <div>
+          <Carousel
+            className="carousel-wrapper"
+            showArrows={true}
+            infiniteLoop={true}
+            autoPlay={true}
+            showThumbs={false}
+          >
+            {images.map((image, i) => (
+              <div key={i}>
+                <img src={image.src} alt={image.legend} />
+                <p className="legend">{image.legend}</p>
+              </div>
+            ))}
+          </Carousel>
+        </div>
+        <div className="widePageFrame pageSection">
+          <div className="textCenter">
+            <h4 className="frameTitle">Total Control</h4>
+            <p className="frameText">{"Some overly detailed text about how much control this program can give you. "}<Link to="/product">Get it here.</Link></p>
+            <img
+              alt={`${config.appName} Dashboard`}
+              className="frameImage"
+              src={mainDashboard}
+            />
+          </div>
+        </div>
+
+        <div className="widePageFrame pageSection">
+          <div className="textCenter">
+            <h4 className="frameTitle textLeft">Product Features</h4>
+            <p className="frameText">{"Some overly detailed text about how much control this program can give you. Visit our "}<Link to="/features">Features</Link>{" page to see them all!"}</p>
+            <ul>
+              <li><span>{"Feature one"}</span></li>
+              <li><span>{"Feature two"}</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="widePageFrame pageSection">
+          <div className="textCenter">
+            <h4 className="frameTitle textRight">Help Directory</h4>
+            <p className="frameText">{"Some overly detailed text about how much control this program can give you. Visit our "}<Link to="/features">Features</Link>{" page to see them all!"}</p>
+          </div>
+        </div>
+
+      </Layout>
+    )
+  }
+}
 
 export default Landing;

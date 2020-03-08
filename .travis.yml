@@ -1,0 +1,7 @@
+language: node_js
+node_js:
+    - 10
+install:
+    npm install
+script:
+    npm run coverage 2>&1 | egrep '^.*All files\s+\|\s+100\s\|\s+100\s\|\s+100\s\|\s+100.*$'

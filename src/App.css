@@ -1,3 +1,10 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+
+@font-face {
+  font-family: "Patua One";
+  src: url("/fonts/PatuaOne-Regular.ttf");
+}
+
 /**
  * html, body and #root should all be flexing vertically
  * to consume at least the entire page.
@@ -6,6 +13,10 @@ html {
   min-height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+body {
+  min-width: 800px;
 }
 
 body, #root {
@@ -44,10 +55,6 @@ nav ul li.active:hover {
   position: relative;
 }
 
-.App {
-  text-align: center;
-}
-
 .App-logo {
   height: 40vmin;
 }
@@ -62,4 +69,288 @@ nav ul li.active:hover {
 
 .memberCard {
   cursor: pointer;
+}
+
+.articleTitle {
+  margin-top: 24px;
+}
+
+.searchResult {
+  cursor: pointer;
+}
+
+/* Text classes */
+.textCenter {
+  text-align: center;
+}
+
+.textJustify {
+  text-align: justify;
+}
+
+.textLeft {
+  text-align: left;
+}
+
+.textRight {
+  text-align: right;
+}
+
+.textSmall {
+  font-size: 10px;
+}
+
+.textMedium {
+  font-size: 16px;
+}
+
+li.tab > a.active {
+ border-bottom: 2px solid white; 
+}
+
+.widgets a {
+  display: inline-block;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.controlBox {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  text-align: left;
+  z-index: 2;
+
+  position: absolute;
+  top: 0px;
+  right: 12px;
+}
+
+.controlBox button > i {
+  font-size: 16px;
+}
+
+.controlBox button {
+  margin-right: 6px;
+}
+
+/* Subpage styles */
+.sidenavButton {
+  cursor: pointer;
+  color: #555;
+  position: fixed;
+  left: 10px;
+  top: 0;
+}
+
+.controlBox button {
+  cursor: pointer;
+}
+
+.colorBadge {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  font-size: 0.8rem;
+}
+
+.statusBox {
+  padding: 5px;
+}
+
+.statusBox label {
+  padding-right: 5px;
+}
+
+.ticketReplies {
+  background-color: rgba(0, 0, 0, 0.02);
+  padding: 25px;
+  border-radius: 4px;
+}
+
+.ticketReplies .collapsible {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.breadcrumbTransparent .breadcrumb {
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 12px;
+  line-height: 2em;
+}
+
+.breadcrumbTransparent .breadcrumb:before {
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 12px;
+}
+
+.breadcrumbTransparent .breadcrumb:last-child {
+  color: black;
+}
+
+.tickets tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+  cursor: pointer;
+}
+
+.supportLogin {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.horizontalGap {
+  display: inline-block;
+  width: 6px;
+}
+
+.error:before {
+  content: "Error: ";
+}
+
+.error {
+  font-size: 12px;
+  color: #ff6e6e;
+}
+
+.success {
+  font-size: 12px;
+  color: #6ecc43;
+}
+
+.brand-logo {
+  font-family: "Patua One";
+  font-size: 42px !important;
+}
+
+.aligned {
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+.searchResults {
+  margin-top: 0px;
+}
+
+/* Override row's margin-bottom */
+.row {
+  margin-bottom: 0px;
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.clear {
+  float: none;
+  clear: both;
+}
+
+.pageFrame {
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+.widePageFrame {
+  position: relative;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.frameTitle {
+  margin-top: 0;
+}
+
+.frameTitle {
+  font-weight: bold;
+  color: grey;
+}
+
+.frameTitle,
+.frameText,
+.flowText,
+.flowTitle
+{
+  font-family: "Open Sans";
+}
+
+.frameImage {
+  width: 50%;
+  height: auto;
+}
+
+/* Page section colors */
+.pageSection {
+  padding-right: 100px;
+  padding-left: 100px;
+}
+
+.pageSection:nth-child(odd) {
+  background-color: white;
+}
+
+.pageSection:nth-child(even) {
+  background-color: #f7fafb;
+}
+
+.Layout {
+  padding-top: 64px;
+}
+
+.sidenav {
+  z-index: 999999;
+}
+
+#main-navigation {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+}
+
+/* We should by default hide .helper-text */
+input.validate + .helper-text {
+  display: none;
+}
+
+/* In the case where our input is flagged invalid, display .helper-text */
+input.validate.invalid + .helper-text {
+  display: block;
+}
+
+.Page[title="Contact Us"] > .container,
+.Page[title="Product"] > .container {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  margin: 0 auto;
+}
+
+.card .message {
+  margin-top: 16px;
+}
+
+.card .card-title {
+  font-family: "Open Sans";
+}
+
+.card > .card-content {
+  padding-bottom: 12px;
+  position: relative;
+}
+
+.card .card-content .frameText {
+  margin-top: 12px;
+  margin-bottom: 12px;
 }

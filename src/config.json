@@ -1,7 +1,24 @@
 {
-  "appName": "Break Scheduler",
+  "appName": "Give 'em a Break",
   "apiPrefix": "http://localhost:5000",
+
   "contact": {
     "email": "kevr.gtalk@gmail.com"
+  },
+
+  "article": {
+    "allowedTags": [
+      "br",
+      "a",
+      "img"
+    ],
+    "allowedAttributes": {
+      "a": [ "href" ],
+      "img": [ "src", "alt" ]
+    }
+  },
+
+  "download": {
+    "url": "http://localhost:3000/program.exe"
   }
 }
