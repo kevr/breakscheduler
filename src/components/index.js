@@ -15,6 +15,7 @@ import ReplyCollapse from './ReplyCollapse';
 import TicketControl from './TicketControl';
 import Paginator from './Paginator';
 import SearchBar from './SearchBar';
+import Card from './Card';
 
 // All partials exported here should be mimicked in
 // the module's default export below.
@@ -31,7 +32,8 @@ export {
   ReplyCollapse,
   TicketControl,
   Paginator,
-  SearchBar
+  SearchBar,
+  Card
 };
 
 export default {
@@ -75,5 +77,7 @@ export default {
   Paginator,
 
   // Search component
-  SearchBar
+  SearchBar,
+
+  Card
 };

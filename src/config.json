@@ -16,5 +16,9 @@
       "a": [ "href" ],
       "img": [ "src", "alt" ]
     }
+  },
+
+  "download": {
+    "url": "http://localhost:3000/program.exe"
   }
 }
