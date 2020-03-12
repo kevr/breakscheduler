@@ -115,7 +115,7 @@ class Contact extends Component {
                 {/* This message will display error codes or successful
                     notifications from our submit function. */}
                 {this.props.message !== null && (
-                  <div className="row">
+                  <div className="row textCenter">
                     <div className="message col s12">
                       <span className={this.props.messageClass}>
                         {this.props.message}
