@@ -5,7 +5,6 @@ import { Loader } from '../../../components';
 import Login from './Login';
 import Ticket from './Ticket';
 import AuthorizedRouter from './AuthorizedRouter';
-import AuthenticationBarrier from '../../../components/AuthenticationBarrier';
 
 // This needs to be moved to SessionRouter
 const SessionRouter = ({ session, history }) => (

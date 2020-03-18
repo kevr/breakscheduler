@@ -9,9 +9,9 @@
 //
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
-import Ticket from './Ticket';
 import SessionRouter from './SessionRouter';
 import AuthenticationBarrier from '../../../components/AuthenticationBarrier';
+
 // This needs to be moved to SessionRouter
 const SupportRouter = () => (
   <AuthenticationBarrier>

@@ -4,7 +4,6 @@ import Dashboard from './Dashboard';
 import Create from './Create';
 import Settings from './Settings';
 import TicketBarrier from '../../../components/TicketBarrier';
-import Ticket from './Ticket';
 
 const AuthorizedRouter = () => {
   console.log(`AuthorizedRouter.render`);

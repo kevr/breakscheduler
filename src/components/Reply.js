@@ -7,7 +7,6 @@ import {
   updateReply,
   deleteReply
 } from '../actions/API';
-import Loader from './Loader';
 
 class Reply extends Component {
   constructor(props) {
