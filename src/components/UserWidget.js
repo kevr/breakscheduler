@@ -11,7 +11,7 @@ const UserWidget = ({ session, clearSession }) => (
               in the case where the user is an administrator. */}
           {`Logged in as ${session.email}`}{session.type === "admin" && " [admin]"}
         </span>
-        {session.id !== null && (
+        {session.registered && (
           <span className="widgets right">
             <Link
               to="/help/support/settings"
