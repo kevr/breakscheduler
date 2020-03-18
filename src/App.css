@@ -420,3 +420,13 @@ label .indicator > i {
   height: 16px;
 }
 
+.replyStatus {
+  position: absolute;
+  left: 6px;
+  top: 6px;
+}
+
+.replyStatus .indicator > i {
+  font-size: 18px;
+}
+

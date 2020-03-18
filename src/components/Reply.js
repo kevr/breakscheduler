@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
+  Indicator
+} from '../components';
+import {
   updateReply,
   deleteReply
 } from '../actions/API';
@@ -85,7 +88,10 @@ class Reply extends Component {
 
     const {
       reply,
-      setReply
+      setReply,
+      setReplyLoading,
+      setReplySuccess,
+      setReplyFailure
     } = this.props;
 
     const updatedReply = Object.assign({}, reply, {
@@ -98,23 +104,21 @@ class Reply extends Component {
     // to some relevent text and log out warnings
     // and errors. Otherwise, we'll just set the
     // updated reply.
-    this.setState({ status: "loading" }, () => {
-      updateReply(updatedReply, this.props.authKey).then(reply => {
-          this.setState({
-            body: reply.body,
-            edit: false,
-            error: null
-          }, () => {
-            setReply(reply);
-          });
-        })
-        .catch(error => {
-          console.error(error);
-          this.setState({
-            error: "Encountered a server error while saving reply edits."
-          });
+    setReplyLoading("replyStatus");
+    updateReply(updatedReply, this.props.authKey).then(reply => {
+        this.setState({
+          body: reply.body,
+          edit: false,
+          error: null
+        }, () => {
+          setReplySuccess("replyStatus");
+          setReply(reply);
         });
-    });
+      })
+      .catch(error => {
+        console.error(error);
+        setReplyFailure("replyStatus");
+      });
   }
 
   render() {
@@ -127,6 +131,13 @@ class Reply extends Component {
     return (
       <div className="ticketReply card">
         <div className="replyContent card-content">
+          <div className="replyStatus">
+            <Indicator
+              indicatorId="replyStatus"
+              id={`reply_${reply.id}_status`}
+            />
+          </div>
+
           {this.props.isOwner && (
             <div className="controlBox right">
               {!this.state.edit && (
@@ -195,6 +206,31 @@ const mapState = (state, ownProps) => ({
 });
 
 const mapDispatch = (dispatch, ownProps) => ({
+  setReplyLoading: (id) => {
+    dispatch({
+      type: "SET_ENABLED",
+      id: id
+    });
+    dispatch({
+      type: "SET_LOADING",
+      id: id
+    });
+  },
+
+  setReplySuccess: (id) => {
+    dispatch({
+      type: "SET_SUCCESS",
+      id: id
+    });
+  },
+
+  setReplyFailure: (id) => {
+    dispatch({
+      type: "SET_FAILURE",
+      id: id
+    });
+  },
+
   setReply: (reply) => dispatch({
     type: "SET_REPLY",
     reply: reply

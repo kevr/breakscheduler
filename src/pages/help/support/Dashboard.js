@@ -114,8 +114,9 @@ class Dashboard extends Component {
         <div className="row">
           <Breadcrumb items={[ { text: "Dashboard" } ]} />
         </div>
+        <div style={{ height: "10px" }} />
         <div className="Content">
-          <div className="controlBox">
+          <div>
             <Link
               to="/help/support/createTicket"
                className="primary red lighten-2 btn"
