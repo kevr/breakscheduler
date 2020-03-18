@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { CancelToken } from 'axios';
 import config from '../config.json';
 
 export const apiRequest = (method, endpoint, data) => {
@@ -12,13 +12,19 @@ export const apiRequest = (method, endpoint, data) => {
     head["Authorization"] = `Token ${token}`;
   }
 
-  return axios.request({
+  let cancel;
+  let p = axios.request({
     url: url,
     method: method,
     headers: head,
     data: data,
-    responseType: 'json'
+    responseType: 'json',
+    cancelToken: new CancelToken(function executor(c) {
+      cancel = c;
+    })
   });
+  p._cancel = cancel;
+  return p;
 }
 
 /* To be uncommented and tested when used.
@@ -39,8 +45,14 @@ export const deleteRequest = (endpoint) =>
   apiRequest("delete", endpoint, null);
 
 // Abstracted API methods.
-export const getSession = () =>
-  getRequest("users/me").then(response => response.data);
+export const getSession = (key) => {
+  let path = "users/me";
+  if(key) {
+    path = path + `?key=${key}`;
+  }
+  return getRequest(path)
+    .then(response => response.data);
+};
 
 export const updateSession = (data) => {
   return patchRequest("users/me", data).then(response => response.data);
@@ -105,6 +117,7 @@ export const updateReply = (data, key) => {
     path = path + `?key=${key}`;
   }
 
+  console.log(`Ticket path: ${path}`);
   return patchRequest(path, data).then(response => response.data);
 }
 

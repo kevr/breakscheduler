@@ -54,12 +54,8 @@ describe('Support page', () => {
   test('/help/support with auth token gets user info on mount', async () => {
     const history = createHistory("/help/support");
 
-    axiosMock.onGet(mockPath("users/me")).reply(200, {
-      id: 1,
-      name: "Kevin Morris",
-      email: "test@example.com"
-    });
-
+    const user = createUser("Kevin Morris", "test@example.com");
+    axiosMock.onGet(mockPath("users/me")).reply(200, user);
     axiosMock.onGet(mockPath("tickets")).reply(200, []);
 
     let node;

@@ -115,22 +115,20 @@ li.tab > a.active {
 }
 
 .controlBox {
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 5px 5px;
   text-align: left;
-  z-index: 2;
+  z-index: 1;
 
   position: absolute;
   top: 0px;
-  right: 12px;
+  right: 0px;
 }
 
-.controlBox button > i {
-  font-size: 16px;
+.controlBox i {
+  font-size: 20px;
 }
 
 .controlBox button {
-  margin-right: 6px;
 }
 
 /* Subpage styles */
@@ -156,7 +154,11 @@ li.tab > a.active {
 }
 
 .statusBox {
-  padding: 5px;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  z-index: 1;
+  padding: 5px 10px;
 }
 
 .statusBox label {
@@ -241,6 +243,10 @@ li.tab > a.active {
   float: left;
 }
 
+i.left {
+  margin-right: 6px;
+}
+
 .right {
   float: right;
 }
@@ -309,7 +315,7 @@ li.tab > a.active {
 
 #main-navigation {
   position: fixed;
-  z-index: 1;
+  z-index: 999999;
   top: 0;
   left: 0;
 }
@@ -354,3 +360,63 @@ input.validate.invalid + .helper-text {
   margin-top: 12px;
   margin-bottom: 12px;
 }
+
+select.colorBadge {
+  display: block;
+  padding: 0;
+  height: 24px;
+  outline: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.actions {
+  position: fixed;
+  bottom: 6px;
+  right: 6px;
+}
+
+.replyAction {
+  cursor: pointer;
+
+  transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+}
+
+.replyAction:hover {
+  color: #F44336;
+  opacity: 0.8;
+}
+
+.cursorPtr {
+  cursor: pointer;
+}
+
+.ticketReply .editButton {
+  font-size: 16px;
+}
+
+pre {
+  font-size: 14px;
+  font-family: "Open Sans";
+}
+
+label .indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding-bottom: 0;
+}
+
+label .indicator > i {
+  font-size: 14px;
+}
+
+.indicator .indicatorLoader {
+  width: 16px;
+  height: 16px;
+}
+

@@ -5,28 +5,45 @@ import {
   Loader,
   Reply,
   Breadcrumb,
-  Badge,
+  StatusBadge,
   ReplyCollapse,
-  TicketControl
+  Indicator
 } from '../../../components';
 import {
-  getTicket
+  getTicket,
+  updateTicket
 } from '../../../actions/API';
 
 class Ticket extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      loading: true
-    };
+    this.onStatusChange = this.onStatusChange.bind(this);
     this.handleReply = this.handleReply.bind(this);
+
+    this.reply_collapse = React.createRef();
+    this.reply_form_link = React.createRef();
   }
 
-  handleReply() {
-    if(this.ticketControl) {
-      console.log("handleReply called resetState on TicketControl");
-      this.ticketControl.resetState();
-    }
+  handleReply(reply) {
+  }
+
+  onStatusChange(status) {
+    const params = qs.parse(this.props.location.search);
+    const key = params.key;
+
+    this.props.setStatusLoading("statusProgress");
+    updateTicket(Object.assign({}, this.props.ticket.data, {
+      status: status
+    }), key)
+      .then(ticket => {
+        this.props.setTicket(ticket);
+        this.props.setStatusSuccess("statusProgress");
+      })
+      .catch(error => {
+        console.error(error);
+        this.props.setStatusFailure("statusProgress");
+        this.status_badge.forceUpdate();
+      });
   }
 
   // In order to properly load a Ticket, we first need to perform
@@ -41,20 +58,20 @@ class Ticket extends Component {
     const params = qs.parse(this.props.location.search);
     const key = params.key;
 
+    // Always fetch a ticket when we mount this component.
+    this.props.resetTicket();
     getTicket(id, key)
       .then(ticket => {
         this.props.setTicket(ticket);
-        this.setState({ loading: false });
       })
       .catch(error => {
         this.props.clearTicket();
-        this.setState({ loading: false });
       });
   }
 
   render() {
     console.log("Ticket.render");
-    if(this.state.loading) {
+    if(!this.props.ticket.resolved) {
       return <Loader />;
     }
 
@@ -90,23 +107,30 @@ class Ticket extends Component {
     }
     console.log(`Rendering ${JSON.stringify(ticket)}`);
 
-    let email;
-    // Set *our* email depending on our auth state
-    if(!this.props.session.isValid) {
-      email = ticket.email;
-    } else {
-      email = this.props.session.email;
-    }
+    const email = this.props.session.email;
 
     // Breadcrumb items we'll use for <Breadcrumb> when rendering.
-    const breadcrumb = [
-      { to: "/help/support", text: "Dashboard" },
+    let breadcrumb = [
       { text: `Ticket(${ticket.id})` }
     ];
 
-    // const dateUpdated = new Date(ticket.updated_at);
+    if(this.props.session.isValid) {
+      breadcrumb = [
+        { to: "/help/support", text: "Dashboard" },
+        { text: `Ticket(${ticket.id})` }
+      ];
+    }
 
     const isAdmin = u => u.isValid && u.type === "admin";
+    const isStaff = u => u.isValid && u.type === "staff";
+
+    const options = ["open", "closed"];
+    if(isAdmin(this.props.session) || isStaff(this.props.session)) {
+      options.splice(1, 0, "escalated");
+    }
+
+    const isEditable = isAdmin(this.props.session) ||
+      this.props.session.email === ticket.email;
 
     return (
       <div className="ticketPage">
@@ -114,27 +138,27 @@ class Ticket extends Component {
           <Breadcrumb items={breadcrumb} />
         </div>
 
-        {/* If the viewer is an Administrator, display our TicketControl */}
-        {isAdmin(this.props.session) && (
-          <div className="row">
-            <TicketControl
-              ref={(c) => {
-                this.ticketControl = c;
-              }}
-              ticket={ticket}
-              authKey={key}
-            />
-          </div>
-        )}
-
         <div className="row">
           <div className="col s12">
             <div className="ticket card" id={`ticket_${ticket.id}`}>
               <div className="statusBox right">
-                <label htmlFor="status-badge">Status</label>
-                <Badge
+                <label htmlFor="status-badge">
+                  Status
+                  <Indicator
+                    id="status-indicator"
+                    indicatorId="statusProgress"
+                  />
+                </label>
+                <StatusBadge
                   id="status-badge"
-                  value={ticket.status}
+                  status={ticket.status}
+                  onChange={this.onStatusChange}
+                  options={options}
+                  editable={isEditable}
+                  confirm={true}
+                  ref={e => {
+                    this.status_badge = e;
+                  }}
                 />
               </div>
 
@@ -150,7 +174,7 @@ class Ticket extends Component {
                 </span>
                 <div className="row">
                   <div className="col s10">
-                    <p>{ticket.body}</p>
+                    <pre>{ticket.body}</pre>
                   </div>
                 </div>
               </div>
@@ -183,11 +207,36 @@ class Ticket extends Component {
             {/* If our ticket status is closed, we'll hide the widget */}
             {ticket.status !== "closed" && (
               <ReplyCollapse
+                id="reply-form"
                 ticket={ticket}
                 authKey={key}
                 onReply={this.handleReply}
+                ref={this.reply_collapse}
               />
             )}
+          </div>
+
+          <div>
+            {ticket.status !== "closed" && (
+            <div className="actions">
+              <span
+                className="btn-floating btn-large waves-effect waves-light red"
+                onClick={e => {
+                  e.preventDefault();
+                  // Collapse, then open to reset the scroll anchor state
+                  this.reply_collapse.current.open();
+                  this.reply_collapse.current.element().scrollIntoView({
+                    behavior: "smooth"
+                  });
+                }}
+                ref={this.reply_form_link}
+              >
+                <i className="material-icons">
+                  add
+                </i>
+              </span>
+            </div>
+          )}
           </div>
         </div>
       </div>
@@ -201,6 +250,31 @@ const mapState = (state, ownProps) => ({
 });
 
 const mapDispatch = (dispatch, ownProps) => ({
+  setStatusLoading: (id) => {
+    dispatch({
+      type: "SET_ENABLED",
+      id: id
+    });
+    dispatch({
+      type: "SET_LOADING",
+      id: id
+    });
+  },
+
+  setStatusSuccess: (id) => {
+    dispatch({
+      type: "SET_SUCCESS",
+      id: id
+    });
+  },
+
+  setStatusFailure: (id) => {
+    dispatch({
+      type: "SET_FAILURE",
+      id: id
+    });
+  },
+
   setTicket: (ticket) =>
     dispatch({
       type: "SET_TICKET",
@@ -209,7 +283,11 @@ const mapDispatch = (dispatch, ownProps) => ({
   clearTicket: () =>
     dispatch({
       type: "CLEAR_TICKET"
-    })
+    }),
+  resetTicket: () =>
+    dispatch({
+      type: "RESET_TICKET"
+    }),
 });
 
 export default connect(mapState, mapDispatch)(Ticket);

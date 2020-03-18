@@ -17,6 +17,7 @@ import {
   mockStore
 } from 'TestUtil';
 import {
+  createGuest,
   createUser,
   createAdmin,
   createTicket,
@@ -98,6 +99,12 @@ describe('Ticket page', () => {
     axiosMock.onGet(mockPath("users/me")).reply(200, user);
     axiosMock.onGet(mockPath(`tickets/${ticket.id}`)).reply(200, ticket);
 
+    let scrolled = false;
+    window.HTMLElement.prototype.scrollIntoView = 
+      jest.fn().mockImplementation((obj = {}) => {
+        scrolled = true;
+      });
+
     // Mount the node at /help/support/ticket/:id
     let node;
     await act(async () => {
@@ -111,18 +118,16 @@ describe('Ticket page', () => {
     });
     node.update();
 
-    const collapsible = node.find(".addReply");
-    const header = collapsible.find(".toggleButton");
-    expect(header.exists()).toBe(true);
+    const replyButton = node.find(".actions > span");
 
     // Click to open the Reply dialog
     await act(async () => {
-      header.simulate('click');
+      replyButton.simulate('click');
     });
     node.update();
 
     // Reply dialog should be open, change the textarea
-    const replyBody = collapsible.find("textarea");
+    const replyBody = node.find(".addReply").find("textarea");
     expect(replyBody.exists()).toBe(true);
 
     await act(async () => {
@@ -139,7 +144,7 @@ describe('Ticket page', () => {
       .replyOnce(500);
 
     // Submit the replyForm
-    const replyForm = collapsible.find("form");
+    const replyForm = node.find(".addReply").find("form");
     expect(replyForm.exists()).toBe(true);
 
     await act(async () => {
@@ -174,93 +179,6 @@ describe('Ticket page', () => {
 
     // Now, begin to edit a reply.
     let replyNode = replies.at(0);
-    let editButton = replyNode.find(".editButton");
-    expect(editButton.exists()).toBe(true);
-
-    await act(async () => {
-      editButton.simulate('click');
-    });
-    node.update();
-
-    // We can cancel an edit.
-    const cancelButton = replyNode.update().find(".cancelButton");
-    await act(async () => {
-      cancelButton.simulate('click');
-    });
-    node.update();
-
-    editButton = replyNode.find(".editButton");
-    await act(async () => {
-      editButton.simulate('click');
-    });
-
-    // Or we can fill out the text area with new content.
-    const replyEditor = await waitForElement(() => {
-      return node.update().find(".replyEditor").first();
-    });
-    replyNode = node.find(".ticketReply").first();
-
-    // const replyEditor = reply.find(".replyEditor");
-    expect(replyEditor.exists()).toBe(true);
-
-    const replyEditText = replyEditor.find("textarea");
-    expect(replyEditText.exists()).toBe(true);
-
-    // Try to save an edit with no content
-    const replySaveButton = replyEditor.find(".saveButton");
-
-    await act(async () => {
-      replyEditText.simulate('change', {
-        target: {
-          value: ''
-        }
-      });
-    });
-    node.update();
-
-    // We can try to save edits with a blank body.
-    await act(async () => {
-      replySaveButton.simulate('click');
-    });
-    node.update();
-
-    // But a body is required.
-    expect(node.find("#reply-edit-error").text())
-      .toBe("Reply body is required.");
-
-    await act(async() => {
-      replyEditText.simulate('change', {
-        target: {
-          value: "Edited reply"
-        }
-      });
-    });
-    node.update();
-
-    // We can try to edit the reply again, with a 500 API server error.
-    axiosMock.onPatch(mockPath(`tickets/${ticket.id}/replies/${reply.id}`))
-      .replyOnce(500);
-
-    await act(async () => {
-      replySaveButton.simulate('click');
-    });
-    node.update();
-
-    expect(node.find("#reply-edit-error").text())
-      .toBe("Encountered a server error while saving reply edits.");
-
-    // Now we can update our reply successfully.
-    const updatedReply = Object.assign({}, reply, {
-      body: "Edited reply"
-    });
-    axiosMock.onPatch(mockPath(`tickets/${ticket.id}/replies/${reply.id}`))
-      .replyOnce(200, updatedReply);
-
-    await act(async () => {
-      replySaveButton.simulate('click');
-    });
-    node.update();
-    replyNode = node.find(".ticketReply").first();
 
     // We can also delete a reply.
     const deleteButton = await waitForElement(() => {
@@ -339,12 +257,10 @@ describe('Ticket page', () => {
 
     // This is bad!
     expect(node.find("select").instance().value).toBe("open");
-    expect(node.find("#status-badge").at(1).text()).toBe("Open");
 
-    let control = node.find(".ticketControl");
-    expect(control.exists()).toBe(true);
+    axiosMock.onPatch(mockPath(`tickets/${ticket.id}`)).replyOnce(500);
 
-    let select = control.find("select");
+    let select = node.find(".statusBox").find("select");
     await act(async () => {
       select.simulate('change', {
         target: {
@@ -354,39 +270,29 @@ describe('Ticket page', () => {
     });
     node.update();
 
-    // Update our copy of ticketControl
-    control = node.find(".ticketControl");
-
-    // Click the Save Button
-    let button = control.find("button");
-    expect(button.exists()).toBe(true);
-    expect(button.text()).toBe("Save Changes");
-
-    axiosMock.onPatch(mockPath(`tickets/${ticket.id}`)).replyOnce(500);
-
-    await act(async () => {
-      button.simulate('click');
-    });
-    node.update();
-
-    expect(node.find("#ticket-control-error").text())
-      .toBe("Unable to update ticket through API.");
-
     let updatedTicket = Object.assign({}, ticket, {
       status: "closed"
     });
 
     axiosMock.onPatch(mockPath(`tickets/${ticket.id}`))
       .replyOnce(200, updatedTicket);
-
     await act(async () => {
-      button.simulate('click');
+      select.simulate('change', {
+        target: {
+          value: "closed"
+        }
+      });
     });
     node.update();
-    control = node.find(".ticketControl");
 
     expect(node.find("select").instance().value).toBe("closed");
-    expect(node.find("#status-badge").at(1).text()).toBe("Closed");
+
+    updatedTicket = Object.assign({}, ticket, {
+      status: "escalated"
+    });
+
+    axiosMock.onPatch(mockPath(`tickets/${ticket.id}`))
+      .replyOnce(200, updatedTicket);
 
     await act(async () => {
       select.simulate('change', {
@@ -397,29 +303,13 @@ describe('Ticket page', () => {
     });
     node.update();
 
-    // Update our copy of ticketControl
-    control = node.find(".ticketControl");
-
-    // Click the Save Button
-    button = control.find("button");
-    expect(button.exists()).toBe(true);
-    expect(button.text()).toBe("Save Changes");
+    expect(node.find("select").instance().value).toBe("escalated");
 
     updatedTicket = Object.assign({}, ticket, {
-      status: "escalated"
+      status: "open"
     });
-
     axiosMock.onPatch(mockPath(`tickets/${ticket.id}`))
       .replyOnce(200, updatedTicket);
-
-    await act(async () => {
-      button.simulate('click');
-    });
-    node.update();
-    control = node.find(".ticketControl");
-
-    expect(node.find("select").instance().value).toBe("escalated");
-    expect(node.find("#status-badge").at(1).text()).toBe("Escalated");
 
     // Back to open
     await act(async () => {
@@ -430,40 +320,9 @@ describe('Ticket page', () => {
       });
     });
     node.update();
-
-    // Update our copy of ticketControl
-    control = node.find(".ticketControl");
-
-    // Click the Save Button
-    button = control.find("button");
-    expect(button.exists()).toBe(true);
-    expect(button.text()).toBe("Save Changes");
-
-    updatedTicket = Object.assign({}, ticket, {
-      status: "open"
-    });
-    axiosMock.onPatch(mockPath(`tickets/${ticket.id}`))
-      .replyOnce(200, updatedTicket);
-
-    await act(async () => {
-      button.simulate('click');
-    });
-
-    node.update();
-    control = node.find(".ticketControl");
-
-    expect(node.find("#status-badge").at(1).text()).toBe("Open");
-
-    const ticketControl = node.find(".ticketControl");
     
-    select = ticketControl.find("#status-select").at(1);
-    const expectSelectValue = (value) => {
-      select.update();
-      expect(select.instance().value).toBe(value);
-    };
-
-    expectSelectValue("open");
-    
+    expect(node.find("select").instance().value).toBe("open");
+   
     const replyCollapse = node.find(".addReply");
     await act(async () => {
       replyCollapse.simulate('click');
@@ -514,7 +373,7 @@ describe('Ticket page', () => {
     node.update();
 
     // We should have changed to closed status.
-    expectSelectValue("closed");
+    expect(node.find("select").instance().value).toBe("closed");
 
     // Unmount our node.
     await act(async () => {
@@ -543,6 +402,35 @@ describe('Ticket page', () => {
     expect(node.find(".textCenter").text())
       .toBe("The ticket you were looking for " +
             "with id '666' could not be located.");
+  });
+
+  test('navigate a ticket as guest user', async () => {
+    const guestUser = createGuest("guest@example.com");
+    const ticket = createTicket("Subject", "body", "open", guestUser.email);
+
+    const history = createHistory(
+      `/help/support/tickets/${ticket.id}?key=stubKey`);
+
+    axiosMock.onGet(mockPath(`users/me?key=stubKey`))
+      .reply(200, guestUser);
+    axiosMock.onGet(mockPath(`tickets/${ticket.id}?key=stubKey`))
+      .reply(200, ticket);
+
+    let node;
+    await act(async () => {
+      node = mount((
+        <TestRouter store={store} history={history}>
+          <App />
+        </TestRouter>
+      ), {
+        assignTo: document.getElementById("root")
+      });
+    });
+    node.update();
+
+    axiosMock.onGet(mockPath("users/me")).reply(401);
+    history.push("/help/support");
+    node.update();
   });
 
 });

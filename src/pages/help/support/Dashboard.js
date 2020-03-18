@@ -42,8 +42,11 @@ class Dashboard extends Component {
   render() {
     const { tickets } = this.props;
 
-    const format = (date) => {
-      return dateFormat(date, "dd/mm/yyyy, h:MM:ss TT Z");
+    const formatDate = (date) => {
+      return dateFormat(date, "dd/mm/yyyy");
+    };
+    const formatTime = (date) => {
+      return dateFormat(date, "h:MM:ss TT Z");
     };
 
     // Enum conversion table for sorting.
@@ -91,7 +94,11 @@ class Dashboard extends Component {
                 {ticket.subject}
               </Link>
             </td>
-            <td>{format(new Date(ticket.updated_at))}</td>
+            <td>
+              <div className="textSmall">
+                {formatDate(new Date(ticket.updated_at))} - {formatTime(new Date(ticket.updated_at))}
+              </div>
+            </td>
             <td>
               <Badge
                 id={`ticket_${ticket.id}_badge`}

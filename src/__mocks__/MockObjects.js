@@ -5,14 +5,24 @@ export const createUser = (name, email) => ({
   id: 1,
   name: name,
   email: email,
-  type: "user"
+  type: "user",
+  registered: true
 });
 
 export const createAdmin = (name, email) => ({
   id: 2,
   name: name,
   email: email,
-  type: "admin"
+  type: "admin",
+  registered: true
+});
+
+export const createGuest = (email) => ({
+  id: null,
+  name: '',
+  email: email,
+  type: "guest",
+  registered: false
 });
 
 let extraUserId = 2; // A counter used for generating IDs

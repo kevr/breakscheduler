@@ -52,7 +52,9 @@ class Navbar extends Component {
                 <NavItem label="Home" to="/" />
                 <NavItem label="Features" to="/features" />
                 <NavItem label="Get It" to="/product" />
-                <NavItem label="Help" to="/help" />
+                <li className={isActive(this.props.location.pathname, "/help") ? "active" : ""}>
+                  <a href="/help">Help</a>
+                </li>
                 <li className={isNested ? "active" : ""}>
                   <a className="dropdown-trigger" href="#!"
                      data-target="about-dropdown">About</a>

@@ -25,6 +25,21 @@ const getBadgeText = (text) => {
   return table[text];
 };
 
+const SelectBadge = (props) => {
+  console.log(`Badge Class: ${props.value}`);
+  return (
+    <select
+      className={`colorBadge ${getBadgeClass(props.value)}`}
+      id={props.id}
+      value={props.value}
+      onChange={e => props.onChange(e)}
+    >
+      {props.children}
+    </select>
+  );
+};
+
+
 const Badge = (props) => {
   let className = `colorBadge ${getBadgeClass(props.value)}`;
   return (
@@ -44,7 +59,9 @@ Badge.propTypes = {
 
 export {
   getBadgeText,
-  getBadgeClass
+  getBadgeClass,
+  Badge,
+  SelectBadge
 };
 
 export default Badge;

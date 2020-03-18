@@ -4,17 +4,23 @@ import Dashboard from './Dashboard';
 import Create from './Create';
 import Settings from './Settings';
 import TicketBarrier from '../../../components/TicketBarrier';
+import Ticket from './Ticket';
 
 const AuthorizedRouter = () => {
   console.log(`AuthorizedRouter.render`);
   return (
-    <TicketBarrier>
+    <span>
+      <TicketBarrier>
+        <Switch>
+          <Route
+            exact
+            path={"/help/support"}
+            component={Dashboard}
+          />
+        </Switch>
+      </TicketBarrier>
+
       <Switch>
-        <Route
-          exact
-          path={"/help/support"}
-          component={Dashboard}
-        />
         <Route
           exact
           path={"/help/support/createTicket"}
@@ -26,7 +32,7 @@ const AuthorizedRouter = () => {
           component={Settings}
         />
       </Switch>
-    </TicketBarrier>
+    </span>
   );
 };
 

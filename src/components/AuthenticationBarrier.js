@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+import qs from 'query-string';
 import {
   getSession
 } from '../actions/API';
@@ -14,14 +16,39 @@ class AuthenticationBarrier extends Component {
       clearSession
     } = this.props;
 
-    if(!session.resolved || !session.isValid) {
+    const params = qs.parse(this.props.location.search);
+    const key = params.key;
+
+    if(!session.resolved || !session.isValid || session.id === null) {
       // Try a crude authentication that just grabs
       // from @authToken no matter what. We don't
       // have Redux state yet.
-      getSession().then(user => setSession(user))
+      getSession(key).then(user => setSession(user))
         .catch(error => {
           console.error(error);
           clearSession();
+        });
+    }
+  }
+
+  componentDidUpdate() {
+    const {
+      session,
+      setSession,
+      clearSession
+    } = this.props;
+
+    const params = qs.parse(this.props.location.search);
+    const key = params.key;
+
+    // If we're a guest
+    if(!session.registered && !key) {
+      getSession().then(user => setSession(user))
+        .catch(error => {
+          console.error(error);
+          if(this.props.session.email) {
+            clearSession();
+          }
         });
     }
   }
@@ -66,4 +93,6 @@ const mapDispatch = (dispatch, ownProps) => ({
   })
 });
 
-export default connect(mapState, mapDispatch)(AuthenticationBarrier);
+export default connect(mapState, mapDispatch)(
+  withRouter(AuthenticationBarrier)
+);

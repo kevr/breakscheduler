@@ -20,7 +20,8 @@ import { mockPath } from 'TestUtil';
 import {
   createUser,
   createTicket,
-  createReply
+  createReply,
+  createGuest
 } from 'MockObjects';
 
 describe('API', () => {
@@ -80,6 +81,17 @@ describe('API', () => {
       expect(user.name).toBe("Test User");
       expect(user.email).toBe("test@example.com");
       expect(user.type).toBe("user");
+    });
+  });
+
+  test('can get session with a key', async () => {
+    const guestUser = createGuest("guest@example.com");
+
+    const key = "stubKey";
+    axiosMock.onGet(mockPath(`users/me?key=${key}`))
+      .reply(200, guestUser);
+    await getSession(key).then(session => {
+      expect(session).toEqual(guestUser);
     });
   });
 

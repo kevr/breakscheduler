@@ -116,7 +116,7 @@ class ReplyForm extends Component {
     ];
 
     return (
-      <form id="reply-form" onSubmit={this.handleSubmit}>
+      <form id={this.props.id} onSubmit={this.handleSubmit}>
         <div className="input-field">
           <textarea
             id="reply-body-input"

@@ -4,6 +4,7 @@ import Tickets from './Tickets';
 import Ticket from './Ticket';
 import Message from './Message';
 import Articles from './Articles';
+import Indicator from './Indicator';
 import { combineReducers } from 'redux';
 
 export default combineReducers({
@@ -13,4 +14,6 @@ export default combineReducers({
   ticket: Ticket,
   message: Message,
   articles: Articles,
+
+  statusProgress: Indicator,
 });

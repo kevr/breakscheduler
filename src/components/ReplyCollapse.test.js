@@ -61,6 +61,7 @@ describe('ReplyCollapse component', () => {
       node = mount((
         <Provider store={store}>
           <ReplyCollapse
+            id="reply-form"
             ticket={ticket}
           />
         </Provider>
@@ -90,7 +91,7 @@ describe('ReplyCollapse component', () => {
     });
     node.update();
 
-    const replyForm = addReply.find("#reply-form");
+    const replyForm = addReply.find("form#reply-form");
     await act(async () => {
       replyForm.simulate('submit');
     });
@@ -119,6 +120,7 @@ describe('ReplyCollapse component', () => {
       node = mount((
         <Provider store={store}>
           <ReplyCollapse
+            id="reply-form"
             ticket={ticket}
             onReply={onReply}
           />
@@ -149,7 +151,7 @@ describe('ReplyCollapse component', () => {
     });
     node.update();
 
-    const replyForm = addReply.find("#reply-form");
+    const replyForm = addReply.find("form#reply-form");
     await act(async () => {
       replyForm.simulate('submit');
     });

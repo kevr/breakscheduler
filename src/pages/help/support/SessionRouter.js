@@ -3,11 +3,17 @@ import { Switch, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Loader } from '../../../components';
 import Login from './Login';
+import Ticket from './Ticket';
 import AuthorizedRouter from './AuthorizedRouter';
+import AuthenticationBarrier from '../../../components/AuthenticationBarrier';
 
 // This needs to be moved to SessionRouter
 const SessionRouter = ({ session, history }) => (
   <Switch>
+    <Route
+      exact path={"/help/support/tickets/:id"}
+      component={Ticket}
+    />
     <Route
       exact
       path={"/help/support/login"}

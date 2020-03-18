@@ -3,7 +3,7 @@
 // accessible from this module export.
 // 
 import Breadcrumb from './Breadcrumb';
-import Badge from './Badge';
+import Badge, { SelectBadge } from './Badge';
 import Loader from './Loader';
 import Modal from './Modal';
 import UserWidget from './UserWidget';
@@ -12,10 +12,11 @@ import ExtendedNavbar from './ExtendedNavbar';
 import Reply from './Reply';
 import ReplyForm from './ReplyForm';
 import ReplyCollapse from './ReplyCollapse';
-import TicketControl from './TicketControl';
 import Paginator from './Paginator';
 import SearchBar from './SearchBar';
 import Card from './Card';
+import StatusBadge from './StatusBadge';
+import Indicator from './Indicator';
 
 // All partials exported here should be mimicked in
 // the module's default export below.
@@ -30,10 +31,12 @@ export {
   Reply,
   ReplyForm,
   ReplyCollapse,
-  TicketControl,
   Paginator,
   SearchBar,
-  Card
+  Card,
+  SelectBadge,
+  StatusBadge,
+  Indicator
 };
 
 export default {
@@ -68,16 +71,16 @@ export default {
   // Provides a collapsible form.
   ReplyCollapse,
 
-  // Administrator Ticket control widget.
-  // Used for updating Ticket status, and other actions
-  // requiring elevated privileges.
-  TicketControl,
-
   // Data paginator
   Paginator,
 
   // Search component
   SearchBar,
 
-  Card
+  Card,
+
+  SelectBadge,
+  StatusBadge,
+
+  Indicator
 };

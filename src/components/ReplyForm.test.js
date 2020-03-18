@@ -29,7 +29,7 @@ describe('ReplyForm component', () => {
 
   // A reusable user object.
   const user = createUser("Test User", "test@example.com");
-  const ticket = createTicket("Test ticket", "Test body", "open", user, []);
+  const ticket = createTicket("Test ticket", "Test body", "open", user.email);
 
   beforeAll(() => {
     axiosMock = new MockAdapter(axios);
@@ -61,7 +61,9 @@ describe('ReplyForm component', () => {
       node = mount((
         <TestRouter store={store} history={history}>
           <ReplyForm
+            id="reply-form"
             ticket={ticket}
+            onReply={(e) => {}}
             collapse={() => {}}
           />
         </TestRouter>
@@ -75,7 +77,7 @@ describe('ReplyForm component', () => {
     axiosMock.onPost(mockPath("tickets/1/replies")).reply(200, reply);
 
     const replyBodyInput = node.find("#reply-body-input");
-    const replyForm = node.find("#reply-form");
+    const replyForm = node.find("form#reply-form");
     await act(async () => {
       replyBodyInput.simulate('change', {
         target: {
@@ -108,7 +110,9 @@ describe('ReplyForm component', () => {
       node = mount((
         <TestRouter store={store} history={history}>
           <ReplyForm
+            id="reply-form"
             ticket={ticket}
+            onReply={(e) => {}}
             collapse={() => {}}
           />
         </TestRouter>
@@ -170,6 +174,7 @@ describe('ReplyForm component', () => {
       node = mount((
         <TestRouter store={store} history={history}>
           <ReplyForm
+            id="reply-form"
             ticket={ticket}
             collapse={() => {}}
           />
@@ -192,7 +197,7 @@ describe('ReplyForm component', () => {
     const replyBodyInput = node.find("#reply-body-input");
     const dropdownTrigger = node.find(".dropdown-trigger");
 
-    const replyForm = node.find("#reply-form");
+    const replyForm = node.find("form#reply-form");
 
     await act(async () => {
       replyBodyInput.simulate('change', {

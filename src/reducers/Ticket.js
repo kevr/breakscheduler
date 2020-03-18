@@ -14,6 +14,8 @@ const DEFAULT_STATE = {
 };
 
 export default (state = DEFAULT_STATE, action) => {
+  console.log("action");
+  console.log(action);
   switch(action.type) {
     case SET_TICKET:
       return Object.assign({}, DEFAULT_STATE, {
@@ -26,6 +28,8 @@ export default (state = DEFAULT_STATE, action) => {
         resolved: true,
         exists: false
       });
+    case RESET_TICKET:
+      return DEFAULT_STATE;
 
       // Requires action.reply, an object containing:
       //

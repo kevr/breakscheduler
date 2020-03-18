@@ -20,7 +20,6 @@ class Reply extends Component {
     this.handleEdit = this.handleEdit.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.handleSave = this.handleSave.bind(this);
-    this.handleCancel = this.handleCancel.bind(this);
   }
 
   handleBodyChange(e) {
@@ -70,7 +69,14 @@ class Reply extends Component {
 
   handleSave(e) {
     console.log("handleSave called");
+
+    if(this.state.body === this.props.reply.body) {
+      this.setState({ edit: false });
+      return;
+    }
+
     if(this.state.body === '') {
+      // Leave edit true in this case
       this.setState({
         error: "Reply body is required."
       });
@@ -94,12 +100,12 @@ class Reply extends Component {
     // updated reply.
     this.setState({ status: "loading" }, () => {
       updateReply(updatedReply, this.props.authKey).then(reply => {
-          setReply(reply);
           this.setState({
             body: reply.body,
             edit: false,
-            error: null,
-            status: "updated"
+            error: null
+          }, () => {
+            setReply(reply);
           });
         })
         .catch(error => {
@@ -111,26 +117,10 @@ class Reply extends Component {
     });
   }
 
-  handleCancel(e) {
-    this.setState({ edit: false, error: null });
-  }
-
   render() {
     const {
       reply
     } = this.props;
-
-    // Prepare status component here.
-    const renderStatus = (s) => {
-      switch(s) {
-        case "updated":
-          return <i className="material-icons">updated</i>;
-        case "loading":
-          return <Loader />;
-        default:
-          return '';
-      }
-    };
 
     const dateUpdated = new Date(reply.updated_at);
 
@@ -141,15 +131,13 @@ class Reply extends Component {
             <div className="controlBox right">
               {!this.state.edit && (
                 <div className="right">
-                  {/* Edit button */}
-                  <button className="editButton" onClick={this.handleEdit}>
-                    <i className="material-icons">edit</i>
-                  </button>
-
                   {/* Delete */}
-                  <button className="deleteButton" onClick={this.handleDelete}>
-                    <i className="material-icons">delete</i>
-                  </button>
+                  <i
+                    onClick={this.handleDelete}
+                    className="material-icons cursorPtr deleteButton red-text text-lighten-2"
+                  >
+                    delete
+                  </i>
                 </div>
               )}
             </div>
@@ -158,38 +146,23 @@ class Reply extends Component {
           {this.state.edit ? (
             <div className="replyEditor">
               <div className="input-field">
-                <div className="right">
-                  {/* Update */}
-                  <button
-                    className="saveButton"
-                    onClick={this.handleSave}
-                  >
-                    <i className="material-icons">save</i>
-                  </button>
-
-                  {/* Cancel edit */}
-                  <button
-                    className="cancelButton"
-                    onClick={this.handleCancel}
-                  >
-                    <i className="material-icons">close</i>
-                  </button>
-                </div>
-
                 <textarea
                   id="reply-textarea"
                   className="materialize-textarea"
                   value={this.state.body}
                   onChange={this.handleBodyChange}
+                  onBlur={this.handleSave}
+                  ref={e => {
+                    if(e) {
+                      e.focus();
+                    }
+                  }}
                 />
-                <label htmlFor="reply-textarea">
-                  {"Edit Reply"}
-                </label>
               </div>
             </div>
           ) : (
             <div className="replyInfo">
-              <p>{reply.body}</p>
+              <pre onClick={this.handleEdit}>{reply.body}</pre>
             </div>
           )}
 
@@ -204,10 +177,6 @@ class Reply extends Component {
                 {this.state.error}
               </span>
             )}
-          </div>
-
-          <div className="status">
-            {renderStatus(this.state.status)}
           </div>
         </div>
 

@@ -28,6 +28,11 @@ const Product = () => (
 
         <div className="col s6">
           <Card title={"Purchase"}>
+            <ul className="collection">
+              <li className="collection-item">{"Licensed forever"}</li>
+              <li className="collection-item">{"Premium support"}</li>
+              <li className="collection-item">{"Most affordable in the market"}</li>
+            </ul>
           </Card>
         </div>
       </div>
