@@ -57,6 +57,8 @@ class Contact extends Component {
     return (
       <Layout pageTitle="Contact Us">
 
+        <div className="flex flexColumn" />
+
         <div className="container">
           <div className="row">
 
@@ -128,6 +130,8 @@ class Contact extends Component {
             </div>
           </div>
         </div>
+
+        <div className="flex flexColumn" />
       </Layout>
     );
   }

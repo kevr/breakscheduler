@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import config from '../config.json';
 
 const Layout = ({ pageTitle, children }) => (
-  <div className="Layout">
+  <div className="Layout flex flexColumn">
 
     {
       // If a pageTitle was supplied, append it to
@@ -23,7 +23,7 @@ const Layout = ({ pageTitle, children }) => (
 
     <Navbar />
 
-    <div className="Page" title={pageTitle}>
+    <div className="Page flex flexColumn" title={pageTitle}>
       {children}
     </div>
   </div>

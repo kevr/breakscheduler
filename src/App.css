@@ -25,6 +25,11 @@ body, #root {
   flex: 1 1 auto;
 }
 
+.Page {
+  position: relative;
+}
+
+
 /* white-text does not override specific <li> text color,
  * so we override it here with plain white. */
 .dropdown-content li > a {
@@ -330,19 +335,6 @@ input.validate.invalid + .helper-text {
   display: block;
 }
 
-.Page[title="Contact Us"] > .container,
-.Page[title="Product"] > .container {
-  position: absolute;
-
-  left: 0;
-  right: 0;
-  top: 50%;
-
-  transform: translateY(-50%);
-
-  margin: 0 auto;
-}
-
 .card .message {
   margin-top: 16px;
 }
@@ -428,5 +420,18 @@ label .indicator > i {
 
 .replyStatus .indicator > i {
   font-size: 18px;
+}
+
+.flex {
+  flex: 1 1 auto;
+  display: flex;
+}
+
+.flexColumn {
+  flex-direction: column;
+}
+
+.flexRow {
+  flex-direction: row;
 }
 

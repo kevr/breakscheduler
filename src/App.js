@@ -16,7 +16,7 @@ import './App.css';
 class App extends React.Component {
   render() {
     return (
-      <div className="App">
+      <div className="App flex flexColumn">
         <Switch>
           {/* Home page */}
           <Route exact path="/" component={Landing} />
