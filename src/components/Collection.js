@@ -4,13 +4,11 @@ import { appendIf } from '../lib/Util';
 /**
  * A collection item.
 **/
-export const Item = ({ children, className }) => {
-  return (
-    <li className={appendIf("collection-item", className)}>
-      {children}
-    </li>
-  );
-}
+export const Item = ({ children, className }) => (
+  <li className={appendIf("collection-item", className)}>
+    {children}
+  </li>
+);
 
 Item.defaultProps = {
   className: null
@@ -19,13 +17,11 @@ Item.defaultProps = {
 /**
  * A collection.
 **/
-const Collection = ({ children, className }) => {
-  return (
-    <ul className={appendIf("collection", className)}>
-      {children}
-    </ul>
-  );
-}
+const Collection = ({ children, className }) => (
+  <ul className={appendIf("collection", className)}>
+    {children}
+  </ul>
+);
 
 Collection.defaultProps = {
   className: null
