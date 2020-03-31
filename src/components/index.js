@@ -17,6 +17,7 @@ import SearchBar from './SearchBar';
 import Card from './Card';
 import StatusBadge from './StatusBadge';
 import Indicator from './Indicator';
+import Collection from './Collection';
 
 // All partials exported here should be mimicked in
 // the module's default export below.
@@ -36,7 +37,8 @@ export {
   Card,
   SelectBadge,
   StatusBadge,
-  Indicator
+  Indicator,
+  Collection
 };
 
 export default {
@@ -82,5 +84,7 @@ export default {
   SelectBadge,
   StatusBadge,
 
-  Indicator
+  Indicator,
+
+  Collection
 };
