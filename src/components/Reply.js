@@ -144,7 +144,7 @@ class Reply extends Component {
                   {/* Delete */}
                   <i
                     onClick={this.handleDelete}
-                    className="material-icons cursorPtr deleteButton red-text text-lighten-2"
+                    className="material-icons cursorPtr deleteButton red-text text-lighten-2 waves-effect waves-light"
                   >
                     delete
                   </i>
