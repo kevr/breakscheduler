@@ -1,0 +1,15 @@
+#!/bin/bash
+REMOTE_HOST="zerocost.dev"
+REMOTE_USER="www"
+REMOTE_PATH="/home/www/breakscheduler"
+
+sshcmd() {
+    ssh ${REMOTE_USER}@${REMOTE_HOST} "$@"
+}
+
+sshcmd "cd $REMOTE_PATH && git pull origin master"
+
+if [ "$1" == "--build" ]; then
+    sshcmd "cd $REMOTE_PATH && npm run build"
+fi
+
