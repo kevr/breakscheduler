@@ -37,6 +37,8 @@ describe('Collection component', () => {
     node.update();
 
     expect(node.find("li").length).toBe(2);
+    expect(node.find("li").at(0).text()).toBe("One");
+    expect(node.find("li").at(1).text()).toBe("Two");
   });
 
 });
