@@ -435,3 +435,8 @@ label .indicator > i {
   flex-direction: row;
 }
 
+.replyInfo > pre {
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
