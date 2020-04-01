@@ -7,6 +7,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
 
 import constructionImage from '../assets/hires/construction.jpg';
+import { Collection } from '../components';
 
 class Landing extends Component {
   render() {
@@ -15,6 +16,8 @@ class Landing extends Component {
       { src: constructionImage, legend: "Stay Up To Date" },
       { src: constructionImage, legend: "Automate Your Schedules" },
     ];
+
+    const { Item } = Collection;
 
     return (
       <Layout>
@@ -34,6 +37,21 @@ class Landing extends Component {
             ))}
           </Carousel>
         </div>
+
+        <div className="widePageFrame pageSection">
+          <h4 className="frameTitle">Download Now</h4>
+          <div className="row">
+            <div className="col s6">
+              <Collection>
+                <Item>{"30 Day Free Trial"}</Item>
+                <Item>{"Blah2"}</Item>
+              </Collection>
+            </div>
+            <div className="col s6">
+            </div>
+          </div>
+        </div>
+
         <div className="widePageFrame pageSection">
           <div className="textCenter">
             <h4 className="frameTitle">Total Control</h4>
