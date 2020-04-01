@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 const Indicator = (props) => {
-  if(!props.indicator.enabled) {
+  if(!props.indicator || !props.indicator.enabled) {
     return <span></span>;
   } else if(!props.indicator.loaded) {
     return (
@@ -47,7 +47,7 @@ Indicator.propTypes = {
 };
 
 const mapState = (state, ownProps) => ({
-  indicator: state[ownProps.indicatorId]
+  indicator: state.progress[ownProps.indicatorId]
 });
 
 export default connect(mapState)(Indicator);
