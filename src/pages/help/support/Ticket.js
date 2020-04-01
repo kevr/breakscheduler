@@ -13,6 +13,7 @@ import {
   getTicket,
   updateTicket
 } from '../../../actions/API';
+import { colorStyle } from '../../../lib/Style';
 
 class Ticket extends Component {
   constructor(props) {
@@ -220,7 +221,8 @@ class Ticket extends Component {
             {ticket.status !== "closed" && (
             <div className="actions">
               <span
-                className="btn-floating btn-large waves-effect waves-light red"
+                className="btn-floating btn-large waves-effect waves-light"
+                style={colorStyle()}
                 onClick={e => {
                   e.preventDefault();
                   // Collapse, then open to reset the scroll anchor state
