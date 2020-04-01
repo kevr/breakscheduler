@@ -6,11 +6,10 @@ import config from '../config.json';
  * our colors stored in config.json, as well as an optional
  * object we pass in.
 **/
-const Style = (opts = {}) => {
+export const colorStyle = (opts = {}) => {
   return Object.assign({}, opts, {
     backgroundColor: config.color.background,
     color: config.color.foreground
   });
 };
 
-export default Style;

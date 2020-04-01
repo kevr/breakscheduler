@@ -9,6 +9,7 @@ import {
   Paginator
 } from '../../../components';
 import SearchBar from '../../../components/SearchBar';
+import { colorStyle } from '../../../lib/Style';
 
 class Dashboard extends Component {
   constructor(props) {
@@ -119,7 +120,8 @@ class Dashboard extends Component {
           <div>
             <Link
               to="/help/support/createTicket"
-               className="primary red lighten-2 btn"
+              className="primary btn"
+              style={colorStyle()}
             >
               {"Create A Ticket"}
             </Link>

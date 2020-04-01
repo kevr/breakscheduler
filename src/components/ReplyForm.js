@@ -6,6 +6,7 @@ import {
   updateTicket,
   addReply
 } from '../actions/API';
+import { colorStyle } from '../lib/Style';
 
 class ReplyForm extends Component {
   constructor(props) {
@@ -133,7 +134,8 @@ class ReplyForm extends Component {
           <button
             id="reply-submit-button"
             type="submit"
-            className="primary btn red lighten-2"
+            className="primary btn"
+            style={colorStyle()}
           >
             {this.state.buttonText}
           </button>
@@ -141,7 +143,8 @@ class ReplyForm extends Component {
           <div className="horizontalGap" />
 
           <a href="#!"
-            className="dropdown-trigger btn red lighten-2"
+            className="dropdown-trigger btn"
+            style={colorStyle()}
             data-target="reply-dropdown"
           >
             <i className="material-icons">
@@ -160,7 +163,8 @@ class ReplyForm extends Component {
 
         <ul
           id="reply-dropdown"
-          className="dropdown-content red lighten-2 white-text"
+          className="dropdown-content"
+          style={colorStyle()}
         >
           {dropdownOptions.map((item, i) => (
             <li

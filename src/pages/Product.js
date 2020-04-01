@@ -3,6 +3,7 @@ import Layout from './Layout';
 import {
   Card
 } from '../components';
+import { colorStyle } from '../lib/Style';
 import config from '../config.json';
 
 const Product = () => (
@@ -18,7 +19,10 @@ const Product = () => (
             </p>
             <p className="frameText textCenter">
               <a href={`${config.download.url}`}>
-                <button type="button" className="primary btn red lighten-2">
+                <button type="button"
+                  className="primary btn"
+                  style={colorStyle()}
+                >
                   {"Download the installer"}
                 </button>
               </a>

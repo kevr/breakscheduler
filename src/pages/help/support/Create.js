@@ -4,6 +4,7 @@ import {
   postRequest
 } from '../../../actions/API';
 import Breadcrumb from '../../../components/Breadcrumb';
+import { colorStyle } from '../../../lib/Style';
 
 // A Ticket creation form for users.
 //
@@ -93,7 +94,8 @@ class Create extends Component {
           <div className="input-field">
             <button
               type="submit"
-              className="primary red lighten-2 btn"
+              className="primary btn"
+              style={colorStyle()}
             >
               {"Create Ticket"}
             </button>

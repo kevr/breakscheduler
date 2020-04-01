@@ -1,6 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { Button } from './Input';
+import { colorStyle } from '../lib/Style';
 
 const UserWidget = ({ session, clearSession }) => (
   <div className="userWidget">
@@ -15,14 +17,14 @@ const UserWidget = ({ session, clearSession }) => (
           <span className="widgets right">
             <Link
               to="/help/support/settings"
-              className="settingsButton primary red lighten-2 btn"
+              className="settingsButton primary btn"
+              style={colorStyle()}
               alt="Settings"
             >
               {"Settings"}
             </Link>
-            <button
-              className="logoutButton primary red lighten-2 btn"
-              alt="Logout"
+            <Button
+              className="logoutButton"
               onClick={(e) => {
                 e.preventDefault();
                 if(window.confirm("Are you sure you want to logout?"))
@@ -30,7 +32,7 @@ const UserWidget = ({ session, clearSession }) => (
               }}
             >
               {"Logout"}
-            </button>
+            </Button>
           </span>
         )}
       </div>
