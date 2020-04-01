@@ -18,6 +18,11 @@
     }
   },
 
+  "color": {
+    "background": "#ee6e73",
+    "foreground": "#fff"
+  },
+
   "download": {
     "url": "http://localhost:3000/program.exe"
   }
