@@ -19,6 +19,9 @@ import StatusBadge from './StatusBadge';
 import Indicator from './Indicator';
 import Collection from './Collection';
 import Section from './Section';
+import Row from './Row';
+import Col from './Col';
+import Container from './Container';
 
 // All partials exported here should be mimicked in
 // the module's default export below.
@@ -40,7 +43,12 @@ export {
   StatusBadge,
   Indicator,
   Collection,
-  Section
+  Section,
+
+  // Materialize grid components
+  Row,
+  Col,
+  Container
 };
 
 export default {
@@ -90,5 +98,9 @@ export default {
 
   Collection,
 
-  Section
+  Section,
+
+  Row,
+  Col,
+  Container
 };

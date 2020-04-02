@@ -7,7 +7,13 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
 
 import constructionImage from '../assets/hires/construction.jpg';
-import { Collection, Section } from '../components';
+import {
+  Collection,
+  Section,
+  Container,
+  Row,
+  Col
+} from '../components';
 
 class Landing extends Component {
   render() {
@@ -45,16 +51,16 @@ class Landing extends Component {
             </h4>
           )}
         >
-          <div className="row">
-            <div className="col s6">
+          <Row>
+            <Col s={6}>
               <Collection>
                 <Item>{"30 Day Free Trial"}</Item>
                 <Item>{"Blah2"}</Item>
               </Collection>
-            </div>
-            <div className="col s6">
-            </div>
-          </div>
+            </Col>
+            <Col s={6}>
+            </Col>
+          </Row>
         </Section>
 
         <Section
