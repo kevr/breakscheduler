@@ -24,6 +24,7 @@ const UserWidget = ({ session, clearSession }) => (
               {"Settings"}
             </Link>
             <Button
+              id="logout-button"
               className="logoutButton"
               onClick={(e) => {
                 e.preventDefault();
