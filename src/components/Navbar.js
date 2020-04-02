@@ -3,6 +3,7 @@ import { Link, withRouter } from 'react-router-dom';
 import M from 'materialize-css';
 import PropTypes from 'prop-types';
 import config from '../config.json';
+import { colorStyle } from '../lib/Style';
 
 // A set of dynamic route-dependent rendering functions.
 // NavItem sets it's className property as active in
@@ -40,11 +41,11 @@ class Navbar extends Component {
     const isNested = this.props.location.pathname.startsWith("/about");
     return (
       <div>
-        <ul id="about-dropdown" className="dropdown-content red lighten-2">
+        <ul id="about-dropdown" className="dropdown-content" style={colorStyle()}>
           <NavItem label="The Team" to="/about/team" />
           <NavItem label="Contact Us" to="/about/contact" />
         </ul>
-        <nav id="main-navigation">
+        <nav id="main-navigation" style={colorStyle()}>
           <div className="nav-wrapper">
             <div className="container">
               <a href="#!" className="brand-logo left">{config.appName}</a>

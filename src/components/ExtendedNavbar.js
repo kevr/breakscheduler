@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
+import { colorStyle } from '../lib/Style';
 
 class ExtendedNavbar extends Component {
   render() {
@@ -13,7 +14,7 @@ class ExtendedNavbar extends Component {
     };
 
     return (
-      <nav className="nav-extended">
+      <nav className="nav-extended" style={colorStyle()}>
         <div className="nav-content container">
           <ul className="tabs tabs-transparent">
             {this.props.routes.map((route, i) => (

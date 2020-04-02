@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { colorStyle } from '../lib/Style';
 
 const Input = (props) => {
   let className = "input-field";
@@ -109,7 +110,8 @@ Textarea.defaultProps = {
 export const Button = (props) => (
   <button
     id={props.id}
-    className={`btn red lighten-2 ${props.disabled ? "disabled" : ""} ${props.className}`}
+    className={`btn ${props.disabled ? "disabled" : ""} ${props.className}`}
+    style={colorStyle()}
     type="submit"
     onClick={props.onClick}
   >

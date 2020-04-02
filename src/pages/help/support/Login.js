@@ -4,6 +4,7 @@ import {
   userLogin,
   getSession
 } from '../../../actions/API';
+import { colorStyle } from '../../../lib/Style';
 
 class Login extends Component {
   constructor(props) {
@@ -177,7 +178,8 @@ class Login extends Component {
             <button
               id="submit-button"
               type="submit"
-              className="btn primary red lighten-2"
+              className="btn primary"
+              style={colorStyle()}
             >
               {"Login"}
             </button>

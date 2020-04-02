@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { colorStyle } from '../lib/Style';
 
 class Paginator extends Component {
   constructor(props) {
@@ -116,6 +117,7 @@ class Paginator extends Component {
           {pageArray.map((page) => (
             <li key={page}
               className={page === this.state.page ? "active" : ""}
+              style={page === this.state.page ? colorStyle() : {}}
             >
               <a href="#!"
                 onClick={e => {

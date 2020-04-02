@@ -13,6 +13,7 @@ import {
   getTicket,
   updateTicket
 } from '../../../actions/API';
+import { colorStyle } from '../../../lib/Style';
 
 class Ticket extends Component {
   constructor(props) {
@@ -31,17 +32,17 @@ class Ticket extends Component {
     const params = qs.parse(this.props.location.search);
     const key = params.key;
 
-    this.props.setStatusLoading("statusProgress");
+    this.props.setStatusLoading();
     updateTicket(Object.assign({}, this.props.ticket.data, {
       status: status
     }), key)
       .then(ticket => {
         this.props.setTicket(ticket);
-        this.props.setStatusSuccess("statusProgress");
+        this.props.setStatusSuccess();
       })
       .catch(error => {
         console.error(error);
-        this.props.setStatusFailure("statusProgress");
+        this.props.setStatusFailure();
         this.status_badge.forceUpdate();
       });
   }
@@ -220,7 +221,8 @@ class Ticket extends Component {
             {ticket.status !== "closed" && (
             <div className="actions">
               <span
-                className="btn-floating btn-large waves-effect waves-light red"
+                className="btn-floating btn-large waves-effect waves-light"
+                style={colorStyle()}
                 onClick={e => {
                   e.preventDefault();
                   // Collapse, then open to reset the scroll anchor state
@@ -250,28 +252,28 @@ const mapState = (state, ownProps) => ({
 });
 
 const mapDispatch = (dispatch, ownProps) => ({
-  setStatusLoading: (id) => {
+  setStatusLoading: () => {
     dispatch({
       type: "SET_ENABLED",
-      id: id
+      id: "statusProgress"
     });
     dispatch({
       type: "SET_LOADING",
-      id: id
+      id: "statusProgress"
     });
   },
 
-  setStatusSuccess: (id) => {
+  setStatusSuccess: () => {
     dispatch({
       type: "SET_SUCCESS",
-      id: id
+      id: "statusProgress"
     });
   },
 
-  setStatusFailure: (id) => {
+  setStatusFailure: () => {
     dispatch({
       type: "SET_FAILURE",
-      id: id
+      id: "statusProgress"
     });
   },
 

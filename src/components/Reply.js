@@ -103,20 +103,20 @@ class Reply extends Component {
     // to some relevent text and log out warnings
     // and errors. Otherwise, we'll just set the
     // updated reply.
-    setReplyLoading("replyStatus");
+    setReplyLoading();
     updateReply(updatedReply, this.props.authKey).then(reply => {
         this.setState({
           body: reply.body,
           edit: false,
           error: null
         }, () => {
-          setReplySuccess("replyStatus");
+          setReplySuccess();
           setReply(reply);
         });
       })
       .catch(error => {
         console.error(error);
-        setReplyFailure("replyStatus");
+        setReplyFailure();
       });
   }
 
@@ -132,7 +132,7 @@ class Reply extends Component {
         <div className="replyContent card-content">
           <div className="replyStatus">
             <Indicator
-              indicatorId="replyStatus"
+              indicatorId={`replyStatus_${reply.id}`}
               id={`reply_${reply.id}_status`}
             />
           </div>
@@ -205,28 +205,28 @@ const mapState = (state, ownProps) => ({
 });
 
 const mapDispatch = (dispatch, ownProps) => ({
-  setReplyLoading: (id) => {
+  setReplyLoading: () => {
     dispatch({
       type: "SET_ENABLED",
-      id: id
+      id: `replyStatus_${ownProps.reply.id}`
     });
     dispatch({
       type: "SET_LOADING",
-      id: id
+      id: `replyStatus_${ownProps.reply.id}`
     });
   },
 
-  setReplySuccess: (id) => {
+  setReplySuccess: () => {
     dispatch({
       type: "SET_SUCCESS",
-      id: id
+      id: `replyStatus_${ownProps.reply.id}`
     });
   },
 
-  setReplyFailure: (id) => {
+  setReplyFailure: () => {
     dispatch({
       type: "SET_FAILURE",
-      id: id
+      id: `replyStatus_${ownProps.reply.id}`
     });
   },
 

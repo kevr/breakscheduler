@@ -1,43 +1,42 @@
-Source code for the [breakscheduler.com](https://breakscheduler.com "Break Scheduler") webpage.
+# breakscheduler
 
 [![Build Status](https://travis-ci.org/kevr/breakscheduler.svg?branch=help)](https://travis-ci.org/kevr/breakscheduler)
 
+Source code for the [breakscheduler.com](https://breakscheduler.com "Break Scheduler") webpage.
+
 ## Design
 
-This website is written using React.js for it's front-end choice of framework. It is meant to communicate with a back-end API server which provides contents for some pages via fetching from a database[, as well as user accounts that can be used for support tickets].
+This project implements the UI portion of the Break Scheduler website. Written in `React.js`, the UI is meant to authenticate and speak with our API, which can be configured via apiPrefix in `src/config.json`.
 
-### Pages
-1. Home (Landing)
-2. Features
-3. Help
-4. Get It
-5. About Us
-    1. The Team
-    2. Contact Us
+## Deployment
 
-#### Home (Landing)
+To deploy under production, we have a various number of dependencies.
 
-Welcome page to the website. Banners and logos, images of the product and close-ups of most important features of the product.
+* NVM
 
-#### Features
+#### Setup a webhost user
 
-Display of product features. This page should correlate features with business gain, to give a more compelling sales pitch to anybody browsing the product.
+To host this project in production under nginx, we require a user with read and write access to it's own home directory, as well as an nginx install destination. Login to your server as root, and add a user called (for the purposes of this README: `www`).
 
-#### Get Help
+    # useradd -s /bin/bash -m www
 
-Technical help directory. Users can search terms in this directory to reveal any matching topics in a grid-like poster format. More of a Q&A section than anything.
+#### Give webhost user sudo capability for setup
 
-#### Get It
+**NOTE**: This should be reversed after initial project deployment is complete.
 
-Product trial download page and link to purchasing options.
+    # gpasswd -a www sudo
 
-#### About Us
+#### Configure NVM as `www`
 
-##### The Team
+    $ nvm install 10
+    $ nvm use 10
 
-A descriptive explanation of who we are, both personally and in business,
-accompanied by a gallery.
+#### Install Required NVM Packages
 
-##### Contact Us
+    $ npm install
 
-Contact details. *Break Scheduler* being a B2B product, close relationships are absolutely required to communicate the needs of the business using it. Also, general contact location for any potential clients or questions from bystanders.
+#### Build Production Release
+
+After running the following command, the `./build` directory shall contain the entire website compiled into production.
+
+    $ npm run build

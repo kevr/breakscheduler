@@ -15,6 +15,5 @@ export default combineReducers({
   message: Message,
   articles: Articles,
 
-  statusProgress: Indicator,
-  replyStatus: Indicator,
+  progress: Indicator
 });
