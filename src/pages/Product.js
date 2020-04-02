@@ -1,7 +1,10 @@
 import React from 'react';
 import Layout from './Layout';
 import {
-  Card
+  Card,
+  Row,
+  Col,
+  Container
 } from '../components';
 import { colorStyle } from '../lib/Style';
 import config from '../config.json';
@@ -9,10 +12,10 @@ import config from '../config.json';
 const Product = () => (
   <Layout pageTitle="Product">
 
-    <div className="container">
-      <div className="row">
+    <Container>
+      <Row>
 
-        <div className="col s6">
+        <Col s={6}>
           <Card title={`Download`}>
             <p className="frameText">
               {`Each installation of ${config.appName} comes with a free 30 day trial period.`}
@@ -28,9 +31,9 @@ const Product = () => (
               </a>
             </p>
           </Card>
-        </div>
+        </Col>
 
-        <div className="col s6">
+        <Col s={6}>
           <Card title={"Purchase"}>
             <ul className="collection">
               <li className="collection-item">{"Licensed forever"}</li>
@@ -38,9 +41,9 @@ const Product = () => (
               <li className="collection-item">{"Most affordable in the market"}</li>
             </ul>
           </Card>
-        </div>
-      </div>
-    </div>
+        </Col>
+      </Row>
+    </Container>
 
   </Layout>
 );

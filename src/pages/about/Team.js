@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import Layout from '../Layout';
-import Modal from '../../components/Modal';
+import {
+  Modal,
+  Row,
+  Col
+} from '../../components';
 import { getRequest } from '../../actions/API';
 
 class Team extends Component {
@@ -56,9 +60,9 @@ class Team extends Component {
           </p>
 
           {rows.map((i) => (
-            <div className="row" key={i}>
+            <Row key={i}>
             {members.slice(i, i + 4).map((member, c) => (
-              <div className="col s3" key={c}>
+              <Col s={3} key={c}>
                 <Modal
                   id={c}
                   trigger={(
@@ -77,9 +81,9 @@ class Team extends Component {
                   <div className="memberTitle">{member.title}</div>
                   <p>{member.summary}</p>
                 </Modal>
-              </div>
+              </Col>
             ))}
-            </div>
+            </Row>
           ))}
 
         </div>

@@ -8,7 +8,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { updateSession } from '../../../actions/API';
-import { Breadcrumb } from '../../../components';
+import {
+  Breadcrumb,
+  Row,
+  Col
+} from '../../../components';
 import {
   TextInput,
   PasswordInput,
@@ -155,62 +159,68 @@ class Settings extends Component {
 
     return (
       <div className="subPage settingsPage">
-        <div className="row">
+        <Row>
           <Breadcrumb items={breadcrumb} />
-        </div>
+        </Row>
 
-        <div className="changeName row">
-          <TextInput
-            active={this.nameActive()}
-            className="col s4"
-            id="name-input"
-            label="Real Name"
-            value={this.state.name}
-            onChange={e => {
-              this.setState({ name: e.target.value });
-            }}
-          />
-        </div>
+        <Row>
+          <div className="changeName">
+            <TextInput
+              active={this.nameActive()}
+              className="col s4"
+              id="name-input"
+              label="Real Name"
+              value={this.state.name}
+              onChange={e => {
+                this.setState({ name: e.target.value });
+              }}
+            />
+          </div>
+        </Row>
 
-        <div className="changeName row">
-          <EmailInput
-            active={this.emailActive()}
-            className="col s4"
-            id="email-input"
-            label="email@example.org"
-            value={this.state.email}
-            onChange={e => {
-              this.setState({ email: e.target.value });
-            }}
-            invalidText={"Invalid email format"}
-          />
-        </div>
+        <Row>
+          <div className="changeName">
+            <EmailInput
+              active={this.emailActive()}
+              className="col s4"
+              id="email-input"
+              label="email@example.org"
+              value={this.state.email}
+              onChange={e => {
+                this.setState({ email: e.target.value });
+              }}
+              invalidText={"Invalid email format"}
+            />
+          </div>
+        </Row>
 
-        <div className="changePassword row">
-          <PasswordInput
-            id="password-input"
-            className="col s4"
-            label="Change Password"
-            value={this.state.password}
-            onChange={e => {
-              this.setState({ password: e.target.value });
-            }}
-          />
-          <PasswordInput
-            id="confirm-input"
-            className="col s4"
-            label="Confirm"
-            value={this.state.password_confirmation}
-            valid={this.state.password === this.state.password_confirmation}
-            invalidText={"Must match the password input"}
-            onChange={e => {
-              this.setState({ password_confirmation: e.target.value });
-            }}
-          />
-        </div>
+        <Row>
+          <div className="changePassword">
+            <PasswordInput
+              id="password-input"
+              className="col s4"
+              label="Change Password"
+              value={this.state.password}
+              onChange={e => {
+                this.setState({ password: e.target.value });
+              }}
+            />
+            <PasswordInput
+              id="confirm-input"
+              className="col s4"
+              label="Confirm"
+              value={this.state.password_confirmation}
+              valid={this.state.password === this.state.password_confirmation}
+              invalidText={"Must match the password input"}
+              onChange={e => {
+                this.setState({ password_confirmation: e.target.value });
+              }}
+            />
+          </div>
+        </Row>
 
-        <div className="row">
-          <div className="col s12">
+        <Row>
+          <Col s={12}>
             <Button
               id="save-button"
               disabled={!this.isValid() || !this.isModified()}
@@ -218,19 +228,21 @@ class Settings extends Component {
             >
               {"Save Changes"}
             </Button>
-          </div>
-        </div>
+          </Col>
+        </Row>
 
         {/* This message will display error codes or successful
             notifications from our submit function. */}
         {this.props.message !== null && (
-          <div className="row">
-            <div className="message col s12">
-              <span className={this.props.messageClass}>
-                {this.props.message}
-              </span>
-            </div>
-          </div>
+          <Row>
+            <Col s={12}>
+              <div className="message">
+                <span className={this.props.messageClass}>
+                  {this.props.message}
+                </span>
+              </div>
+            </Col>
+          </Row>
         )}
 
       </div>

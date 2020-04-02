@@ -7,7 +7,10 @@ import {
   Breadcrumb,
   StatusBadge,
   ReplyCollapse,
-  Indicator
+  Indicator,
+  Row,
+  Col,
+  Container
 } from '../../../components';
 import {
   getTicket,
@@ -94,15 +97,15 @@ class Ticket extends Component {
       const id = this.props.match.params.id;
       return (
         <div className="ticketPage">
-          <div className="row">
+          <Row>
             <Breadcrumb items={breadcrumb} />
-          </div>
+          </Row>
 
-          <div className="row">
+          <Row>
             <p className="textCenter">
               {`The ticket you were looking for with id '${id}' could not be located.`}
             </p>
-          </div>
+          </Row>
         </div>
       );
     }
@@ -135,12 +138,12 @@ class Ticket extends Component {
 
     return (
       <div className="ticketPage">
-        <div className="row">
+        <Row>
           <Breadcrumb items={breadcrumb} />
-        </div>
+        </Row>
 
-        <div className="row">
-          <div className="col s12">
+        <Row>
+          <Col s={12}>
             <div className="ticket card" id={`ticket_${ticket.id}`}>
               <div className="statusBox right">
                 <label htmlFor="status-badge">
@@ -167,17 +170,17 @@ class Ticket extends Component {
                   on the right of this card. */}
               <div className="card-content">
                 <span className="card-title">
-                  <div className="row">
-                    <div className="col s10">
+                  <Row>
+                    <Col s={10}>
                       {ticket.subject}
-                    </div>
-                  </div>
+                    </Col>
+                  </Row>
                 </span>
-                <div className="row">
-                  <div className="col s10">
+                <Row>
+                  <Col s={10}>
                     <pre>{ticket.body}</pre>
-                  </div>
-                </div>
+                  </Col>
+                </Row>
               </div>
 
               <div className="card-action">
@@ -188,12 +191,12 @@ class Ticket extends Component {
 
             </div>
 
-          </div>
-        </div>
+          </Col>
+        </Row>
 
         <div className="ticketReplies">
           <span className="textSmall">Replies</span>
-          <div className="container">
+          <Container>
             {ticket.replies.map((reply) => (
               <Reply
                 key={reply.id}
@@ -202,7 +205,7 @@ class Ticket extends Component {
                 isOwner={email === reply.email}
               />
             ))}
-          </div>
+          </Container>
 
           <div>
             {/* If our ticket status is closed, we'll hide the widget */}

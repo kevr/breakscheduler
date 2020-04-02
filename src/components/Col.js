@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Col = ({ children, s }) => (
-  <div className={`col s${s}`}>
-    {children}
+const Col = (props) => (
+  <div className={`col s${props.s}`} {...props}>
+    {props.children}
   </div>
 );
 

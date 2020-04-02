@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import Col from './Col';
+import Row from './Row';
 import { colorStyle } from '../lib/Style';
 
 class Paginator extends Component {
@@ -82,18 +84,18 @@ class Paginator extends Component {
           {this.props.children}
         </div>
 
-        <div className="row"
+        <Row
           style={{
             marginTop: "6px",
             marginBottom: "0"
           }}
         >
-          <div className="col s12">
+          <Col s={12}>
             <label>
               {`Displaying ${Math.min(pageSize, dataSize)} of ${dataSize} results on Page ${page}`}
             </label>
-          </div>
-        </div>
+          </Col>
+        </Row>
 
         <ul className="pagination">
           {/* Disabled if we're on the first page. */}

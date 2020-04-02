@@ -1,8 +1,8 @@
 import React from 'react';
 
-const Row = ({ children }) => (
-  <div className="row">
-    {children}
+const Row = (props) => (
+  <div className="row" {...props}>
+    {props.children}
   </div>
 );
 

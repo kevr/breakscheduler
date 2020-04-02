@@ -7,7 +7,12 @@ import {
   Textarea,
   Button
 } from '../../components/Input';
-import Card from '../../components/Card';
+import {
+  Card,
+  Container,
+  Row,
+  Col
+} from '../../components';
 import { validateEmail } from '../../lib/Validation';
 import {
   addTicket
@@ -56,19 +61,18 @@ class Contact extends Component {
   render() {
     return (
       <Layout pageTitle="Contact Us">
-
         <div className="flex flexColumn" />
 
-        <div className="container">
-          <div className="row">
+        <Container>
+          <Row>
 
-            <div className="col s6">
+            <Col s={6}>
               <p className="flowText textJustify">
                 {"Test"}
               </p>
-            </div>
+            </Col>
 
-            <div className="col s6">
+            <Col s={6}>
               <Card title="Contact Form">
                 <form
                   id="contact-form"
@@ -117,19 +121,21 @@ class Contact extends Component {
                 {/* This message will display error codes or successful
                     notifications from our submit function. */}
                 {this.props.message !== null && (
-                  <div className="row textCenter">
-                    <div className="message col s12">
-                      <span className={this.props.messageClass}>
-                        {this.props.message}
-                      </span>
-                    </div>
-                  </div>
+                  <Row>
+                    <Col s={12}>
+                      <div className="message textCenter">
+                        <span className={this.props.messageClass}>
+                          {this.props.message}
+                        </span>
+                      </div>
+                    </Col>
+                  </Row>
                 )}
 
               </Card>
-            </div>
-          </div>
-        </div>
+            </Col>
+          </Row>
+        </Container>
 
         <div className="flex flexColumn" />
       </Layout>
