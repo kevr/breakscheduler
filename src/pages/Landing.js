@@ -7,7 +7,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
 
 import constructionImage from '../assets/hires/construction.jpg';
-import { Collection } from '../components';
+import { Collection, Section } from '../components';
 
 class Landing extends Component {
   render() {
@@ -38,8 +38,13 @@ class Landing extends Component {
           </Carousel>
         </div>
 
-        <div className="widePageFrame pageSection">
-          <h4 className="frameTitle">Download Now</h4>
+        <Section
+          title={(
+            <h4 className="frameTitle textLeft">
+              {"Download Now"}
+            </h4>
+          )}
+        >
           <div className="row">
             <div className="col s6">
               <Collection>
@@ -50,11 +55,16 @@ class Landing extends Component {
             <div className="col s6">
             </div>
           </div>
-        </div>
+        </Section>
 
-        <div className="widePageFrame pageSection">
+        <Section
+          title={(
+            <h4 className="frameTitle textCenter">
+              {"Total Control"}
+            </h4>
+          )}
+        >
           <div className="textCenter">
-            <h4 className="frameTitle">Total Control</h4>
             <p className="frameText">{"Some overly detailed text about how much control this program can give you. "}<Link to="/product">Get it here.</Link></p>
             <img
               alt={`${config.appName} Dashboard`}
@@ -62,25 +72,35 @@ class Landing extends Component {
               src={mainDashboard}
             />
           </div>
-        </div>
+        </Section>
 
-        <div className="widePageFrame pageSection">
+        <Section
+          title={(
+            <h4 className="frameTitle textLeft">
+              {"Product Features"}
+            </h4>
+          )}
+        >
           <div className="textCenter">
-            <h4 className="frameTitle textLeft">Product Features</h4>
             <p className="frameText">{"Some overly detailed text about how much control this program can give you. Visit our "}<Link to="/features">Features</Link>{" page to see them all!"}</p>
             <ul>
               <li><span>{"Feature one"}</span></li>
               <li><span>{"Feature two"}</span></li>
             </ul>
           </div>
-        </div>
+        </Section>
 
-        <div className="widePageFrame pageSection">
+        <Section
+          title={(
+            <h4 className="frameTitle textRight">
+              {"Help Directory"}
+            </h4>
+          )}
+        >
           <div className="textCenter">
-            <h4 className="frameTitle textRight">Help Directory</h4>
             <p className="frameText">{"Some overly detailed text about how much control this program can give you. Visit our "}<Link to="/features">Features</Link>{" page to see them all!"}</p>
           </div>
-        </div>
+        </Section>
 
       </Layout>
     )
