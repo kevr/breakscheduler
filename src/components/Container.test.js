@@ -45,5 +45,7 @@ describe('Container component', () => {
     node.update();
 
     expect(node.find(".container").find(".row").find(".col").length).toBe(2);
+    expect(node.find(".col").at(0).text()).toBe("First");
+    expect(node.find(".col").at(1).text()).toBe("Second");
   });
 });
