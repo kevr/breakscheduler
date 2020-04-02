@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import Modal from '../../components/Modal';
-import SearchBar from '../../components/SearchBar';
+import {
+  Modal,
+  SearchBar,
+  Row,
+  Col,
+  Container
+} from '../../components';
 import {
   Checkbox
 } from '../../components/Input';
@@ -26,6 +31,7 @@ class Search extends Component {
   }
 
   handleSearchChange(terms) {
+    console.debug(`Updating search terms: ${terms}`);
     this.setState({ searchTerms: terms });
   }
 
@@ -34,7 +40,6 @@ class Search extends Component {
 
     // Convert all terms to lowercase versions
     const terms = searchTerms.map(t => t.toLowerCase());
-    console.log(`Terms: ${terms}`);
 
     let qnaFilter = null;
     if(this.state.qnaFilter) {
@@ -81,7 +86,7 @@ class Search extends Component {
     // filtered is the final candidate for display data
 
     return (
-      <div className="container">
+      <Container>
         <div className="searchForm">
           <SearchBar
             id="search-input"
@@ -120,15 +125,15 @@ class Search extends Component {
           </div>
         </div>
 
-        <div className="searchResults row">
-          <div>
-            <label>Results</label>
-          </div>
-          <ArticleBarrier>
-            <TopicBarrier>
-              {filtered.map((topic, i) => (
-                <span key={i}>
-                  <div className="col s6 m6 l4 xl3"
+        <Row>
+          <div className="searchResults">
+            <div>
+              <label>Results</label>
+            </div>
+            <ArticleBarrier>
+              <TopicBarrier>
+                {filtered.map((topic, i) => (
+                  <Col key={i} s={6} m={6} l={4} xl={3}
                     style={{
                       paddingLeft: "4px",
                       paddingRight: "4px"
@@ -157,14 +162,14 @@ class Search extends Component {
                       <h4>{topic.subject}</h4>
                       <p>{topic.body}</p>
                     </Modal>
-                  </div>
-                </span>
-              ))}
-            </TopicBarrier>
-          </ArticleBarrier>
-        </div>
+                  </Col>
+                ))}
+              </TopicBarrier>
+            </ArticleBarrier>
+          </div>
+        </Row>
 
-      </div>
+      </Container>
     )
   }
 }
